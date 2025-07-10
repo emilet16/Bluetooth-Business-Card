@@ -2,6 +2,8 @@ package com.example.businesscard.connect
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.businesscard.R
@@ -25,7 +27,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ConnectUiState(
-    val networkMode: Boolean,
     val users: List<User>,
     val userMessage: Int? = null
 )
@@ -34,17 +35,16 @@ data class ConnectUiState(
 class ConnectViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val bleServices: BleServices
-) : ViewModel() {
-    private val _networkMode = MutableStateFlow<Boolean>(false)
+) : ViewModel(), DefaultLifecycleObserver {
     private val _userMessage = MutableStateFlow<Int?>(null)
 
     private val _users = bleServices.userIds.map { ids ->
         userRepository.getUsers(ids)
     }
 
-    val uiState: StateFlow<ConnectUiState> = combine(_networkMode, _users, _userMessage) { networkMode, users, userMessage ->
-        ConnectUiState(networkMode, users, userMessage)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectUiState(false, emptyList(), null))
+    val uiState: StateFlow<ConnectUiState> = combine(_users, _userMessage) { users, userMessage ->
+        ConnectUiState(users, userMessage)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectUiState(emptyList(), null))
 
     var stopScanJob: Job? = null
 
@@ -52,38 +52,37 @@ class ConnectViewModel @Inject constructor(
         _userMessage.value = null
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
-    fun advertise() {
-        _networkMode.value = !_networkMode.value
-        if(_networkMode.value) {
-            viewModelScope.launch {
-                bleServices.startAdvertising(supabase.auth.currentUserOrNull()!!.id.toByteArray())
-            }
-        } else {
-            viewModelScope.launch {
-                bleServices.stopAdvertising()
-            }
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        viewModelScope.launch {
+            bleServices.startAdvertising(supabase.auth.currentUserOrNull()!!.id)
+        }
+        viewModelScope.launch {
+            refreshScan()
         }
     }
 
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
+        viewModelScope.launch {
+            bleServices.stopAdvertising()
+        }
+        viewModelScope.launch {
+            bleServices.stopScanning()
+        }
+    }
+
+
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun refreshScan() {
-        if(_networkMode.value) {
-            viewModelScope.launch {
-                bleServices.startScanning()
-            }
-            viewModelScope.launch {
-                stopScanJob?.cancelAndJoin()
-                delay(10000)
-                bleServices.stopScanning()
-                stopScanJob = null
-            }
-        } else {
-            viewModelScope.launch {
-                stopScanJob?.cancelAndJoin()
-                bleServices.stopScanning()
-                stopScanJob = null
-            }
+        viewModelScope.launch {
+            bleServices.startScanning()
+        }
+        viewModelScope.launch {
+            stopScanJob?.cancelAndJoin()
+            delay(10000)
+            bleServices.stopScanning()
+            stopScanJob = null
         }
     }
 

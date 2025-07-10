@@ -1,0 +1,48 @@
+//
+//  ProfileImageButton.swift
+//  Connect
+//
+//  Created by Emile Turcotte on 2025-07-09.
+//
+
+import SwiftUI
+import PhotosUI
+
+struct ProfileImageButton: View {
+    let url: String?
+    
+    @State var selectedImage: UIImage?
+    @State var selectedItem: PhotosPickerItem?
+    
+    var body: some View {
+        PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()){
+            if(selectedImage != nil) {
+                Image(uiImage: selectedImage!)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 150, height: 150)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.black, lineWidth: 2))
+                    .shadow(radius: 5)
+                    .padding()
+            } else if(url != nil) {
+                ProfileImage(url: url, size: 150)
+            }
+            else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .padding()
+                    .scaledToFit()
+                    .frame(width: 150, height: 150)
+            }
+        }.onChange(of: selectedItem) {
+            Task {
+                if let data = try? await selectedItem?.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data)
+                {
+                    self.selectedImage = uiImage
+                }
+            }
+        }
+    }
+}

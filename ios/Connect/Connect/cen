@@ -1,0 +1,74 @@
+//
+//  BluetoothUtils.swift
+//  Connect
+//
+//  Created by Emile Turcotte on 2025-06-18.
+//
+
+import Foundation
+import CoreBluetooth
+import os
+
+class BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManagerDelegate {
+    private var peripheralManager: CBPeripheralManager?
+    private var shouldAdvertise: Bool = false
+    var userID: String?
+    
+    override init() {
+        super.init()
+        self.peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+    }
+    
+    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+        switch peripheral.state {
+       case .poweredOn:
+           print("Peripheral Manager is powered on.")
+           if shouldAdvertise {
+               startAdvertising()
+           }
+       case .poweredOff:
+           print("Bluetooth is powered off.")
+           stopAdvertising()
+       case .unauthorized:
+           print("Bluetooth not authorized.")
+       case .unsupported:
+           print("Bluetooth unsupported.")
+       case .resetting:
+           print("Bluetooth resetting.")
+           stopAdvertising()
+       case .unknown:
+           print("Bluetooth state unknown.")
+       @unknown default:
+           print("Unknown peripheral manager state.")
+       }
+    }
+    
+    func startAdvertising() {
+        if peripheralManager?.state == .poweredOn {
+            let serviceUUID = CBUUID(string: "D17B")
+            let userUUID = CBUUID(string: userID!)
+            
+            peripheralManager?.startAdvertising([
+                CBAdvertisementDataServiceUUIDsKey: [serviceUUID, userUUID],
+            ])
+            shouldAdvertise = false
+        } else {
+            shouldAdvertise = true //Advertise when available
+        }
+    }
+    
+    func stopAdvertising() {
+        peripheralManager?.stopAdvertising()
+        shouldAdvertise = false
+    }
+}
+
+class BluetoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
+    @Published var discoveredUIDS: [String] = []
+    
+    private var 
+    
+    override init() {
+        super.self.setValue(self, forKey: "delegate")
+    }
+}

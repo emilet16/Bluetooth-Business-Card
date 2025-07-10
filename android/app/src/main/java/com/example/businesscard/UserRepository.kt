@@ -15,7 +15,8 @@ data class User(
     val id: String,
     val name: String,
     val job: String,
-    val pfp_url: String? = null
+    val pfp_url: String? = null,
+    val connectionStatus: String? = null
 )
 
 @Serializable
@@ -31,7 +32,7 @@ data class Socials(
     val linkedin_url: String?
 )
 
-class UserRepository @Inject constructor(val imageManager: ImageManager) {
+class UserRepository @Inject constructor(private val imageManager: ImageManager) {
     suspend fun getUsers(uids: List<String>): List<User> {
         return supabase.from("profiles").select(columns = Columns.ALL) {
             filter {
@@ -112,17 +113,18 @@ class UserRepository @Inject constructor(val imageManager: ImageManager) {
 
     suspend fun requestConnection(requestedId: String) : ConnectResult {
         var currentConnection: Connection? = null
+        val userId = supabase.auth.currentUserOrNull()!!.id
         try {
             currentConnection = supabase.from("connections").select(Columns.ALL) {
                 filter {
                     or {
                         and {
-                            Connection::requested_by eq supabase.auth.currentUserOrNull()!!.id
+                            Connection::requested_by eq userId
                             Connection::requested_for eq requestedId
                         }
                         and {
                             Connection::requested_by eq requestedId
-                            Connection::requested_for eq supabase.auth.currentUserOrNull()!!.id
+                            Connection::requested_for eq userId
                         }
                     }
                 }
@@ -132,7 +134,7 @@ class UserRepository @Inject constructor(val imageManager: ImageManager) {
         }
 
         if(currentConnection == null) {
-            supabase.from("connections").upsert(Connection(supabase.auth.currentUserOrNull()!!.id, requestedId, "pending")) {
+            supabase.from("connections").upsert(Connection(userId, requestedId, "pending")) {
                 ignoreDuplicates = true
             }
             return ConnectResult.Requested
@@ -169,30 +171,34 @@ class UserRepository @Inject constructor(val imageManager: ImageManager) {
         }
     }
 
-    suspend fun getConnectedUsers() : Map<String, List<User>>{
+    private suspend fun getConnections() : List<Connection> {
         val currentUserID = supabase.auth.currentUserOrNull()!!.id
 
-        val connections: List<Connection> = supabase.from("connections").select(Columns.ALL) {
+        return supabase.from("connections").select(Columns.ALL) {
             filter {
                 or{
-                    Connection::requested_by eq currentUserID
+                    and{
+                        Connection::requested_by eq currentUserID
+                        Connection::status eq "accepted"
+                    }
                     Connection::requested_for eq currentUserID
                 }
             }
         }.decodeList()
+    }
 
-        val connectionIds: Map<String, MutableList<String>> = mapOf(Pair("pending", mutableListOf<String>()), Pair("accepted", mutableListOf<String>())) //maybe encapsulate status inside a class
+    suspend fun getConnectedUsers() : List<User> {
+        val currentUserID = supabase.auth.currentUserOrNull()!!.id
 
-        for(connection in connections) {
-            if(connection.requested_by == currentUserID) {
-                if(connection.status == "accepted") connectionIds[connection.status]!!.add(connection.requested_for) //In the future maybe show sent pending connection requests in another place
-            } else {
-                connectionIds[connection.status]!!.add(connection.requested_by)
-            }
-        }
+        val connections = getConnections()
+        val connectionsMap = connections.associateBy(
+            {if (it.requested_by == currentUserID) it.requested_for else it.requested_by},
+            {it.status}
+        )
 
-        return connectionIds.mapValues { userIds ->
-            getUsers(userIds.value)
+        val users = getUsers(connectionsMap.keys.toList())
+        return users.map { user ->
+            User(user.id, user.name, user.job, user.pfp_url, connectionsMap[user.id])
         }
     }
 }

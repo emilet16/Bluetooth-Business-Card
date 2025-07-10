@@ -1,6 +1,12 @@
 package com.example.businesscard.ble
 
 import android.Manifest
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattServerCallback
+import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertisingSet
@@ -19,8 +25,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Singleton
 class BleServices @Inject constructor(@ApplicationContext val context: Context) {
@@ -29,7 +38,7 @@ class BleServices @Inject constructor(@ApplicationContext val context: Context) 
     private val _userIds: MutableStateFlow<List<String>> = MutableStateFlow<List<String>>(listOf<String>())
     val userIds: StateFlow<List<String>> = _userIds.asStateFlow()
 
-    val advertisingSetCallback = object : AdvertisingSetCallback() {
+    private val advertisingSetCallback = object : AdvertisingSetCallback() {
         override fun onAdvertisingSetStarted(
             advertisingSet: AdvertisingSet?,
             txPower: Int,
@@ -51,43 +60,41 @@ class BleServices @Inject constructor(@ApplicationContext val context: Context) 
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    val scanCallback = object : ScanCallback() {
+    private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
-            if(result != null && result.scanRecord != null) {
-                val userId = result.scanRecord?.serviceData[result.scanRecord?.serviceUuids[0]]
-                if(userId != null) {
-                    val idString: String = userId.toString(Charsets.UTF_8)
-                    if(!_userIds.value.contains(idString)) {
-                        _userIds.value = _userIds.value.plus(idString)
-                    }
+
+            val serviceIds = result?.scanRecord?.serviceUuids
+            serviceIds?.remove(ParcelUuid.fromString(bleUUID))
+
+            val userId = serviceIds?.get(0)
+
+            if(userId != null) {
+                val idString: String = userId.uuid.toString()
+                if(!_userIds.value.contains(idString)) {
+                    _userIds.value = _userIds.value.plus(idString)
                 }
             }
         }
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
-    fun startAdvertising(data: ByteArray) {
+    fun startAdvertising(data: String) {
         val pUuid = ParcelUuid.fromString(bleUUID)
 
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val advertiser = bluetoothManager.adapter.bluetoothLeAdvertiser
 
         val parameters = AdvertisingSetParameters.Builder()
-            .setLegacyMode(false)
-            .setConnectable(false)
-            .setInterval(AdvertisingSetParameters.INTERVAL_MEDIUM)
-            .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_MEDIUM)
+            .setLegacyMode(true)
             .build()
 
-        val data = AdvertiseData.Builder()
-            .setIncludeTxPowerLevel(false)
-            .setIncludeDeviceName(false)
+        val advData = AdvertiseData.Builder()
             .addServiceUuid(pUuid)
-            .addServiceData(pUuid, data)
+            .addServiceUuid(ParcelUuid.fromString(data))
             .build()
 
-        advertiser.startAdvertisingSet(parameters, data, null, null, null, advertisingSetCallback)
+        advertiser.startAdvertisingSet(parameters, advData, null, null, null, advertisingSetCallback)
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
@@ -106,8 +113,7 @@ class BleServices @Inject constructor(@ApplicationContext val context: Context) 
         val scanner = bluetoothManager.adapter.bluetoothLeScanner
 
         val settings = ScanSettings.Builder()
-            .setLegacy(false)
-            .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
+            .setLegacy(true)
             .build()
 
         val filter = ScanFilter.Builder()
