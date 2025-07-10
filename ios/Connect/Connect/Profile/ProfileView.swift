@@ -8,7 +8,30 @@
 import SwiftUI
 
 struct ProfileView : View {
+    @Environment(\.openURL) private var openURL
+    @StateObject private var viewModel = ProfileViewModel()
+    
     var body : some View {
-        Text("Profile")
+        VStack {
+            if(viewModel.userProfile != nil) {
+                UserCard(user: viewModel.userProfile!, socials: viewModel.userSocials, onViewProfile: { url in
+                    if(url != nil) {
+                        if let url = URL(string: url!) {
+                            openURL(url)
+                        }
+                    }
+                    
+                })
+            } else {
+                Text("Loading...")
+            }
+        }.toolbar {
+            NavigationLink (destination: EditProfileView()) {
+                Image(systemName: "square.and.pencil")
+            }
+        }
+        .onAppear() {
+            viewModel.fetchProfile()
+        }
     }
 }

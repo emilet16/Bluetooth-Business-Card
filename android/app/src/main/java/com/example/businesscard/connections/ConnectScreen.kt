@@ -1,13 +1,10 @@
-package com.example.businesscard.connect
+package com.example.businesscard.connections
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -27,7 +24,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -38,12 +34,12 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.businesscard.R
 import com.example.businesscard.components.UserCard
-import com.example.businesscard.supabase.User
+import com.example.businesscard.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConnectScreen(viewModel: ConnectViewModel = hiltViewModel(), onExit: ()->Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
-    viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
+fun ConnectScreen(viewModel: ConnectViewModel = hiltViewModel(), returnToConnections: ()->Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
+    viewModel.ObserveLifecycle(LocalLifecycleOwner.current.lifecycle)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val bluetoothManager = LocalContext.current.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -52,7 +48,7 @@ fun ConnectScreen(viewModel: ConnectViewModel = hiltViewModel(), onExit: ()->Uni
     Scaffold(modifier = Modifier.fillMaxSize(), snackbarHost = { SnackbarHost(snackbarHostState) }, topBar = {
         TopAppBar(
             navigationIcon = {
-                IconButton(onClick = onExit) {
+                IconButton(onClick = returnToConnections) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = LocalContext.current.getString(R.string.back))
                 }
             },
@@ -97,11 +93,11 @@ private fun ConnectScreen(users: List<User>, onSendProfileRequest: (User)->Unit)
 }
 
 @Composable
-fun <LO : LifecycleObserver> LO.observeLifecycle(lifecycle: Lifecycle) {
+fun <LO : LifecycleObserver> LO.ObserveLifecycle(lifecycle: Lifecycle) {
     DisposableEffect(lifecycle) {
-        lifecycle.addObserver(this@observeLifecycle)
+        lifecycle.addObserver(this@ObserveLifecycle)
         onDispose {
-            lifecycle.removeObserver(this@observeLifecycle)
+            lifecycle.removeObserver(this@ObserveLifecycle)
         }
     }
 }

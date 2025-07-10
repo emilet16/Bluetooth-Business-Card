@@ -1,4 +1,4 @@
-package com.example.businesscard.editprofile
+package com.example.businesscard.profile
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -40,14 +40,14 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.businesscard.R
-import com.example.businesscard.supabase.Socials
-import com.example.businesscard.supabase.UploadStatus
-import com.example.businesscard.supabase.User
+import com.example.businesscard.Socials
+import com.example.businesscard.UploadStatus
+import com.example.businesscard.User
 import com.example.businesscard.ui.theme.Typography
 
 
 @Composable
-fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnToLastScreen: ()->Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
+fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnToProfile: ()->Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val shownPfpUri = uiState.newPfpUri?.toString() ?: uiState.user?.pfp_url
@@ -63,7 +63,7 @@ fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnT
             EditProfileScreen(uiState.user, uiState.socials, shownPfpUri, onChangePfp = {
                 pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
             }, onSaveProfile = { name, job, linkedin ->
-                val result = viewModel.saveUser(name, job, linkedin)
+                viewModel.saveUser(name, job, linkedin)
             })
         }
 
@@ -78,7 +78,7 @@ fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnT
         uiState.saveStatus?.let { status ->
             when(status) {
                 UploadStatus.Success -> {
-                    returnToLastScreen()
+                    returnToProfile()
                 }
                 UploadStatus.Loading -> {
                     val snackbarText = LocalContext.current.getString(R.string.saving)
@@ -101,7 +101,10 @@ fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnT
 private fun EditProfileScreen(userData: User?, userSocials: Socials?, shownPfpUri: String?, onChangePfp: ()->Unit, onSaveProfile: (String, String, String)->Unit) {
     var newName by rememberSaveable { mutableStateOf("") }
     var newJob by rememberSaveable { mutableStateOf("") }
+
     var newLinkedin by rememberSaveable { mutableStateOf("") }
+    var linkedinValid by rememberSaveable { mutableStateOf(true) }
+    val linkedinRegex = Regex("^https://www\\.linkedin\\.com/in/[^/]+/?$")
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxSize()) {
         Text(LocalContext.current.getString(R.string.edit_profile_title), style = Typography.headlineMedium, textAlign = TextAlign.Center)
@@ -118,9 +121,17 @@ private fun EditProfileScreen(userData: User?, userSocials: Socials?, shownPfpUr
             placeholder = {Text(userData?.name ?: "")})
         TextField(value = newJob, onValueChange = {newJob = it}, label = { Text(LocalContext.current.getString(R.string.job_label)) },
             placeholder = {Text(userData?.job ?: "")})
-        TextField(value = newLinkedin, onValueChange = {newLinkedin = it}, label = { Text(LocalContext.current.getString(R.string.linkedin_url_label)) },
-            placeholder = {Text(userSocials?.linkedin_url ?: "")})
-        Button(onClick = {onSaveProfile(newName, newJob, newLinkedin)}) {
+        TextField(value = newLinkedin, onValueChange = {
+                newLinkedin = it
+                linkedinValid = newLinkedin.isEmpty() || linkedinRegex.matches(newLinkedin)
+                }, label = { Text(LocalContext.current.getString(R.string.linkedin_url_label)) },
+                placeholder = {Text(userSocials?.linkedin_url ?: "https://www.linkedin.com/in/[your-username]")},
+                isError = !linkedinValid,
+                supportingText = {
+                    if(!linkedinValid) Text(LocalContext.current.getString(R.string.invalid_input))
+                }
+            )
+        Button(onClick = {onSaveProfile(newName, newJob, newLinkedin)}, enabled = linkedinValid) {
             Text(LocalContext.current.getString(R.string.save_profile))
         }
     }

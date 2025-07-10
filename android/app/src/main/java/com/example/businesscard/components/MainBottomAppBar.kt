@@ -21,21 +21,16 @@ import androidx.compose.ui.unit.dp
 import com.example.businesscard.R
 
 interface SelectedScreen {
-    object Home: SelectedScreen
     object Connections: SelectedScreen
     object Profile: SelectedScreen
 }
 
 @Composable
-fun MainBottomAppBar(onNavToHome: ()->Unit = {}, onNavToConnections: ()->Unit = {}, onNavToProfile: ()->Unit = {}, selectedScreen: SelectedScreen) {
-    var homeIcon = Icons.Outlined.Home
+fun MainBottomAppBar(onNavToConnections: ()->Unit = {}, onNavToProfile: ()->Unit = {}, selectedScreen: SelectedScreen) {
     var connectionsIcon = painterResource(R.drawable.outline_business_center_24)
     var profileIcon = Icons.Outlined.AccountCircle
 
     when(selectedScreen) {
-        is SelectedScreen.Home -> {
-            homeIcon = Icons.Filled.Home
-        }
         is SelectedScreen.Connections -> {
             connectionsIcon = painterResource(R.drawable.baseline_business_center_24)
         }
@@ -46,11 +41,6 @@ fun MainBottomAppBar(onNavToHome: ()->Unit = {}, onNavToConnections: ()->Unit = 
 
     BottomAppBar {
         Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-            IconButton(onClick = onNavToHome) {
-                Column {
-                    Icon(homeIcon, LocalContext.current.getString(R.string.main_app_bar_home), modifier = Modifier.size(32.dp))
-                }
-            }
             IconButton(onClick = onNavToConnections) {
                 Column {
                     Icon(connectionsIcon, LocalContext.current.getString(R.string.main_app_bar_home), modifier = Modifier.size(32.dp))

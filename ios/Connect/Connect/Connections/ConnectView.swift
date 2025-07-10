@@ -16,7 +16,7 @@ struct ConnectView : View {
             LazyVGrid(columns: columns) {
                 ForEach(viewModel.users, id: \.self) { user in
                     PublicUserCard(user: user, onConnect: {uid in
-                        viewModel.connectWithUser(userID: uid)
+                        viewModel.connectWithUser(requestedID: uid)
                     })
                 }
             }

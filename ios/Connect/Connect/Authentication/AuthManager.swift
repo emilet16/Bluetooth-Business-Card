@@ -8,6 +8,8 @@ import Foundation
 
 @MainActor
 class AuthManager : ObservableObject {
+    static let shared = AuthManager()
+    
     @Published var userID: String? = nil
     
     private var authListener: Task<Void, Never>?
@@ -24,23 +26,17 @@ class AuthManager : ObservableObject {
         authListener?.cancel()
     }
     
-    func login(email:String, pwd: String) {
-        Task {
-            try await supabase.auth.signIn(email: email, password: pwd)
-        }
+    func login(email:String, pwd: String) async throws {
+        try await supabase.auth.signIn(email: email, password: pwd)
     }
     
-    func signup(email:String, pwd: String, name: String) {
-        Task {
-            try await supabase.auth.signUp(email: email, password: pwd, data: [
-                "name": .string(name),
-            ])
-        }
+    func signup(email:String, pwd: String, name: String) async throws {
+        try await supabase.auth.signUp(email: email, password: pwd, data: [
+            "name": .string(name),
+        ])
     }
     
-    func logout() {
-        Task {
-            try await supabase.auth.signOut()
-        }
+    func logout() async throws {
+        try await supabase.auth.signOut()
     }
 }

@@ -8,11 +8,13 @@
 import SwiftUI
 import PhotosUI
 
-struct ProfileImageButton: View {
+struct ProfileImagePicker: View {
     let url: String?
     
     @State var selectedImage: UIImage?
     @State var selectedItem: PhotosPickerItem?
+    
+    var onChange: (UIImage) -> Void
     
     var body: some View {
         PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()){
@@ -41,6 +43,7 @@ struct ProfileImageButton: View {
                    let uiImage = UIImage(data: data)
                 {
                     self.selectedImage = uiImage
+                    onChange(uiImage)
                 }
             }
         }

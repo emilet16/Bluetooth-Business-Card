@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-struct ProfileImageView: View {
+struct ProfileImage: View {
     let url: String?
+    var size: CGFloat = 60
     
     var body: some View {
         if(url != nil) {
@@ -16,12 +17,12 @@ struct ProfileImageView: View {
                 switch phase {
                 case .empty:
                     ProgressView()
-                        .frame(width: 60, height: 60)
+                        .frame(width: size, height: size)
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 60, height: 60)
+                        .frame(width: size, height: size)
                         .clipShape(Circle())
                         .overlay(Circle().stroke(Color.black, lineWidth: 2))
                         .shadow(radius: 5)
@@ -29,7 +30,7 @@ struct ProfileImageView: View {
                     Image(systemName: "person.circle.fill")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 60, height: 60)
+                        .frame(width: size, height: size)
                         .foregroundStyle(.gray)
                 @unknown default:
                     EmptyView()
@@ -39,7 +40,7 @@ struct ProfileImageView: View {
             Image(systemName: "person.circle.fill")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 60, height: 60)
+                .frame(width: size, height: size)
                 .foregroundStyle(.gray)
         }
     }

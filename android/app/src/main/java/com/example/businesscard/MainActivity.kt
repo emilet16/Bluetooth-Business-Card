@@ -31,7 +31,6 @@ const val TAG: String = "BusinessCard"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supabase.handleDeeplinks(intent)
 
         enableEdgeToEdge()
         setContent {

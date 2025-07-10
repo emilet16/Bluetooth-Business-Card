@@ -1,10 +1,7 @@
-package com.example.businesscard.login
+package com.example.businesscard.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.businesscard.supabase.AuthManager
-import com.example.businesscard.supabase.AuthResult
-import com.example.businesscard.supabase.messageFromErrorCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

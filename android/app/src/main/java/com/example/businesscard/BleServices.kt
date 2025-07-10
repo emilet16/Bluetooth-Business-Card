@@ -1,12 +1,6 @@
-package com.example.businesscard.ble
+package com.example.businesscard
 
 import android.Manifest
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattServerCallback
-import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertisingSet
@@ -20,16 +14,12 @@ import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import com.example.businesscard.TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @Singleton
 class BleServices @Inject constructor(@ApplicationContext val context: Context) {

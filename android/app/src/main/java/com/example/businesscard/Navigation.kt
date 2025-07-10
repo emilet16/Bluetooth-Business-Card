@@ -1,5 +1,6 @@
 package com.example.businesscard
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,52 +10,56 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.businesscard.connect.ConnectScreen
+import com.example.businesscard.connections.ConnectScreen
 import com.example.businesscard.connections.ConnectionsScreen
-import com.example.businesscard.editprofile.EditProfileScreen
-import com.example.businesscard.login.LoginScreen
+import com.example.businesscard.profile.EditProfileScreen
+import com.example.businesscard.auth.LoginScreen
 import com.example.businesscard.profile.ProfileScreen
-import com.example.businesscard.register.RegisterScreen
+import com.example.businesscard.auth.RegisterScreen
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.serialization.Serializable
+import androidx.core.net.toUri
 
-@Serializable
-object Home
-@Serializable
-object Loading
-@Serializable
-object Login
-@Serializable
-object Register
-@Serializable
-object Connections
-@Serializable
-object Profile
-@Serializable
-object EditProfile
+interface Screen {
+    @Serializable
+    object Connect: Screen
+    @Serializable
+    object Loading: Screen
+    @Serializable
+    object Login: Screen
+    @Serializable
+    object Register: Screen
+    @Serializable
+    object Connections: Screen
+    @Serializable
+    object Profile: Screen
+    @Serializable
+    object EditProfile: Screen
+}
 
 @Composable
-fun Navigation(viewModel: NavigationViewModel = hiltViewModel()) {
+fun Navigation(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
 
-    val sessionStatus = viewModel.sessionStatus.collectAsStateWithLifecycle()
+    val navigationState = viewModel.navigationState.collectAsStateWithLifecycle()
 
-    val startDestination = when(sessionStatus.value) {
+    val context = LocalContext.current
+
+    val startDestination = when(navigationState.value.sessionStatus) {
         is SessionStatus.Initializing -> {
-            Loading
+            Screen.Loading
         }
         is SessionStatus.Authenticated -> {
-            Home
+            navigationState.value.savedScreen
         }
         else -> {
-            Login
+            Screen.Login
         }
     }
 
@@ -62,56 +67,58 @@ fun Navigation(viewModel: NavigationViewModel = hiltViewModel()) {
         "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
     }
 
-    val uriHandler = LocalUriHandler.current
-
     NavHost(navController = navController, startDestination = startDestination) {
-        composable<Login> {
+        composable<Screen.Login> {
             LoginScreen(onNavToRegister = {
-                navController.navigate(Register)
+                navController.navigate(Screen.Register)
             })
         }
 
-        composable<Register> {
+        composable<Screen.Register> {
             RegisterScreen(onNavToLogin = {
-                navController.navigate(Login)
+                navController.navigate(Screen.Login)
             })
         }
 
-        composable<Home> {
-            ConnectScreen(viewModel = hiltViewModel(viewModelStoreOwner), onNavToProfile = {
-                navController.navigate(Profile)
-            }, onNavToConnections = {
-                navController.navigate(Connections)
-            })
-        }
-
-        composable<Connections> {
-            ConnectionsScreen(onNavToHome = {
-                navController.navigate(Home)
-            }, onNavToProfile = {
-                navController.navigate(Profile)
-            }, onNavToLinkedin = {
-                uriHandler.openUri(it)
-            })
-        }
-
-        composable<Profile> {
-            ProfileScreen(onNavToEditProfile = {
-                navController.navigate(EditProfile)
-            }, onNavToHome = {
-                navController.navigate(Home)
-            }, onNavToConnections = {
-                navController.navigate(Connections)
-            })
-        }
-
-        composable<EditProfile> {
-            EditProfileScreen(returnToLastScreen = {
+        composable<Screen.Connect> {
+            ConnectScreen(viewModel = hiltViewModel(viewModelStoreOwner), returnToConnections = {
                 navController.navigateUp()
+                viewModel.navigate(Screen.Connections)
             })
         }
 
-        composable<Loading> {
+        composable<Screen.Connections> {
+            ConnectionsScreen(onNavToConnect = {
+                navController.navigate(Screen.Connect)
+                viewModel.navigate(Screen.Connect)
+            }, onNavToProfile = {
+                navController.navigate(Screen.Profile)
+                viewModel.navigate(Screen.Profile)
+            }, onNavToLinkedin = { url ->
+                context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+            })
+        }
+
+        composable<Screen.Profile> {
+            ProfileScreen(onNavToEditProfile = {
+                navController.navigate(Screen.EditProfile)
+                viewModel.navigate(Screen.EditProfile)
+            }, onNavToConnections = {
+                navController.navigate(Screen.Connections)
+                viewModel.navigate(Screen.Connections)
+            }, onNavToLinkedin = { url ->
+                context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+            })
+        }
+
+        composable<Screen.EditProfile> {
+            EditProfileScreen(returnToProfile = {
+                navController.navigateUp()
+                viewModel.navigate(Screen.Profile)
+            })
+        }
+
+        composable<Screen.Loading> {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
                     Text(LocalContext.current.getString(R.string.loading), modifier = Modifier.align(Alignment.Center))

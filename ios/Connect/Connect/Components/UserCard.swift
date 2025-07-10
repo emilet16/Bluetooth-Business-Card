@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ConnectedUser : View {
+struct UserCard : View {
     let user: User
     let socials: Socials?
     var onViewProfile: (String?) -> Void = { _ in }
@@ -17,7 +17,7 @@ struct ConnectedUser : View {
             onViewProfile(socials?.linkedin_url)
         }) {
             VStack {
-                ProfileImageView(url: user.pfp_url)
+                ProfileImage(url: user.pfp_url)
                 Text(user.name)
                 Text(user.job)
             }

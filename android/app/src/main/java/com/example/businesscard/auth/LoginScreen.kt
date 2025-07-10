@@ -1,4 +1,4 @@
-package com.example.businesscard.login
+package com.example.businesscard.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,19 +65,19 @@ private fun LoginScreen(onEmailSignIn: (String, String) -> Unit, onNavToRegister
             Text(LocalContext.current.getString(R.string.signin_request), style = Typography.headlineMedium, textAlign = TextAlign.Center)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            EmailTextField(email, emailValid, onValueChange = {
+            EmailTextField(email, showError = (email.isNotEmpty() && !emailValid), onValueChange = {
                 email = it
                 emailValid = (it.isNotBlank() && emailRegex.matches(it))
             })
 
-            PasswordTextField(pwd, pwdValid, onValueChange = {
+            PasswordTextField(pwd, showError = (pwd.isNotEmpty() && !pwdValid), onValueChange = {
                 pwd = it
                 pwdValid = it.isNotBlank() && it.length >= 6
             })
 
             Button(onClick = {
                 onEmailSignIn(email, pwd)
-            }, enabled = emailValid) {
+            }, enabled = emailValid && pwdValid) {
                 Text(LocalContext.current.getString(R.string.signin))
             }
             TextButton(onClick = onNavToRegister) {

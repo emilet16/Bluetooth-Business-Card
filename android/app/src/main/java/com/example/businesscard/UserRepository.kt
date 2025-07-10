@@ -1,8 +1,6 @@
-package com.example.businesscard.supabase
+package com.example.businesscard
 
 import android.net.Uri
-import com.example.businesscard.image.ImageManager
-import com.example.businesscard.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -41,10 +39,10 @@ class UserRepository @Inject constructor(private val imageManager: ImageManager)
         }.decodeList<User>()
     }
 
-    suspend fun getCurrentUser(): User {
+    suspend fun getUser(uid: String): User {
         return supabase.from("profiles").select(columns = Columns.ALL) {
             filter {
-                User::id eq supabase.auth.currentUserOrNull()!!.id
+                User::id eq uid
             }
         }.decodeSingle<User>()
     }
@@ -57,22 +55,18 @@ class UserRepository @Inject constructor(private val imageManager: ImageManager)
         }.decodeSingle()
     }
 
-    suspend fun getUserSocialsList(ids: List<String>) : List<Socials> {
-        return supabase.from("socials").select(columns = Columns.ALL) {
-            filter {
-                Socials::id isIn ids
-            }
-        }.decodeList<Socials>()
+    suspend fun getUserSocialsList() : List<Socials> {
+        return supabase.from("socials").select(columns = Columns.ALL).decodeList<Socials>() //RLS returns all friended users
     }
 
-    suspend fun updateUser(name: String, job: String) : UploadStatus {
+    suspend fun updateUser(uid: String, name: String, job: String) : UploadStatus {
         try {
             supabase.from("profiles").update({
                 User::name setTo name
                 User::job setTo job
             }) {
                 filter {
-                    User::id eq supabase.auth.currentUserOrNull()!!.id
+                    User::id eq uid
                 }
             }
         } catch (e: Exception) { //TODO Better error handling?
@@ -81,9 +75,9 @@ class UserRepository @Inject constructor(private val imageManager: ImageManager)
         return UploadStatus.Success
     }
 
-    suspend fun upsertSocials(linkedinURL: String) : UploadStatus {
+    suspend fun upsertSocials(uid: String, linkedinURL: String) : UploadStatus {
         try {
-            supabase.from("socials").upsert(Socials(id = supabase.auth.currentUserOrNull()!!.id, linkedin_url = linkedinURL)) {
+            supabase.from("socials").upsert(Socials(id = uid, linkedin_url = linkedinURL)) {
                 onConflict = "id"
             }
         } catch (e: Exception) { //TODO Better error handling?
@@ -92,7 +86,7 @@ class UserRepository @Inject constructor(private val imageManager: ImageManager)
         return UploadStatus.Success
     }
 
-    suspend fun uploadPfp(fileName: String, uri: Uri) : UploadStatus { //TODO Delete old unused pfps
+    suspend fun uploadPfp(uid: String, fileName: String, uri: Uri) : UploadStatus { //TODO Delete old unused pfps
         try {
             val image = imageManager.preparePfpForUpload(uri)
             supabase.storage.from("pfp").upload(fileName, image)
@@ -102,7 +96,7 @@ class UserRepository @Inject constructor(private val imageManager: ImageManager)
                 User::pfp_url setTo url
             }) {
                 filter {
-                    User::id eq supabase.auth.currentUserOrNull()!!.id
+                    User::id eq uid
                 }
             }
         } catch (e: Exception) { //TODO Better error handling?
@@ -111,9 +105,8 @@ class UserRepository @Inject constructor(private val imageManager: ImageManager)
         return UploadStatus.Success
     }
 
-    suspend fun requestConnection(requestedId: String) : ConnectResult {
+    suspend fun requestConnection(userId: String, requestedId: String) : ConnectResult {
         var currentConnection: Connection? = null
-        val userId = supabase.auth.currentUserOrNull()!!.id
         try {
             currentConnection = supabase.from("connections").select(Columns.ALL) {
                 filter {
@@ -141,58 +134,54 @@ class UserRepository @Inject constructor(private val imageManager: ImageManager)
         } else if(currentConnection.status == "accepted") {
             return ConnectResult.AlreadyConnected
         } else if(currentConnection.status == "pending" && currentConnection.requested_by == requestedId) { //Accept the request
-            acceptConnection(requestedId)
+            acceptConnection(user1Id = userId, user2Id = requestedId)
             return ConnectResult.Accepted
         }
         return ConnectResult.Pending
     }
 
-    suspend fun acceptConnection(userId: String) { //TODO: error management
+    suspend fun acceptConnection(user1Id: String, user2Id: String) { //TODO: error management
         supabase.from("connections").update({
             Connection::status setTo "accepted"
         }) {
             filter {
                 and {
-                    Connection::requested_by eq userId
-                    Connection::requested_for eq supabase.auth.currentUserOrNull()!!.id
+                    Connection::requested_by eq user2Id
+                    Connection::requested_for eq user1Id
                 }
             }
         }
     }
 
-    suspend fun deleteConnection(userId: String) {
+    suspend fun deleteConnection(user1Id: String, user2Id: String) {
         supabase.from("connections").delete() {
             filter {
                 and {
-                    Connection::requested_by eq userId
-                    Connection::requested_for eq supabase.auth.currentUserOrNull()!!.id
+                    Connection::requested_by eq user2Id
+                    Connection::requested_for eq user1Id
                 }
             }
         }
     }
 
-    private suspend fun getConnections() : List<Connection> {
-        val currentUserID = supabase.auth.currentUserOrNull()!!.id
-
+    private suspend fun getConnections(uid: String) : List<Connection> {
         return supabase.from("connections").select(Columns.ALL) {
             filter {
                 or{
                     and{
-                        Connection::requested_by eq currentUserID
+                        Connection::requested_by eq uid
                         Connection::status eq "accepted"
                     }
-                    Connection::requested_for eq currentUserID
+                    Connection::requested_for eq uid
                 }
             }
         }.decodeList()
     }
 
-    suspend fun getConnectedUsers() : List<User> {
-        val currentUserID = supabase.auth.currentUserOrNull()!!.id
-
-        val connections = getConnections()
+    suspend fun getConnectedUsers(uid: String) : List<User> {
+        val connections = getConnections(uid)
         val connectionsMap = connections.associateBy(
-            {if (it.requested_by == currentUserID) it.requested_for else it.requested_by},
+            {if (it.requested_by == uid) it.requested_for else it.requested_by}, //find the other user's id
             {it.status}
         )
 

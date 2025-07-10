@@ -1,4 +1,4 @@
-package com.example.businesscard.connect
+package com.example.businesscard.connections
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
@@ -7,11 +7,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.businesscard.R
-import com.example.businesscard.ble.BleServices
+import com.example.businesscard.BleServices
 import com.example.businesscard.supabase
-import com.example.businesscard.supabase.ConnectResult
-import com.example.businesscard.supabase.User
-import com.example.businesscard.supabase.UserRepository
+import com.example.businesscard.ConnectResult
+import com.example.businesscard.User
+import com.example.businesscard.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Job
@@ -46,7 +46,9 @@ class ConnectViewModel @Inject constructor(
         ConnectUiState(users, userMessage)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectUiState(emptyList(), null))
 
-    var stopScanJob: Job? = null
+    private var stopScanJob: Job? = null
+
+    private val userId: String = supabase.auth.currentUserOrNull()!!.id
 
     fun snackbarMessageShown() {
         _userMessage.value = null
@@ -55,7 +57,7 @@ class ConnectViewModel @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch {
-            bleServices.startAdvertising(supabase.auth.currentUserOrNull()!!.id)
+            bleServices.startAdvertising(userId)
         }
         viewModelScope.launch {
             refreshScan()
@@ -88,7 +90,7 @@ class ConnectViewModel @Inject constructor(
 
     fun connectWith(user: User) {
         viewModelScope.launch {
-            val result = userRepository.requestConnection(user.id)
+            val result = userRepository.requestConnection(userId, user.id)
             when(result) {
                 ConnectResult.Pending -> {
                     _userMessage.value = R.string.connection_request_wait

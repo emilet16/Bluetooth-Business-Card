@@ -1,13 +1,15 @@
-package com.example.businesscard.editprofile
+package com.example.businesscard.profile
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.businesscard.supabase.Socials
-import com.example.businesscard.supabase.UploadStatus
-import com.example.businesscard.supabase.User
-import com.example.businesscard.supabase.UserRepository
+import com.example.businesscard.Socials
+import com.example.businesscard.UploadStatus
+import com.example.businesscard.User
+import com.example.businesscard.UserRepository
+import com.example.businesscard.supabase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,18 +40,21 @@ class EditProfileViewModel @Inject constructor(val userRepository: UserRepositor
         EditProfileUIState(pfpUri, user, message, status, socials)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), EditProfileUIState())
 
+    private val userId: String = supabase.auth.currentUserOrNull()!!.id
+
     init {
         viewModelScope.launch {
-            _userState.value = userRepository.getCurrentUser()
-            _socials.value = userRepository.getUserSocials(_userState.value!!.id)
+            _userState.value = userRepository.getUser(userId)
+        }
+        viewModelScope.launch {
+            _socials.value = userRepository.getUserSocials(userId)
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     fun saveUser(newName: String, newJob: String, newLinkedin: String) {
-        val savedName = if(newName.isNotBlank()) newName else _userState.value!!.name
-        val savedJob = if(newJob.isNotBlank()) newJob else _userState.value!!.job
-        val savedLinkedin = if(newLinkedin.isNotBlank()) newLinkedin else _socials.value?.linkedin_url
+        val savedName = newName.ifBlank { _userState.value!!.name }
+        val savedJob = newJob.ifBlank { _userState.value!!.job }
+        val savedLinkedin = newLinkedin.ifBlank { _socials.value?.linkedin_url }
         _saveStatus.value = UploadStatus.Loading
 
         viewModelScope.launch {
@@ -65,18 +70,18 @@ class EditProfileViewModel @Inject constructor(val userRepository: UserRepositor
 
         coroutineScope {
             launch {
-                userResult = userRepository.updateUser(savedName, savedJob)
+                userResult = userRepository.updateUser(userId, savedName, savedJob)
             }
             launch {
                 pfpResult = if(_newPfpUri.value != null) {
-                    userRepository.uploadPfp(Uuid.random().toString()+".webp", _newPfpUri.value!!)
+                    userRepository.uploadPfp(userId,Uuid.random().toString()+".webp", _newPfpUri.value!!)
                 } else {
                     UploadStatus.Success
                 }
             }
             launch { 
                 socialsResult = if(savedLinkedin != null) {
-                    userRepository.upsertSocials(savedLinkedin)
+                    userRepository.upsertSocials(userId, savedLinkedin)
                 } else {
                     UploadStatus.Success
                 }

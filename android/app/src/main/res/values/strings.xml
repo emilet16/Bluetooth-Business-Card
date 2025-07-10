@@ -53,5 +53,9 @@
     <string name="connection_request_success">Connection successfully requested!</string>
     <string name="connection_request_accepted">Connection accepted!</string>
     <string name="already_connected">You are already connected with this person</string>
+    <string name="back">Back</string>
+    <string name="add_connections">Connect with users</string>
+    <string name="profile_title">Profile</string>
+    <string name="connections_title">Connections</string>
 
 </resources>

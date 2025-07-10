@@ -1,4 +1,4 @@
-package com.example.businesscard.supabase
+package com.example.businesscard.auth
 
 import com.example.businesscard.R
 import com.example.businesscard.supabase

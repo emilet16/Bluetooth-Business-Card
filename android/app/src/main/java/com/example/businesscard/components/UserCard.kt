@@ -22,7 +22,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.businesscard.R
-import com.example.businesscard.supabase.User
+import com.example.businesscard.User
 import com.example.businesscard.ui.theme.Typography
 
 @Composable

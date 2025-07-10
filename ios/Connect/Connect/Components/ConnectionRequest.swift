@@ -14,7 +14,7 @@ struct ConnectionRequest : View {
     
     var body: some View {
         VStack {
-            ProfileImageView(url: user.pfp_url)
+            ProfileImage(url: user.pfp_url)
             Text(user.name)
             Text(user.job)
             HStack {

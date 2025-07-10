@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct StrangerUserCard : View {
+struct PublicUserCard : View {
     let user: User
     var onConnect: (String) -> Void = { _ in }
     

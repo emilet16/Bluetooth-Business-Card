@@ -19,7 +19,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.example.businesscard.R
 
 @Composable
-fun PasswordTextField(pwd: String, pwdValid: Boolean, onValueChange: (String) -> Unit) {
+fun PasswordTextField(pwd: String, showError: Boolean, onValueChange: (String) -> Unit) {
     var showPwd by rememberSaveable { mutableStateOf(false) }
 
     TextField(value = pwd, onValueChange = onValueChange, label = {Text(LocalContext.current.getString(R.string.password_label))}, singleLine = true, placeholder = {Text(LocalContext.current.getString(R.string.password_placeholder))},
@@ -34,6 +34,6 @@ fun PasswordTextField(pwd: String, pwdValid: Boolean, onValueChange: (String) ->
                 Icon(icon, LocalContext.current.getString(description))
             }
         }, supportingText = {
-            if(!pwdValid && pwd.isNotEmpty()) Text(LocalContext.current.getString(R.string.invalid_input))
-        }, isError = !pwdValid && pwd.isNotEmpty())
+            if(showError) Text(LocalContext.current.getString(R.string.invalid_input))
+        }, isError = showError)
 }
