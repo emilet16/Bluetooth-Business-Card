@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.businesscard.R
 
 @Composable
@@ -36,4 +37,16 @@ fun PasswordTextField(pwd: String, showError: Boolean, onValueChange: (String) -
         }, supportingText = {
             if(showError) Text(LocalContext.current.getString(R.string.invalid_input))
         }, isError = showError)
+}
+
+@Preview
+@Composable
+fun PreviewValidPassword() {
+    PasswordTextField(pwd = "password", showError = false) { }
+}
+
+@Preview
+@Composable
+fun PreviewInvalidPassword() {
+    PasswordTextField(pwd = "pass", showError = true) { }
 }

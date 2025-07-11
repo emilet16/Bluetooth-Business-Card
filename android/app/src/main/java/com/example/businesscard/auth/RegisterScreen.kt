@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.businesscard.R
@@ -43,7 +44,7 @@ fun RegisterScreen(
 
     Scaffold(modifier = Modifier.fillMaxSize(), snackbarHost = { SnackbarHost(snackbarHostState) }) {innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            LoginScreen(onEmailSignUp = { name, email, pwd ->
+            RegisterScreen(onEmailSignUp = { name, email, pwd ->
                 viewModel.emailSignUp(name, email, pwd)
             }, onNavToLogin = onNavToLogin)
 
@@ -59,7 +60,7 @@ fun RegisterScreen(
 }
 
 @Composable
-private fun LoginScreen(onEmailSignUp: (String, String, String) -> Unit, onNavToLogin: () -> Unit) {
+private fun RegisterScreen(onEmailSignUp: (String, String, String) -> Unit, onNavToLogin: () -> Unit) {
     var name by rememberSaveable { mutableStateOf("") }
     var nameValid by rememberSaveable { mutableStateOf(false) }
 
@@ -105,4 +106,10 @@ private fun LoginScreen(onEmailSignUp: (String, String, String) -> Unit, onNavTo
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewRegisterScreen() {
+    RegisterScreen(onEmailSignUp = {_, _, _ ->}, onNavToLogin = {})
 }

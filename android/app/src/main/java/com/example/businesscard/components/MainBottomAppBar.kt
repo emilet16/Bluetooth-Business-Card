@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.businesscard.R
 
@@ -53,4 +54,16 @@ fun MainBottomAppBar(onNavToConnections: ()->Unit = {}, onNavToProfile: ()->Unit
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewMainBottomAppBarConnections() {
+    MainBottomAppBar(onNavToConnections = {}, onNavToProfile = {}, selectedScreen = SelectedScreen.Connections)
+}
+
+@Preview
+@Composable
+fun PreviewMainBottomAppBarProfile() {
+    MainBottomAppBar(onNavToConnections = {}, onNavToProfile = {}, selectedScreen = SelectedScreen.Profile)
 }

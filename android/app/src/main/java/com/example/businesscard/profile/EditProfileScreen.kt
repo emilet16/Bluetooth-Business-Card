@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +44,7 @@ import com.example.businesscard.R
 import com.example.businesscard.Socials
 import com.example.businesscard.UploadStatus
 import com.example.businesscard.User
+import com.example.businesscard.components.UserCard
 import com.example.businesscard.ui.theme.Typography
 
 
@@ -135,4 +137,11 @@ private fun EditProfileScreen(userData: User?, userSocials: Socials?, shownPfpUr
             Text(LocalContext.current.getString(R.string.save_profile))
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewEditProfileScreen() {
+    EditProfileScreen(userData = User(id = "0", name = "Steve Jobs", job = "CEO"),
+        userSocials = null, shownPfpUri = null, onChangePfp = {}) { _, _, _ -> }
 }

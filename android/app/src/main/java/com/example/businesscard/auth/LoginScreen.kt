@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.businesscard.R
@@ -85,4 +86,10 @@ private fun LoginScreen(onEmailSignIn: (String, String) -> Unit, onNavToRegister
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewLoginScreen() {
+    LoginScreen(onEmailSignIn = {_, _ -> }, onNavToRegister = {})
 }

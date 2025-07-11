@@ -1,6 +1,7 @@
 package com.example.businesscard.components
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -43,4 +45,10 @@ fun UserCard(onClick: () -> Unit, user: User) {
             Text(user.job, textAlign = TextAlign.Center)
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewUserCard() {
+    UserCard(onClick = {}, user = User(id = "", name = "Steve Jobs", job = "CEO"))
 }

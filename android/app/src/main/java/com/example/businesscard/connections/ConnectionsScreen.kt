@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -253,4 +254,13 @@ private fun ConnectionsScreen(requests: List<User>, connections: List<User>, soc
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewConnectionsScreen() {
+    ConnectionsScreen(requests = listOf<User>(User("0", "Steve Jobs", "CEO")),
+        connections = listOf<User>(User("1", "Bill Gates", "Philantropist")),
+        socials = mapOf<String, Socials>(),
+        onAcceptConnection = {_ ->}, onDeclineConnection = {_ -> }, onNavToLinkedin = {_ ->})
 }
