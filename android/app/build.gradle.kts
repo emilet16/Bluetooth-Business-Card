@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.businesscard"
+    namespace = "com.quartier.quartier"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.businesscard"
+        applicationId = "com.quartier.quartier"
         minSdk = 31
         targetSdk = 35
         versionCode = 1
@@ -67,6 +67,7 @@ dependencies {
 
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.ui.text.google.fonts)
     ksp(libs.hilt.android.compiler)
 
     testImplementation(libs.junit)

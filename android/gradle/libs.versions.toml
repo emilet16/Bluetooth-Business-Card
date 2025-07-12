@@ -17,6 +17,7 @@ navigationCompose = "2.9.0"
 hiltNavigationCompose = "1.2.0"
 supabaseBom ="3.1.4"
 ucrop = "2.2.9-native"
+uiTextGoogleFonts = "1.8.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ supabase-auth = { group="io.github.jan-tennert.supabase", name="auth-kt" }
 supabase-postgrest = { group="io.github.jan-tennert.supabase", name="postgrest-kt" }
 supabase-storage = { group="io.github.jan-tennert.supabase", name="storage-kt" }
 ucrop = { module = "com.github.yalantis:ucrop", version.ref = "ucrop" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

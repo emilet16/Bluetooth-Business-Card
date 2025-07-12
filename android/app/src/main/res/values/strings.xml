@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BusinessCard</string>
+    <string name="app_name">Quartier</string>
     <string name="email_label">Email</string>
     <string name="email_placeholder">Enter your email here</string>
     <string name="invalid_input">Invalid Input</string>
@@ -57,5 +57,6 @@
     <string name="add_connections">Connect with users</string>
     <string name="profile_title">Profile</string>
     <string name="connections_title">Connections</string>
+    <string name="no_nearby_people">No nearby people</string>
 
 </resources>

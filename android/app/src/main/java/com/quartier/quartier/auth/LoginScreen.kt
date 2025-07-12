@@ -1,0 +1,95 @@
+package com.quartier.quartier.auth
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.quartier.quartier.R
+import com.quartier.quartier.components.EmailTextField
+import com.quartier.quartier.components.PasswordTextField
+import com.quartier.quartier.ui.theme.Typography
+
+@Composable
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onNavToRegister: () -> Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
+    val userMessage by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Scaffold(modifier = Modifier.fillMaxSize(), snackbarHost = { SnackbarHost(snackbarHostState) }) {innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            LoginScreen(onEmailSignIn = { email, pwd ->
+                viewModel.emailSignIn(email, pwd)
+            }, onNavToRegister = onNavToRegister)
+
+            userMessage?.let { userMessage ->
+                val snackbarText = LocalContext.current.getString(userMessage)
+                LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {
+                    snackbarHostState.showSnackbar(snackbarText)
+                    viewModel.snackbarMessageShown()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoginScreen(onEmailSignIn: (String, String) -> Unit, onNavToRegister: () -> Unit) {
+    var email by rememberSaveable { mutableStateOf("") }
+    var emailValid by rememberSaveable { mutableStateOf(false) }
+    val emailRegex = Regex("^[^@]+@[^@]+\\.[^@]+\$")
+
+    var pwd by rememberSaveable { mutableStateOf("") }
+    var pwdValid by rememberSaveable { mutableStateOf(false) }
+
+    Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(LocalContext.current.getString(R.string.greeting), style = Typography.displayMedium, textAlign = TextAlign.Center)
+            Text(LocalContext.current.getString(R.string.signin_request), style = Typography.headlineMedium, textAlign = TextAlign.Center)
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            EmailTextField(email, showError = (email.isNotEmpty() && !emailValid), onValueChange = {
+                email = it
+                emailValid = (it.isNotBlank() && emailRegex.matches(it))
+            })
+
+            PasswordTextField(pwd, showError = (pwd.isNotEmpty() && !pwdValid), onValueChange = {
+                pwd = it
+                pwdValid = it.isNotBlank() && it.length >= 6
+            })
+
+            Button(onClick = {
+                onEmailSignIn(email, pwd)
+            }, enabled = emailValid && pwdValid) {
+                Text(LocalContext.current.getString(R.string.signin))
+            }
+            TextButton(onClick = onNavToRegister) {
+                Text(LocalContext.current.getString(R.string.register_suggestion))
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewLoginScreen() {
+    LoginScreen(onEmailSignIn = {_, _ -> }, onNavToRegister = {})
+}
