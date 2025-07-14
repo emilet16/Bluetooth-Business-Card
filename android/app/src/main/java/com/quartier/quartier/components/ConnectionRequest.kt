@@ -1,17 +1,21 @@
 package com.quartier.quartier.components
 
+import android.telecom.ConnectionRequest
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,38 +34,58 @@ import com.quartier.quartier.R
 import com.quartier.quartier.database.User
 import com.quartier.quartier.ui.theme.Typography
 
-
 @Composable
-fun UserCard(onClick: () -> Unit, user: User) {
-    Card(onClick = onClick) {
-        Row(
+fun ConnectionRequest(onAcceptConnection: (User) -> Unit, onDeclineConnection: (User)->Unit, user: User) {
+    Card(
+        modifier = Modifier
+            .padding(5.dp)
+            .wrapContentHeight()
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(5.dp)
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(
-                        user.pfp_url ?: R.drawable.baseline_account_circle
+                        user.pfp_url
+                            ?: R.drawable.baseline_account_circle
                     )
                     .crossfade(true)
                     .build(),
                 contentDescription = LocalContext.current.getString(R.string.pfp_description),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(60.dp)
                     .border(2.dp, Color.Black, CircleShape)
                     .padding(2.dp)
                     .clip(CircleShape)
             )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(user.name)
-                Text(user.job)
+            Text(
+                user.name,
+                style = Typography.titleSmall,
+                textAlign = TextAlign.Center
+            )
+            Text(user.job, textAlign = TextAlign.Center)
+            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                IconButton({ onAcceptConnection(user) }) {
+                    Icon(
+                        Icons.Default.Done,
+                        contentDescription = LocalContext.current.getString(
+                            R.string.accept_request
+                        )
+                    )
+                }
+                IconButton({ onDeclineConnection(user) }) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = LocalContext.current.getString(
+                            R.string.decline_request
+                        )
+                    )
+                }
             }
         }
     }
@@ -69,6 +93,6 @@ fun UserCard(onClick: () -> Unit, user: User) {
 
 @Preview
 @Composable
-fun PreviewPublicUserCard() {
-    UserCard(onClick = {}, user = User(id = "", name = "Steve Jobs", job = "CEO"))
+fun PreviewConnectionRequest() {
+    ConnectionRequest(onAcceptConnection = {}, onDeclineConnection = {}, user = User(id = "", name = "Steve Jobs", job = "CEO"))
 }

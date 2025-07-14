@@ -1,6 +1,7 @@
 package com.quartier.quartier.database
 
 import com.quartier.quartier.supabase
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.Serializable
@@ -22,7 +23,8 @@ interface ConnectResult {
 }
 
 class ConnectionsDatabase @Inject constructor(){
-    suspend fun getConnections(uid: String) : List<Connection> {
+    suspend fun getConnections() : List<Connection> {
+        val uid = supabase.auth.currentUserOrNull()!!.id
         return supabase.from("connections").select(Columns.ALL) {
             filter {
                 or{
@@ -36,7 +38,8 @@ class ConnectionsDatabase @Inject constructor(){
         }.decodeList()
     }
 
-    suspend fun requestConnection(userId: String, requestedId: String) : ConnectResult {
+    suspend fun requestConnection(requestedId: String) : ConnectResult {
+        val userId = supabase.auth.currentUserOrNull()!!.id
         var currentConnection: Connection? = null
         try {
             currentConnection = supabase.from("connections").select(Columns.ALL) {
@@ -65,13 +68,14 @@ class ConnectionsDatabase @Inject constructor(){
         } else if(currentConnection.status == "accepted") {
             return ConnectResult.AlreadyConnected
         } else if(currentConnection.status == "pending" && currentConnection.requested_by == requestedId) { //Accept the request
-            acceptConnection(user1Id = userId, user2Id = requestedId)
+            acceptConnection(user2Id = requestedId)
             return ConnectResult.Accepted
         }
         return ConnectResult.Pending
     }
 
-    suspend fun acceptConnection(user1Id: String, user2Id: String) { //TODO: error management
+    suspend fun acceptConnection(user2Id: String) { //TODO: error management
+        val user1Id = supabase.auth.currentUserOrNull()!!.id
         supabase.from("connections").update({
             Connection::status setTo "accepted"
         }) {
@@ -84,7 +88,8 @@ class ConnectionsDatabase @Inject constructor(){
         }
     }
 
-    suspend fun deleteConnection(user1Id: String, user2Id: String) {
+    suspend fun deleteConnection(user2Id: String) {
+        val user1Id = supabase.auth.currentUserOrNull()!!.id
         supabase.from("connections").delete() {
             filter {
                 and {

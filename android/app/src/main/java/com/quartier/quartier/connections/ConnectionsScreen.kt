@@ -53,8 +53,10 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.quartier.quartier.R
+import com.quartier.quartier.components.ConnectionRequest
 import com.quartier.quartier.components.MainBottomAppBar
 import com.quartier.quartier.components.SelectedScreen
+import com.quartier.quartier.components.UserCard
 import com.quartier.quartier.database.Socials
 import com.quartier.quartier.database.User
 import com.quartier.quartier.ui.theme.Typography
@@ -156,59 +158,7 @@ isRefreshing: Boolean, onRefresh: ()->Unit) {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         for (request in requests) {
                             item {
-                                Card(
-                                    modifier = Modifier
-                                        .padding(5.dp)
-                                        .wrapContentHeight()
-                                ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(5.dp)
-                                    ) {
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(
-                                                    request.pfp_url
-                                                        ?: R.drawable.baseline_account_circle
-                                                )
-                                                .crossfade(true)
-                                                .build(),
-                                            contentDescription = LocalContext.current.getString(R.string.pfp_description),
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier
-                                                .size(60.dp)
-                                                .border(2.dp, Color.Black, CircleShape)
-                                                .padding(2.dp)
-                                                .clip(CircleShape)
-                                        )
-                                        Text(
-                                            request.name,
-                                            style = Typography.titleSmall,
-                                            textAlign = TextAlign.Center
-                                        )
-                                        Text(request.job, textAlign = TextAlign.Center)
-                                        Row(horizontalArrangement = Arrangement.SpaceAround) {
-                                            IconButton({ onAcceptConnection(request) }) {
-                                                Icon(
-                                                    Icons.Default.Done,
-                                                    contentDescription = LocalContext.current.getString(
-                                                        R.string.accept_request
-                                                    )
-                                                )
-                                            }
-                                            IconButton({ onDeclineConnection(request) }) {
-                                                Icon(
-                                                    Icons.Default.Close,
-                                                    contentDescription = LocalContext.current.getString(
-                                                        R.string.decline_request
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
+                                ConnectionRequest(onAcceptConnection = onAcceptConnection, onDeclineConnection = onDeclineConnection, user = request)
                             }
                         }
                     }
@@ -226,41 +176,10 @@ isRefreshing: Boolean, onRefresh: ()->Unit) {
             } else {
                 for (connection in connections) {
                     item {
-                        Card(onClick = {
+                        UserCard(onClick = {
                             val url = socials[connection.id]?.linkedin_url
                             if (url != null) onNavToLinkedin(url)
-                        }) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(
-                                            connection.pfp_url ?: R.drawable.baseline_account_circle
-                                        )
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = LocalContext.current.getString(R.string.pfp_description),
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(150.dp)
-                                        .border(2.dp, Color.Black, CircleShape)
-                                        .padding(2.dp)
-                                        .clip(CircleShape)
-                                )
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Text(connection.name)
-                                    Text(connection.job)
-                                }
-                            }
-                        }
+                        }, user = connection)
                     }
                 }
             }

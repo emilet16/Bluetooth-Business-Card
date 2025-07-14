@@ -32,8 +32,6 @@ class ProfileViewModel @Inject constructor(private val userDatabase: UserDatabas
         ProfileScreenState(user, socials)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ProfileScreenState(null, null))
 
-    private val userId: String = supabase.auth.currentUserOrNull()!!.id
-
     init {
         viewModelScope.launch {
             supabase.auth.sessionStatus.collect {
@@ -45,10 +43,10 @@ class ProfileViewModel @Inject constructor(private val userDatabase: UserDatabas
     fun refreshUser() {
         if(supabase.auth.sessionStatus.value is SessionStatus.Authenticated) {
             viewModelScope.launch {
-                _user.value = userDatabase.getUser(userId)
+                _user.value = userDatabase.getUser()
             }
             viewModelScope.launch {
-                _socials.value = socialsDatabase.getUserSocials(supabase.auth.currentUserOrNull()!!.id)
+                _socials.value = socialsDatabase.getUserSocials()
             }
         }
     }

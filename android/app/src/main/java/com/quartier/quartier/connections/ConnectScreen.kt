@@ -35,6 +35,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.quartier.quartier.R
+import com.quartier.quartier.components.PublicUserCard
 import com.quartier.quartier.components.UserCard
 import com.quartier.quartier.database.User
 
@@ -91,7 +92,7 @@ private fun ConnectScreen(users: List<User>, onSendProfileRequest: (User)->Unit)
         LazyVerticalGrid(columns = GridCells.FixedSize(200.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalArrangement = Arrangement.spacedBy(10.dp)) {
             for (user in users) {
                 item {
-                    UserCard(onClick = {onSendProfileRequest(user)}, user)
+                    PublicUserCard(onClick = {onSendProfileRequest(user)}, user)
                 }
             }
         }

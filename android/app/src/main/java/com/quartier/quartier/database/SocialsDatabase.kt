@@ -1,6 +1,7 @@
 package com.quartier.quartier.database
 
 import com.quartier.quartier.supabase
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.Serializable
@@ -13,7 +14,8 @@ data class Socials(
 )
 
 class SocialsDatabase @Inject constructor(){
-    suspend fun getUserSocials(id: String): Socials {
+    suspend fun getUserSocials(): Socials {
+        val id = supabase.auth.currentUserOrNull()!!.id
         return supabase.from("socials").select(columns = Columns.ALL) {
             filter {
                 Socials::id eq id
@@ -25,7 +27,8 @@ class SocialsDatabase @Inject constructor(){
         return supabase.from("socials").select(columns = Columns.ALL).decodeList<Socials>() //RLS returns all friended users
     }
 
-    suspend fun upsertSocials(uid: String, linkedinURL: String) : UploadStatus {
+    suspend fun upsertSocials(linkedinURL: String) : UploadStatus {
+        val uid = supabase.auth.currentUserOrNull()!!.id
         try {
             supabase.from("socials").upsert(Socials(id = uid, linkedin_url = linkedinURL)) {
                 onConflict = "id"

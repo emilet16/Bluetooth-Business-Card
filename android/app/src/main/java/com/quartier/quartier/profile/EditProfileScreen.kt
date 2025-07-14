@@ -12,13 +12,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,6 +54,7 @@ import com.quartier.quartier.database.User
 import com.quartier.quartier.ui.theme.Typography
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnToProfile: ()->Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -59,7 +67,15 @@ fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnT
         }
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize(), snackbarHost = { SnackbarHost(snackbarHostState) }) { innerPadding ->
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        TopAppBar(title = {
+            Text("Edit profile")
+        }, navigationIcon = {
+            IconButton(onClick = returnToProfile) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = LocalContext.current.getString(R.string.back))
+            }
+        })
+    }, snackbarHost = { SnackbarHost(snackbarHostState) }) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             EditProfileScreen(uiState.user, uiState.socials, shownPfpUri, onChangePfp = {
                 pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
@@ -108,7 +124,6 @@ private fun EditProfileScreen(userData: User?, userSocials: Socials?, shownPfpUr
     val linkedinRegex = Regex("^https://www\\.linkedin\\.com/in/[^/]+/?$")
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxSize()) {
-        Text(LocalContext.current.getString(R.string.edit_profile_title), style = Typography.headlineMedium, textAlign = TextAlign.Center)
         AsyncImage(model = ImageRequest.Builder(LocalContext.current)
             .data(shownPfpUri ?: R.drawable.baseline_account_circle)
             .crossfade(true)

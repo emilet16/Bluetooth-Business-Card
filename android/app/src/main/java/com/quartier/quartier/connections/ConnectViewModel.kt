@@ -44,13 +44,13 @@ class ConnectViewModel @Inject constructor(
         userDatabase.getUsers(ids)
     }
 
+    private val userID = supabase.auth.currentUserOrNull()!!.id
+
     val uiState: StateFlow<ConnectUiState> = combine(_users, _userMessage) { users, userMessage ->
         ConnectUiState(users, userMessage)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectUiState(emptyList(), null))
 
     private var stopScanJob: Job? = null
-
-    private val userId: String = supabase.auth.currentUserOrNull()!!.id
 
     fun snackbarMessageShown() {
         _userMessage.value = null
@@ -59,7 +59,7 @@ class ConnectViewModel @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch {
-            bleServices.startAdvertising(userId)
+            bleServices.startAdvertising(userID)
         }
         viewModelScope.launch {
             refreshScan()
@@ -92,7 +92,7 @@ class ConnectViewModel @Inject constructor(
 
     fun connectWith(user: User) {
         viewModelScope.launch {
-            val result = connectionsDatabase.requestConnection(userId, user.id)
+            val result = connectionsDatabase.requestConnection(user.id)
             when(result) {
                 ConnectResult.Pending -> {
                     _userMessage.value = R.string.connection_request_wait

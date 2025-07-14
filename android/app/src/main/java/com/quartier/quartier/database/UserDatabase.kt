@@ -1,6 +1,7 @@
 package com.quartier.quartier.database
 
 import com.quartier.quartier.supabase
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.storage
@@ -25,7 +26,8 @@ class UserDatabase @Inject constructor() {
         }.decodeList<User>()
     }
 
-    suspend fun getUser(uid: String): User {
+    suspend fun getUser(): User {
+        val uid = supabase.auth.currentUserOrNull()!!.id
         return supabase.from("profiles").select(columns = Columns.ALL) {
             filter {
                 User::id eq uid
@@ -33,7 +35,8 @@ class UserDatabase @Inject constructor() {
         }.decodeSingle<User>()
     }
 
-    suspend fun updateUser(uid: String, name: String, job: String) : UploadStatus {
+    suspend fun updateUser(name: String, job: String) : UploadStatus {
+        val uid = supabase.auth.currentUserOrNull()!!.id
         try {
             supabase.from("profiles").update({
                 User::name setTo name
@@ -49,7 +52,8 @@ class UserDatabase @Inject constructor() {
         return UploadStatus.Success
     }
 
-    suspend fun uploadPfp(uid: String, fileName: String, image: ByteArray) : UploadStatus { //TODO Delete old unused pfps
+    suspend fun uploadPfp(fileName: String, image: ByteArray) : UploadStatus { //TODO Delete old unused pfps
+        val uid = supabase.auth.currentUserOrNull()!!.id
         try {
             supabase.storage.from("pfp").upload(fileName, image)
 
@@ -66,7 +70,8 @@ class UserDatabase @Inject constructor() {
         }
         return UploadStatus.Success
     }
-    suspend fun getConnectedUsers(uid: String, connections: List<Connection>) : List<User> {
+    suspend fun getConnectedUsers(connections: List<Connection>) : List<User> {
+        val uid = supabase.auth.currentUserOrNull()!!.id
         val connectionsMap = connections.associateBy(
             {if (it.requested_by == uid) it.requested_for else it.requested_by}, //find the other user's id
             {it.status}

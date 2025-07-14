@@ -42,8 +42,6 @@ class ConnectionsViewModel @Inject constructor(private val userDatabase: UserDat
         ConnectionsUIState(requests, connections, connectionsSocials, isRefreshing, userMessage)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionsUIState(emptyList(), emptyList(), emptyMap(),false, null))
 
-    private val userId: String = supabase.auth.currentUserOrNull()!!.id
-
     init {
         refreshConnections()
     }
@@ -51,8 +49,8 @@ class ConnectionsViewModel @Inject constructor(private val userDatabase: UserDat
     fun refreshConnections() {
         _isRefreshing.value = true
         viewModelScope.launch {
-            val connections = connectionsDatabase.getConnections(userId)
-            val connectedUsers = userDatabase.getConnectedUsers(userId, connections)
+            val connections = connectionsDatabase.getConnections()
+            val connectedUsers = userDatabase.getConnectedUsers(connections)
 
             _requests.value = connectedUsers.filter { user -> user.connectionStatus == "pending" }
             _connections.value = connectedUsers.filter { user -> user.connectionStatus == "accepted" }
@@ -66,14 +64,14 @@ class ConnectionsViewModel @Inject constructor(private val userDatabase: UserDat
 
     fun acceptConnection(user: User) {
         viewModelScope.launch {
-            connectionsDatabase.acceptConnection(userId, user.id)
+            connectionsDatabase.acceptConnection(user.id)
             refreshConnections()
         }
     }
 
     fun declineConnection(user: User) {
         viewModelScope.launch {
-            connectionsDatabase.deleteConnection(userId, user.id)
+            connectionsDatabase.deleteConnection(user.id)
             refreshConnections()
         }
     }

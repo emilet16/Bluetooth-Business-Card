@@ -1,5 +1,6 @@
 package com.quartier.quartier.profile
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,7 +72,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel(), onNavToEditProf
 
 @Composable
 private fun ProfileScreen(userData: User?, socials: Socials?, onNavToLinkedin: (String)->Unit) {
-    Column(modifier = Modifier.height(200.dp)) {
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
         if(userData != null) {
             UserCard(onClick = {
                 val url = socials?.linkedin_url

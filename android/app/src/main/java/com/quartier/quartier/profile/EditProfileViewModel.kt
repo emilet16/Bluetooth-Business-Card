@@ -43,14 +43,12 @@ class EditProfileViewModel @Inject constructor(private val userDatabase: UserDat
         EditProfileUIState(pfpUri, user, message, status, socials)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), EditProfileUIState())
 
-    private val userId: String = supabase.auth.currentUserOrNull()!!.id
-
     init {
         viewModelScope.launch {
-            _userState.value = userDatabase.getUser(userId)
+            _userState.value = userDatabase.getUser()
         }
         viewModelScope.launch {
-            _socials.value = socialsDatabase.getUserSocials(userId)
+            _socials.value = socialsDatabase.getUserSocials()
         }
     }
 
@@ -73,19 +71,19 @@ class EditProfileViewModel @Inject constructor(private val userDatabase: UserDat
 
         coroutineScope {
             launch {
-                userResult = userDatabase.updateUser(userId, savedName, savedJob)
+                userResult = userDatabase.updateUser(savedName, savedJob)
             }
             launch {
                 pfpResult = if(_newPfpUri.value != null) {
                     val image = imageManager.preparePfpForUpload(_newPfpUri.value!!)
-                    userDatabase.uploadPfp(userId,Uuid.random().toString()+".webp", image)
+                    userDatabase.uploadPfp(Uuid.random().toString()+".webp", image)
                 } else {
                     UploadStatus.Success
                 }
             }
             launch { 
                 socialsResult = if(savedLinkedin != null) {
-                    socialsDatabase.upsertSocials(userId, savedLinkedin)
+                    socialsDatabase.upsertSocials(savedLinkedin)
                 } else {
                     UploadStatus.Success
                 }

@@ -44,27 +44,23 @@ interface Screen {
 }
 
 @Composable
-fun Navigation(viewModel: MainViewModel = hiltViewModel()) {
+fun Navigation(viewModel: SessionViewModel = hiltViewModel()) {
     val navController = rememberNavController()
 
-    val navigationState = viewModel.sessionStatus.collectAsStateWithLifecycle()
+    val isLoggedIn = viewModel.isLoggedIn.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
-    val startDestination = when(navigationState.value) {
-        is SessionStatus.Initializing -> {
-            Screen.Loading
-        }
-        is SessionStatus.Authenticated -> {
-            Screen.Connections
-        }
-        else -> {
-            Screen.Login
-        }
-    }
-
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
         "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+    }
+
+    val startDestination = if(isLoggedIn.value == null) {
+        Screen.Loading
+    } else if(isLoggedIn.value!!) {
+        Screen.Connections
+    } else {
+        Screen.Login
     }
 
     NavHost(navController = navController, startDestination = startDestination) {
