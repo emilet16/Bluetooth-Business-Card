@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.quartier.quartier"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.quartier.quartier"
-        minSdk = 31
-        targetSdk = 35
+        minSdk = 21
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 

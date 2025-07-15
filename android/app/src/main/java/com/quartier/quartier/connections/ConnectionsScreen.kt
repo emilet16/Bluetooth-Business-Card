@@ -2,6 +2,7 @@ package com.quartier.quartier.connections
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.foundation.border
@@ -66,8 +67,13 @@ import com.quartier.quartier.ui.theme.Typography
 fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavToConnect: ()->Unit, onNavToProfile: ()->Unit, onNavToLinkedin: (String) -> Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val advAllowed = ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
-    val scanAllowed = ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+    val advAllowed = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
+    } else true
+
+    val scanAllowed = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+    } else true
 
     val requestScanPerm = rememberLauncherForActivityResult(RequestPermission()) { granted ->
         if(granted) {
@@ -191,7 +197,7 @@ isRefreshing: Boolean, onRefresh: ()->Unit) {
 @Composable
 fun PreviewConnectionsScreen() {
     ConnectionsScreen(requests = listOf<User>(User("0", "Steve Jobs", "CEO")),
-        connections = listOf<User>(User("1", "Bill Gates", "Philantropist")),
+        connections = listOf<User>(User("1", "Bill Gates", "Philanthropist")),
         socials = mapOf<String, Socials>(),
         onAcceptConnection = {_ ->}, onDeclineConnection = {_ -> }, onNavToLinkedin = {_ ->},
         isRefreshing = false, onRefresh = {})
