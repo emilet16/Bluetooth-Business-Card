@@ -36,7 +36,7 @@ class AuthManager : ObservableObject {
         ])
     }
     
-    func logout() async throws {
+    func signout() async throws {
         try await supabase.auth.signOut()
     }
 }

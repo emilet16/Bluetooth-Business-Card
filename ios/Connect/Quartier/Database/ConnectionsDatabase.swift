@@ -11,6 +11,14 @@ struct Connection: Codable, Sendable, Hashable {
     var status: String
 }
 
+enum ConnectionResult {
+    case alreadyConnected
+    case requested
+    case accepted
+    case error
+    case pending
+}
+
 class ConnectionsDatabase {
     static let shared = ConnectionsDatabase()
     
@@ -19,21 +27,25 @@ class ConnectionsDatabase {
         return try await supabase.from("connections").select("*").or("and(requested_by.eq.\(userID),status.eq.accepted),requested_for.eq.\(userID)").execute().value as [Connection]
     }
     
-    func requestConnection(requestedID: String) async throws {
+    func requestConnection(requestedID: String) async throws -> ConnectionResult? {
         let userID = supabase.auth.currentUser!.id.uuidString
         var currentConnection: Connection? = nil
         
-        currentConnection = try await (supabase.from("connections").select("*").or("and(requested_for.eq.\(userID), requested_by.eq.\(requestedID)), and(requested_by.eq.\(userID), requested_for.eq.\(requestedID))").execute().value as [Connection]).first
-        if(currentConnection == nil) {
-            try await supabase.from("connections").upsert(Connection(requested_by: userID, requested_for: requestedID, status: "pending")).execute()
-        } else if(currentConnection?.status == "accepted") {
-            //TODO
-        } else if (currentConnection?.status == "pending" && currentConnection?.requested_by == requestedID) {
-            try await acceptConnection(requestedID: requestedID)
+        do {
+            currentConnection = try await (supabase.from("connections").select("*").or("and(requested_for.eq.\(userID), requested_by.eq.\(requestedID)), and(requested_by.eq.\(userID), requested_for.eq.\(requestedID))").execute().value as [Connection]).first
+            if(currentConnection == nil) {
+                try await supabase.from("connections").upsert(Connection(requested_by: userID, requested_for: requestedID, status: "pending")).execute()
+                return .requested
+            } else if(currentConnection?.status == "accepted") {
+                return .alreadyConnected
+            } else if (currentConnection?.status == "pending" && currentConnection?.requested_by == requestedID) {
+                try await acceptConnection(requestedID: requestedID)
+                return .accepted
+            }
+        } catch {
+            return .error
         }
-        else {
-            print("test")
-        }
+        return .pending
     }
     
     func acceptConnection(requestedID: String) async throws {

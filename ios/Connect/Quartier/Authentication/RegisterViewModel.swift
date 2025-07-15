@@ -6,14 +6,26 @@
 //
 
 import Foundation
+import Auth
 
 @MainActor
 class RegisterViewModel : ObservableObject {
     private var authManager: AuthManager = AuthManager.shared
     
+    @Published var message: String?
+    
     func signup(email: String, pwd: String, name: String) {
         Task {
-            try await authManager.signup(email: email, pwd: pwd, name: name)
+            do {
+                try await authManager.signup(email: email, pwd: pwd, name: name)
+            }  catch(let error as AuthError) {
+                message = error.localizedDescription
+            }
         }
+    }
+    
+    func matchEmailRegex(text: String) -> Bool {
+        let emailRegex = try! Regex("^[^@]+@[^@]+\\.[^@]+$")
+        return try! emailRegex.wholeMatch(in: text) != nil
     }
 }

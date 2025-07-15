@@ -13,12 +13,16 @@ class BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManage
     private var peripheralManager: CBPeripheralManager?
     private var shouldAdvertise: Bool = false
     
+    @Published var status: CBManagerState? = nil
+    
     override init() {
         super.init()
         self.peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+        self.status = peripheralManager?.state
     }
     
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+        status = peripheral.state
         switch peripheral.state {
        case .poweredOn:
            print("Peripheral Manager is powered on.")
@@ -43,7 +47,8 @@ class BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManage
     }
     
     func startAdvertising() {
-        if peripheralManager?.state == .poweredOn {
+        switch(peripheralManager?.state) {
+        case .poweredOn:
             let serviceUUID = CBUUID(string: "D17B")
             let userUUID = CBUUID(string: supabase.auth.currentUser!.id.uuidString)
             
@@ -51,8 +56,8 @@ class BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManage
                 CBAdvertisementDataServiceUUIDsKey: [serviceUUID, userUUID],
             ])
             shouldAdvertise = false
-        } else {
-            shouldAdvertise = true //Advertise when available
+        default:
+            shouldAdvertise = true
         }
     }
     
@@ -100,13 +105,14 @@ class BluetoothCentralManager: NSObject, ObservableObject, CBCentralManagerDeleg
     }
     
     func startScan() {
-        if centralManager.state == .poweredOn {
+        switch(centralManager.state) {
+        case .poweredOn:
             discoveredUIDS = []
             centralManager.scanForPeripherals(withServices: [targetServiceUUID], options: [
                 CBCentralManagerScanOptionAllowDuplicatesKey: false
             ])
             shouldScan = false
-        } else {
+        default:
             shouldScan = true
         }
     }

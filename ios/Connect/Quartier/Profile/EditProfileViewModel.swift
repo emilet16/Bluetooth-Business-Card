@@ -65,6 +65,11 @@ class EditProfileViewModel: ObservableObject {
             saveStatus = SaveStatus.success
         }
     }
+    
+    func matchesLinkedinRegex(input: String) -> Bool {
+        let regex = try! Regex("^https://www\\.linkedin\\.com/in/[^/]+/?$")
+        return try! regex.wholeMatch(in: input) != nil
+    }
 }
 
 enum SaveStatus {

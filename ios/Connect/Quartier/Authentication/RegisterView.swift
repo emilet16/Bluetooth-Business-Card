@@ -22,52 +22,61 @@ struct RegisterView: View {
     
     
     var body : some View {
-        VStack {
-            Text("We're glad to meet you").font(.roboto(24))
-            Text("Please sign up").font(.roboto(20))
-            
-            TextField(text: $name, prompt: Text("Enter your name here")) {
-                Text("Name")
-            }.onChange(of: name) {
-                nameValid = !name.isEmpty
-            }.font(.roboto(17))
-            
-            if(!nameValid && !name.isEmpty) {
-                Text("Invalid Input").foregroundStyle(.red).font(.caption)
+        ZStack(alignment: .bottom) {
+            if(viewModel.message != nil) {
+                Text(viewModel.message!).font(.roboto(17)).padding().frame(width: 400)
+                    .background(Color.cyan.opacity(0.6))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             
-            TextField(text: $email, prompt: Text("Enter your email here")) {
-                Text("Email")
-            }.keyboardType(.emailAddress).onChange(of: email) {
-                emailValid = !email.isEmpty && matchEmailRegex(text: email)
-            }.font(.roboto(17))
-            
-            if(!emailValid && !email.isEmpty) {
-                Text("Invalid Input").foregroundStyle(.red).font(.caption)
+            VStack {
+                Text("We're glad to meet you").font(.roboto(24))
+                Text("Please sign up").font(.roboto(20))
+                
+                TextField(text: $name, prompt: Text("Enter your name here")) {
+                    Text("Name")
+                }.onChange(of: name) {
+                    nameValid = !name.isEmpty
+                }.font(.roboto(17))
+                
+                if(!nameValid && !name.isEmpty) {
+                    Text("Invalid Input").foregroundStyle(.red).font(.caption)
+                }
+                
+                TextField(text: $email, prompt: Text("Enter your email here")) {
+                    Text("Email")
+                }.keyboardType(.emailAddress).onChange(of: email) {
+                    emailValid = !email.isEmpty && viewModel.matchEmailRegex(text: email)
+                }.font(.roboto(17))
+                
+                if(!emailValid && !email.isEmpty) {
+                    Text("Invalid Input").foregroundStyle(.red).font(.caption)
+                }
+                
+                SecureField(text: $password, prompt: Text("Enter your password here")) {
+                    Text("Password")
+                }.onChange(of: password) {
+                    pwdValid = !password.isEmpty && password.count >= 6
+                }.font(.roboto(17))
+                
+                if(!pwdValid && !password.isEmpty) {
+                    Text("Invalid Input").foregroundStyle(.red).font(.caption)
+                }
+                
+                Button(action: {
+                    viewModel.signup(email: email, pwd: password, name: name)
+                }) {
+                    Text("Register").foregroundStyle(Color("OnAccentColor")).font(.roboto(17))
+                }.disabled(!emailValid || !pwdValid || !nameValid).buttonStyle(.borderedProminent)
+                
+                Button(action: {dismiss()}) {
+                    Text("Already have an account? Log in").font(.roboto(17))
+                }
             }
-            
-            SecureField(text: $password, prompt: Text("Enter your password here")) {
-                Text("Password")
-            }.onChange(of: password) {
-                pwdValid = !password.isEmpty && password.count >= 6
-            }.font(.roboto(17))
-            
-            if(!pwdValid && !password.isEmpty) {
-                Text("Invalid Input").foregroundStyle(.red).font(.caption)
-            }
-            
-            Button(action: {
-                viewModel.signup(email: email, pwd: password, name: name)
-            }) {
-                Text("Register").foregroundStyle(Color("OnAccentColor")).font(.roboto(17))
-            }.disabled(!emailValid || !pwdValid || !nameValid).buttonStyle(.borderedProminent)
-            
-            Button(action: {dismiss()}) {
-                Text("Already have an account? Log in").font(.roboto(17))
-            }
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .padding()
+            .frame(maxHeight: .infinity)
         }
-        .textFieldStyle(RoundedBorderTextFieldStyle())
-        .padding()
     }
 }
 
