@@ -10,10 +10,10 @@ import Combine
 
 @MainActor
 class ConnectViewModel : ObservableObject {
-    private var blePeripheralManager = BluetoothPeripheralManager()
-    private var bleCentralManager = BluetoothCentralManager()
-    private var userDatabase = UserDatabase.shared
-    private var connectionsDatabase = ConnectionsDatabase.shared
+    private var blePeripheralManager: any BluetoothPeripheralManager = BluetoothPeripheralManagerImpl.shared
+    private var bleCentralManager: any BluetoothCentralManager = BluetoothCentralManagerImpl.shared
+    private var userRepository: any UserRepository = UserDatabase.shared
+    private var connectionsRepository: any ConnectionsRepository = ConnectionsDatabase.shared
     
     @Published var users: [User] = []
     @Published var message: String? = nil
@@ -29,15 +29,23 @@ class ConnectViewModel : ObservableObject {
     
     func connectWithUser(requestedID: String) {
         Task {
-            let result = try await connectionsDatabase.requestConnection(requestedID: requestedID)
-            connectionMessage = switch(result) {
-                case .accepted: "Connection request accepted!"
-                case .alreadyConnected: "You are already connected to this user."
-                case .requested: "Connection request sent!"
-                case .error: "An error happened, please try again!"
-                case .pending: "Connection request pending..."
-                default: nil as String?
+            let connection = try await connectionsRepository.getConnectionWithUser(requestedID: requestedID)
+            
+            if(connection == nil) {
+                let result = try await connectionsRepository.requestConnection(requestedID: requestedID)
+                if(result == .cannotConnectWithSelf) { connectionMessage = "You cannot connect with yourself!" }
+                else { connectionMessage = "Connection request sent!" }
+            } else if(connection?.status == "pending" && connection?.requested_by == requestedID) {
+                try await connectionsRepository.acceptConnection(requestedID: requestedID)
+                connectionMessage = "Connection request accepted!"
+            } else if(connection?.status == "accepted") {
+                connectionMessage = "You are already connected to this user."
+            } else if(connection?.status == "pending" && connection?.requested_for == requestedID) {
+                connectionMessage = "Connection request pending..."
+            } else {
+                connectionMessage = "An error happened, please try again!"
             }
+            
             try await Task.sleep(for: .seconds(2))
             connectionMessage = nil
         }
@@ -71,7 +79,7 @@ class ConnectViewModel : ObservableObject {
     }
     
     func updateBleState() {
-        blePeripheralManager.$status.map({ state in
+        blePeripheralManager.status.map({ state in
             switch state {
             case .poweredOff:
                 "Bluetooth is powered off"
@@ -84,10 +92,10 @@ class ConnectViewModel : ObservableObject {
     }
     
     func updateUsers() {
-        bleCentralManager.$discoveredUIDS
+        bleCentralManager.discoveredUIDS
             .sink { [weak self] uids in
                 Task {
-                    self?.users = try await self?.userDatabase.getUsers(ids: uids) ?? []
+                    self?.users = try await self?.userRepository.getUsers(ids: uids) ?? []
                 }
         }.store(in: &cancellables)
     }

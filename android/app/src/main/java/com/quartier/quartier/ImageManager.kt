@@ -8,12 +8,24 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.net.Uri
 import androidx.core.graphics.createBitmap
+import com.quartier.quartier.database.ConnectionsDatabase
+import com.quartier.quartier.database.ConnectionsRepository
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
-class ImageManager @Inject constructor(@ApplicationContext val context: Context) {
-    fun cropImageTo400(uri: Uri) : Bitmap {
+interface ImageRepository {
+    fun cropImageTo400(uri: Uri) : Bitmap
+    fun convertToWebPByteArray(bitmap: Bitmap) : ByteArray
+}
+
+class ImageManager @Inject constructor(@ApplicationContext val context: Context) : ImageRepository {
+    override fun cropImageTo400(uri: Uri) : Bitmap {
         val source = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, _, _ ->
             decoder.isMutableRequired = true
         }
@@ -36,14 +48,16 @@ class ImageManager @Inject constructor(@ApplicationContext val context: Context)
         return croppedBitmap
     }
 
-    fun convertToWebPByteArray(bitmap: Bitmap) : ByteArray {
+    override fun convertToWebPByteArray(bitmap: Bitmap) : ByteArray {
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 80, outputStream)
         return outputStream.toByteArray()
     }
+}
 
-    fun preparePfpForUpload(uri: Uri): ByteArray {
-        val croppedImage = cropImageTo400(uri)
-        return convertToWebPByteArray(croppedImage)
-    }
+@Module
+@InstallIn(ViewModelComponent::class)
+abstract class ImageModule {
+    @Binds
+    abstract fun bindImageRepository(imageManager: ImageManager): ImageRepository
 }

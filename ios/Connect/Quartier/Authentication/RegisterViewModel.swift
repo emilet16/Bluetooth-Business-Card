@@ -10,7 +10,7 @@ import Auth
 
 @MainActor
 class RegisterViewModel : ObservableObject {
-    private var authManager: AuthManager = AuthManager.shared
+    private var authManager: any AuthManager = AuthManagerImpl.shared
     
     @Published var message: String?
     
@@ -19,7 +19,7 @@ class RegisterViewModel : ObservableObject {
             do {
                 try await authManager.signup(email: email, pwd: pwd, name: name)
             }  catch(let error as AuthError) {
-                message = error.localizedDescription
+                message = error.message
             }
         }
     }

@@ -10,9 +10,9 @@ import PhotosUI
 
 @MainActor
 class EditProfileViewModel: ObservableObject {
-    private var userDatabase = UserDatabase.shared
-    private var socialsDatabase = SocialsDatabase.shared
-    private var imageManager = ImageManager()
+    private var userRepository: any UserRepository = UserDatabase.shared
+    private var socialsRepository: any SocialsRepository = SocialsDatabase.shared
+    private var imageRepository: any ImageRepository = ImageManager()
     
     @Published var userProfile: User? = nil
     @Published var userSocials: Socials? = nil
@@ -20,10 +20,10 @@ class EditProfileViewModel: ObservableObject {
     
     init() {
         Task {
-            userProfile = try await userDatabase.getUser()
+            userProfile = try await userRepository.getUser()
         }
         Task {
-            userSocials = try await socialsDatabase.getUserSocials()
+            userSocials = try await socialsRepository.getUserSocials()
         }
     }
     
@@ -38,17 +38,18 @@ class EditProfileViewModel: ObservableObject {
             do {
                 try await withThrowingTaskGroup(of: Void.self) { group in
                     group.addTask {
-                        try await self.userDatabase.updateUser(name: savedName, jobTitle: savedJobTitle)
+                        try await self.userRepository.updateUser(name: savedName, jobTitle: savedJobTitle)
                     }
                     if(savedLinkedIn != nil) {
                         group.addTask {
-                            try await self.socialsDatabase.upsertSocials(linkedInUrl: savedLinkedIn!)
+                            try await self.socialsRepository.upsertSocials(linkedInUrl: savedLinkedIn!)
                         }
                     }
                     if(pfp != nil) {
                         group.addTask {
-                            let imageData = await self.imageManager.prepareImageForUpload(image: pfp!)
-                            try await self.userDatabase.uploadPfp(fileName: UUID().uuidString+".webp", imageData: imageData)
+                            let scaledImage = await self.imageRepository.resizeTo400(image: pfp!)
+                            let imageData = await self.imageRepository.encodeToWebP(image: scaledImage)
+                            try await self.userRepository.uploadPfp(fileName: UUID().uuidString+".webp", imageData: imageData)
                         }
                     }
                     

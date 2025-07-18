@@ -1,11 +1,18 @@
 package com.quartier.quartier.database
 
 import com.quartier.quartier.supabase
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ViewModelComponent
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Serializable
 data class Socials(
@@ -13,9 +20,16 @@ data class Socials(
     val linkedin_url: String?
 )
 
-class SocialsDatabase @Inject constructor(){
-    suspend fun getUserSocials(): Socials {
-        val id = supabase.auth.currentUserOrNull()!!.id
+interface SocialsRepository {
+    suspend fun getUserSocials(): Socials
+    suspend fun getUserSocialsList(): List<Socials>
+    suspend fun upsertSocials(linkedinURL: String)
+}
+
+@Singleton
+class SocialsDatabase @Inject constructor(private val authRepository: AuthRepository) : SocialsRepository {
+    override suspend fun getUserSocials(): Socials {
+        val id = authRepository.userId.value!!
         return supabase.from("socials").select(columns = Columns.ALL) {
             filter {
                 Socials::id eq id
@@ -23,19 +37,25 @@ class SocialsDatabase @Inject constructor(){
         }.decodeSingle()
     }
 
-    suspend fun getUserSocialsList() : List<Socials> {
+    override suspend fun getUserSocialsList() : List<Socials> {
         return supabase.from("socials").select(columns = Columns.ALL).decodeList<Socials>() //RLS returns all friended users
     }
 
-    suspend fun upsertSocials(linkedinURL: String) : UploadStatus {
-        val uid = supabase.auth.currentUserOrNull()!!.id
+    override suspend fun upsertSocials(linkedinURL: String) {
+        val uid = authRepository.userId.value!!
         try {
             supabase.from("socials").upsert(Socials(id = uid, linkedin_url = linkedinURL)) {
                 onConflict = "id"
             }
         } catch (e: Exception) { //TODO Better error handling?
-            return UploadStatus.Error
+            throw e
         }
-        return UploadStatus.Success
     }
+}
+
+@Module
+@InstallIn(ViewModelComponent::class)
+abstract class SocialsModule {
+    @Binds
+    abstract fun bindSocialsRepository(socialsDatabase: SocialsDatabase): SocialsRepository
 }

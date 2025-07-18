@@ -1,7 +1,14 @@
 package com.quartier.quartier.auth
 
 import com.quartier.quartier.R
+import com.quartier.quartier.database.AuthRepository
+import com.quartier.quartier.database.AuthRepositoryImpl
 import com.quartier.quartier.supabase
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
@@ -16,13 +23,16 @@ import kotlinx.serialization.json.put
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class AuthManager @Inject constructor() {
-    val auth = supabase.auth
+interface AuthManager {
+    suspend fun emailSignIn(eml: String, pwd: String): AuthResult
+    suspend fun emailSignUp(name: String, eml: String, pwd: String): AuthResult
+}
 
-    suspend fun emailSignIn(eml: String, pwd: String) : AuthResult {
+@Singleton
+class AuthManagerImpl @Inject constructor() : AuthManager {
+    override suspend fun emailSignIn(eml: String, pwd: String) : AuthResult {
         try{
-            auth.signInWith(Email) {
+            supabase.auth.signInWith(Email) {
                 email = eml
                 password = pwd
             }
@@ -32,9 +42,9 @@ class AuthManager @Inject constructor() {
         return AuthResult.Success
     }
 
-    suspend fun emailSignUp(name: String, eml: String, pwd: String) : AuthResult {
+    override suspend fun emailSignUp(name: String, eml: String, pwd: String) : AuthResult {
         try {
-            auth.signUpWith(Email) {
+            supabase.auth.signUpWith(Email) {
                 email = eml
                 password = pwd
                 data = buildJsonObject {
@@ -46,6 +56,13 @@ class AuthManager @Inject constructor() {
         }
         return AuthResult.Success
     }
+}
+
+@Module
+@InstallIn(ViewModelComponent::class)
+abstract class AuthManagerModule {
+    @Binds
+    abstract fun bindAuthManager(authManagerImpl: AuthManagerImpl): AuthManager
 }
 
 interface AuthResult {

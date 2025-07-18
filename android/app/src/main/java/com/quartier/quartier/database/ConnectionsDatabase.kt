@@ -1,11 +1,17 @@
 package com.quartier.quartier.database
 
 import com.quartier.quartier.supabase
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ViewModelComponent
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Serializable
 data class Connection(
@@ -14,17 +20,17 @@ data class Connection(
     val status: String
 )
 
-interface ConnectResult {
-    object Pending: ConnectResult
-    object Requested: ConnectResult
-    object Accepted: ConnectResult
-    object AlreadyConnected: ConnectResult
-    class Error(val message: String): ConnectResult
+interface ConnectionsRepository {
+    suspend fun getConnections(): List<Connection>
+    suspend fun getConnectionWithUser(requestedId: String): Connection?
+    suspend fun requestConnection(requestedId: String) : ConnectionRequestResult
+    suspend fun acceptConnection(user2Id: String)
+    suspend fun deleteConnection(user2Id: String)
 }
-
-class ConnectionsDatabase @Inject constructor(){
-    suspend fun getConnections() : List<Connection> {
-        val uid = supabase.auth.currentUserOrNull()!!.id
+@Singleton
+class ConnectionsDatabase @Inject constructor(private val authRepository: AuthRepository) : ConnectionsRepository{
+    override suspend fun getConnections() : List<Connection> {
+        val uid = authRepository.userId.value!!
         return supabase.from("connections").select(Columns.ALL) {
             filter {
                 or{
@@ -38,44 +44,35 @@ class ConnectionsDatabase @Inject constructor(){
         }.decodeList()
     }
 
-    suspend fun requestConnection(requestedId: String) : ConnectResult {
-        val userId = supabase.auth.currentUserOrNull()!!.id
-        var currentConnection: Connection? = null
-        try {
-            currentConnection = supabase.from("connections").select(Columns.ALL) {
-                filter {
-                    or {
-                        and {
-                            Connection::requested_by eq userId
-                            Connection::requested_for eq requestedId
-                        }
-                        and {
-                            Connection::requested_by eq requestedId
-                            Connection::requested_for eq userId
-                        }
+    override suspend fun getConnectionWithUser(requestedId: String) : Connection? {
+        val userId = authRepository.userId.value!!
+        return supabase.from("connections").select(Columns.ALL) {
+            filter {
+                or {
+                    and {
+                        Connection::requested_by eq userId
+                        Connection::requested_for eq requestedId
+                    }
+                    and {
+                        Connection::requested_by eq requestedId
+                        Connection::requested_for eq userId
                     }
                 }
-            }.decodeSingleOrNull()
-        } catch(e: Exception) {
-            return ConnectResult.Error(e.message ?: "Unknown error")
-        }
-
-        if(currentConnection == null) {
-            supabase.from("connections").upsert(Connection(userId, requestedId, "pending")) {
-                ignoreDuplicates = true
             }
-            return ConnectResult.Requested
-        } else if(currentConnection.status == "accepted") {
-            return ConnectResult.AlreadyConnected
-        } else if(currentConnection.status == "pending" && currentConnection.requested_by == requestedId) { //Accept the request
-            acceptConnection(user2Id = requestedId)
-            return ConnectResult.Accepted
-        }
-        return ConnectResult.Pending
+        }.decodeSingleOrNull()
     }
 
-    suspend fun acceptConnection(user2Id: String) { //TODO: error management
-        val user1Id = supabase.auth.currentUserOrNull()!!.id
+    override suspend fun requestConnection(requestedId: String) : ConnectionRequestResult {
+        val userId = authRepository.userId.value!!
+        if(userId == requestedId) return ConnectionRequestResult.CannotConnectWithSelf
+        supabase.from("connections").upsert(Connection(userId, requestedId, "pending")) {
+            ignoreDuplicates = true
+        }
+        return ConnectionRequestResult.Success
+    }
+
+    override suspend fun acceptConnection(user2Id: String) { //TODO: error management
+        val user1Id = authRepository.userId.value!!
         supabase.from("connections").update({
             Connection::status setTo "accepted"
         }) {
@@ -88,8 +85,8 @@ class ConnectionsDatabase @Inject constructor(){
         }
     }
 
-    suspend fun deleteConnection(user2Id: String) {
-        val user1Id = supabase.auth.currentUserOrNull()!!.id
+    override suspend fun deleteConnection(user2Id: String) {
+        val user1Id = authRepository.userId.value!!
         supabase.from("connections").delete() {
             filter {
                 and {
@@ -99,4 +96,16 @@ class ConnectionsDatabase @Inject constructor(){
             }
         }
     }
+}
+
+interface ConnectionRequestResult {
+    object Success : ConnectionRequestResult
+    object CannotConnectWithSelf: ConnectionRequestResult
+}
+
+@Module
+@InstallIn(ViewModelComponent::class)
+abstract class ConnectionsModule {
+    @Binds
+    abstract fun bindConnectionsRepository(connectionsDatabase: ConnectionsDatabase): ConnectionsRepository
 }

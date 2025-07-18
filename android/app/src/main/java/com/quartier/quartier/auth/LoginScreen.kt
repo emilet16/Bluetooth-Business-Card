@@ -38,7 +38,9 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onNavToRegister: ()
         Box(modifier = Modifier.padding(innerPadding)) {
             LoginScreen(onEmailSignIn = { email, pwd ->
                 viewModel.emailSignIn(email, pwd)
-            }, onNavToRegister = onNavToRegister)
+            }, onNavToRegister = onNavToRegister, matchesEmailRegex = {
+                viewModel.matchesEmailRegex(it)
+            })
 
             userMessage?.let { userMessage ->
                 val snackbarText = LocalContext.current.getString(userMessage)
@@ -52,10 +54,9 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onNavToRegister: ()
 }
 
 @Composable
-private fun LoginScreen(onEmailSignIn: (String, String) -> Unit, onNavToRegister: () -> Unit) {
+private fun LoginScreen(onEmailSignIn: (String, String) -> Unit, onNavToRegister: () -> Unit, matchesEmailRegex: (String)->Boolean) {
     var email by rememberSaveable { mutableStateOf("") }
     var emailValid by rememberSaveable { mutableStateOf(false) }
-    val emailRegex = Regex("^[^@]+@[^@]+\\.[^@]+\$")
 
     var pwd by rememberSaveable { mutableStateOf("") }
     var pwdValid by rememberSaveable { mutableStateOf(false) }
@@ -68,7 +69,7 @@ private fun LoginScreen(onEmailSignIn: (String, String) -> Unit, onNavToRegister
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             EmailTextField(email, showError = (email.isNotEmpty() && !emailValid), onValueChange = {
                 email = it
-                emailValid = (it.isNotBlank() && emailRegex.matches(it))
+                emailValid = (it.isNotBlank() && matchesEmailRegex(it))
             })
 
             PasswordTextField(pwd, showError = (pwd.isNotEmpty() && !pwdValid), onValueChange = {
@@ -91,5 +92,5 @@ private fun LoginScreen(onEmailSignIn: (String, String) -> Unit, onNavToRegister
 @Preview(showBackground = true)
 @Composable
 fun PreviewLoginScreen() {
-    LoginScreen(onEmailSignIn = {_, _ -> }, onNavToRegister = {})
+    LoginScreen(onEmailSignIn = {_, _ -> }, onNavToRegister = {}, matchesEmailRegex = {_ -> true})
 }

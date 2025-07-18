@@ -46,7 +46,9 @@ fun RegisterScreen(
         Box(modifier = Modifier.padding(innerPadding)) {
             RegisterScreen(onEmailSignUp = { name, email, pwd ->
                 viewModel.emailSignUp(name, email, pwd)
-            }, onNavToLogin = onNavToLogin)
+            }, onNavToLogin = onNavToLogin, matchesEmailRegex = {
+                viewModel.matchesEmailRegex(it)
+            })
 
             userMessage?.let { userMessage ->
                 val snackbarText = LocalContext.current.getString(userMessage)
@@ -60,13 +62,12 @@ fun RegisterScreen(
 }
 
 @Composable
-private fun RegisterScreen(onEmailSignUp: (String, String, String) -> Unit, onNavToLogin: () -> Unit) {
+private fun RegisterScreen(onEmailSignUp: (String, String, String) -> Unit, onNavToLogin: () -> Unit, matchesEmailRegex: (String)->Boolean) {
     var name by rememberSaveable { mutableStateOf("") }
     var nameValid by rememberSaveable { mutableStateOf(false) }
 
     var email by rememberSaveable { mutableStateOf("") }
     var emailValid by rememberSaveable { mutableStateOf(false) }
-    val emailRegex = Regex("^[^@]+@[^@]+\\.[^@]+\$")
 
     var pwd by rememberSaveable { mutableStateOf("") }
     var pwdValid by rememberSaveable { mutableStateOf(false) }
@@ -89,7 +90,7 @@ private fun RegisterScreen(onEmailSignUp: (String, String, String) -> Unit, onNa
 
             EmailTextField(email, showError = (email.isNotEmpty() && !emailValid), onValueChange = {
                 email = it
-                emailValid = (it.isNotBlank() && emailRegex.matches(it))
+                emailValid = (it.isNotBlank() && matchesEmailRegex(it))
             })
 
             PasswordTextField(pwd, showError = (pwd.isNotEmpty() && !pwdValid), onValueChange = {
@@ -111,5 +112,5 @@ private fun RegisterScreen(onEmailSignUp: (String, String, String) -> Unit, onNa
 @Preview(showBackground = true)
 @Composable
 fun PreviewRegisterScreen() {
-    RegisterScreen(onEmailSignUp = {_, _, _ ->}, onNavToLogin = {})
+    RegisterScreen(onEmailSignUp = {_, _, _ ->}, onNavToLogin = {}, matchesEmailRegex = {_ -> true})
 }

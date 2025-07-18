@@ -8,30 +8,44 @@
 import Foundation
 import CoreBluetooth
 import os
+import Combine
 
-class BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManagerDelegate {
+protocol BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManagerDelegate {
+    var status: AnyPublisher<CBManagerState?, Never> { get }
+    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager)
+    func startAdvertising()
+    func stopAdvertising()
+}
+
+class BluetoothPeripheralManagerImpl: NSObject, BluetoothPeripheralManager  {
+    static let shared = BluetoothPeripheralManagerImpl()
+    
     private var peripheralManager: CBPeripheralManager?
     private var shouldAdvertise: Bool = false
     
-    @Published var status: CBManagerState? = nil
+    @Published private(set) var state: CBManagerState? = nil
+    var status: AnyPublisher<CBManagerState?, Never> {
+        $state.eraseToAnyPublisher()
+    }
     
     override init() {
         super.init()
         self.peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
-        self.status = peripheralManager?.state
+        self.state = peripheralManager?.state
     }
     
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
-        status = peripheral.state
+        state = peripheral.state
         switch peripheral.state {
        case .poweredOn:
            print("Peripheral Manager is powered on.")
            if shouldAdvertise {
                startAdvertising()
            }
-       case .poweredOff:
-           print("Bluetooth is powered off.")
-           stopAdvertising()
+        case .poweredOff:
+            print("Bluetooth is powered off.")
+            stopAdvertising()
+            shouldAdvertise = true
        case .unauthorized:
            print("Bluetooth not authorized.")
        case .unsupported:
@@ -47,17 +61,14 @@ class BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManage
     }
     
     func startAdvertising() {
-        switch(peripheralManager?.state) {
-        case .poweredOn:
+        shouldAdvertise = true
+        if (peripheralManager?.state == .poweredOn) {
             let serviceUUID = CBUUID(string: "D17B")
             let userUUID = CBUUID(string: supabase.auth.currentUser!.id.uuidString)
             
             peripheralManager?.startAdvertising([
                 CBAdvertisementDataServiceUUIDsKey: [serviceUUID, userUUID],
             ])
-            shouldAdvertise = false
-        default:
-            shouldAdvertise = true
         }
     }
     
@@ -67,8 +78,22 @@ class BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManage
     }
 }
 
-class BluetoothCentralManager: NSObject, ObservableObject, CBCentralManagerDelegate {
-    @Published var discoveredUIDS: [String] = []
+protocol BluetoothCentralManager : NSObject, ObservableObject, CBCentralManagerDelegate {
+    var discoveredUIDS: AnyPublisher<[String], Never> { get }
+    
+    func centralManagerDidUpdateState(_ central: CBCentralManager)
+    func startScan()
+    func stopScan()
+    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber)
+}
+
+class BluetoothCentralManagerImpl: NSObject, BluetoothCentralManager {
+    static let shared = BluetoothCentralManagerImpl()
+    
+    @Published private(set) var uids: [String] = []
+    var discoveredUIDS: AnyPublisher<[String], Never> {
+        $uids.eraseToAnyPublisher()
+    }
     
     private var centralManager: CBCentralManager!
     private let targetServiceUUID = CBUUID(string: "D17B")
@@ -105,16 +130,13 @@ class BluetoothCentralManager: NSObject, ObservableObject, CBCentralManagerDeleg
     }
     
     func startScan() {
-        switch(centralManager.state) {
-        case .poweredOn:
-            discoveredUIDS = []
+        if(centralManager.state == .poweredOn) {
+            uids = []
             centralManager.scanForPeripherals(withServices: [targetServiceUUID], options: [
                 CBCentralManagerScanOptionAllowDuplicatesKey: false
             ])
-            shouldScan = false
-        default:
-            shouldScan = true
         }
+        shouldScan = true
     }
     
     func stopScan() {
@@ -127,8 +149,8 @@ class BluetoothCentralManager: NSObject, ObservableObject, CBCentralManagerDeleg
         services.removeAll(where: { $0 == targetServiceUUID})
         let uid = services.first?.uuidString
         if(uid != nil) {
-            if(!discoveredUIDS.contains(where: {$0 == uid})) {
-                discoveredUIDS.append(uid!)
+            if(!uids.contains(where: {$0 == uid})) {
+                uids.append(uid!)
             }
         }
     }

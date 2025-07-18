@@ -23,4 +23,9 @@ class LoginViewModel @Inject constructor(val authManager: AuthManager) : ViewMod
             _userMessage.value = messageFromErrorCode(result.error)
         }
     }
+
+    fun matchesEmailRegex(input: String): Boolean {
+        val emailRegex = Regex("^[^@]+@[^@]+\\.[^@]+\$")
+        return emailRegex.matches(input)
+    }
 }

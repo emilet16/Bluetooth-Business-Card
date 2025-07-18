@@ -1,12 +1,20 @@
 package com.quartier.quartier.database
 
+import androidx.lifecycle.ViewModel
 import com.quartier.quartier.supabase
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.storage
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Serializable
 data class User(
@@ -17,8 +25,15 @@ data class User(
     val connectionStatus: String? = null
 )
 
-class UserDatabase @Inject constructor() {
-    suspend fun getUsers(uids: List<String>): List<User> {
+interface UserRepository {
+    suspend fun getUsers(uids: List<String>): List<User>
+    suspend fun getUser(): User
+    suspend fun updateUser(name: String, job: String)
+    suspend fun uploadPfp(fileName: String, image: ByteArray)
+}
+@Singleton
+class UserDatabase @Inject constructor(private val authRepository: AuthRepository) : UserRepository {
+    override suspend fun getUsers(uids: List<String>): List<User> {
         return supabase.from("profiles").select(columns = Columns.ALL) {
             filter {
                 User::id isIn uids
@@ -26,8 +41,8 @@ class UserDatabase @Inject constructor() {
         }.decodeList<User>()
     }
 
-    suspend fun getUser(): User {
-        val uid = supabase.auth.currentUserOrNull()!!.id
+    override suspend fun getUser(): User {
+        val uid = authRepository.userId.value!!
         return supabase.from("profiles").select(columns = Columns.ALL) {
             filter {
                 User::id eq uid
@@ -35,8 +50,8 @@ class UserDatabase @Inject constructor() {
         }.decodeSingle<User>()
     }
 
-    suspend fun updateUser(name: String, job: String) : UploadStatus {
-        val uid = supabase.auth.currentUserOrNull()!!.id
+    override suspend fun updateUser(name: String, job: String) {
+        val uid = authRepository.userId.value!!
         try {
             supabase.from("profiles").update({
                 User::name setTo name
@@ -47,13 +62,12 @@ class UserDatabase @Inject constructor() {
                 }
             }
         } catch (e: Exception) { //TODO Better error handling?
-            return UploadStatus.Error
+            throw e
         }
-        return UploadStatus.Success
     }
 
-    suspend fun uploadPfp(fileName: String, image: ByteArray) : UploadStatus { //TODO Delete old unused pfps
-        val uid = supabase.auth.currentUserOrNull()!!.id
+    override suspend fun uploadPfp(fileName: String, image: ByteArray) { //TODO Delete old unused pfps
+        val uid = authRepository.userId.value!!
         try {
             supabase.storage.from("pfp").upload(fileName, image)
 
@@ -66,22 +80,16 @@ class UserDatabase @Inject constructor() {
                 }
             }
         } catch (e: Exception) { //TODO Better error handling?
-            return UploadStatus.Error
+            throw e
         }
-        return UploadStatus.Success
     }
-    suspend fun getConnectedUsers(connections: List<Connection>) : List<User> {
-        val uid = supabase.auth.currentUserOrNull()!!.id
-        val connectionsMap = connections.associateBy(
-            {if (it.requested_by == uid) it.requested_for else it.requested_by}, //find the other user's id
-            {it.status}
-        )
+}
 
-        val users = getUsers(connectionsMap.keys.toList())
-        return users.map { user ->
-            User(user.id, user.name, user.job, user.pfp_url, connectionsMap[user.id])
-        }
-    }
+@Module
+@InstallIn(ViewModelComponent::class)
+abstract class UserModule {
+    @Binds
+    abstract fun bindUserRepository(userDatabase: UserDatabase): UserRepository
 }
 
 interface UploadStatus {

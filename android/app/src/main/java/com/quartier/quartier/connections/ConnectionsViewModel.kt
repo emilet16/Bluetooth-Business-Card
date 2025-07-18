@@ -3,11 +3,16 @@ package com.quartier.quartier.connections
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quartier.quartier.R
+import com.quartier.quartier.database.AuthRepository
+import com.quartier.quartier.database.Connection
 import com.quartier.quartier.database.ConnectionsDatabase
+import com.quartier.quartier.database.ConnectionsRepository
 import com.quartier.quartier.database.Socials
 import com.quartier.quartier.database.SocialsDatabase
+import com.quartier.quartier.database.SocialsRepository
 import com.quartier.quartier.database.User
 import com.quartier.quartier.database.UserDatabase
+import com.quartier.quartier.database.UserRepository
 import com.quartier.quartier.supabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.auth
@@ -28,9 +33,12 @@ data class ConnectionsUIState(
 )
 
 @HiltViewModel
-class ConnectionsViewModel @Inject constructor(private val userDatabase: UserDatabase,
-                                               private val connectionsDatabase: ConnectionsDatabase,
-                                               private val socialsDatabase: SocialsDatabase) : ViewModel() {
+class ConnectionsViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val connectionsRepository: ConnectionsRepository,
+    private val socialsRepository: SocialsRepository,
+    private val authRepository: AuthRepository
+) : ViewModel() {
     private val _requests: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
     private val _connections: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
     private val _connectionsSocials: MutableStateFlow<Map<String, Socials>> = MutableStateFlow(emptyMap())
@@ -49,29 +57,42 @@ class ConnectionsViewModel @Inject constructor(private val userDatabase: UserDat
     fun refreshConnections() {
         _isRefreshing.value = true
         viewModelScope.launch {
-            val connections = connectionsDatabase.getConnections()
-            val connectedUsers = userDatabase.getConnectedUsers(connections)
+            val connections = connectionsRepository.getConnections()
+
+            val connectedUsers = connectionsToUsers(connections)
 
             _requests.value = connectedUsers.filter { user -> user.connectionStatus == "pending" }
             _connections.value = connectedUsers.filter { user -> user.connectionStatus == "accepted" }
             _isRefreshing.value = false
         }
         viewModelScope.launch {
-            val socials = socialsDatabase.getUserSocialsList()
+            val socials = socialsRepository.getUserSocialsList()
             _connectionsSocials.value = socials.associateBy { it.id }
+        }
+    }
+
+    suspend fun connectionsToUsers(connections: List<Connection>) : List<User> {
+        val uid = authRepository.userId.value!!
+        val connectionsMap = connections.associateBy(
+            {if (it.requested_by == uid) it.requested_for else it.requested_by}, //find the other user's id
+            {it.status}
+        )
+        val users = userRepository.getUsers(connectionsMap.keys.toList())
+        return users.map { user ->
+            User(user.id, user.name, user.job, user.pfp_url, connectionsMap[user.id])
         }
     }
 
     fun acceptConnection(user: User) {
         viewModelScope.launch {
-            connectionsDatabase.acceptConnection(user.id)
+            connectionsRepository.acceptConnection(user.id)
             refreshConnections()
         }
     }
 
     fun declineConnection(user: User) {
         viewModelScope.launch {
-            connectionsDatabase.deleteConnection(user.id)
+            connectionsRepository.deleteConnection(user.id)
             refreshConnections()
         }
     }

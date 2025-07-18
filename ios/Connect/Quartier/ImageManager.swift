@@ -9,12 +9,12 @@ import PhotosUI
 import SDWebImage
 import SDWebImageWebPCoder
 
-class ImageManager {
-    func prepareImageForUpload(image: UIImage) -> Data {
-        let resizedImage = resizeTo400(image: image)
-        return encodeToWebP(image: resizedImage)
-    }
-    
+protocol ImageRepository  {
+    func resizeTo400(image: UIImage) -> UIImage
+    func encodeToWebP(image: UIImage) -> Data
+}
+
+class ImageManager : ImageRepository {
     func resizeTo400(image: UIImage) -> UIImage {
         let size = image.size
         

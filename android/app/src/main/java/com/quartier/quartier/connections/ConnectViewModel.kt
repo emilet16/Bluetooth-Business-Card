@@ -6,15 +6,13 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.quartier.quartier.BleRepository
 import com.quartier.quartier.R
-import com.quartier.quartier.BleServices
-import com.quartier.quartier.supabase
-import com.quartier.quartier.database.ConnectResult
-import com.quartier.quartier.database.ConnectionsDatabase
+import com.quartier.quartier.database.ConnectionRequestResult
+import com.quartier.quartier.database.ConnectionsRepository
 import com.quartier.quartier.database.User
-import com.quartier.quartier.database.UserDatabase
+import com.quartier.quartier.database.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -34,17 +32,15 @@ data class ConnectUiState(
 
 @HiltViewModel
 class ConnectViewModel @Inject constructor(
-    private val userDatabase: UserDatabase,
-    private val connectionsDatabase: ConnectionsDatabase,
-    private val bleServices: BleServices
+    private val userRepository: UserRepository,
+    private val connectionsRepository: ConnectionsRepository,
+    private val bleRepository: BleRepository
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _userMessage = MutableStateFlow<Int?>(null)
 
-    private val _users = bleServices.userIds.map { ids ->
-        userDatabase.getUsers(ids)
+    private val _users = bleRepository.userIds.map { ids ->
+        userRepository.getUsers(ids)
     }
-
-    private val userID = supabase.auth.currentUserOrNull()!!.id
 
     val uiState: StateFlow<ConnectUiState> = combine(_users, _userMessage) { users, userMessage ->
         ConnectUiState(users, userMessage)
@@ -59,7 +55,7 @@ class ConnectViewModel @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch {
-            bleServices.startAdvertising(userID)
+            bleRepository.startAdvertising()
         }
         viewModelScope.launch {
             refreshScan()
@@ -69,52 +65,44 @@ class ConnectViewModel @Inject constructor(
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
         viewModelScope.launch {
-            bleServices.stopAdvertising()
+            bleRepository.stopAdvertising()
         }
         viewModelScope.launch {
-            bleServices.stopScanning()
+            bleRepository.stopScanning()
         }
     }
-
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun refreshScan() {
         viewModelScope.launch {
-            bleServices.startScanning()
+            bleRepository.startScanning()
         }
         viewModelScope.launch {
             stopScanJob?.cancelAndJoin()
             delay(10000)
-            bleServices.stopScanning()
+            bleRepository.stopScanning()
             stopScanJob = null
         }
     }
 
     fun connectWith(user: User) {
         viewModelScope.launch {
-            val result = connectionsDatabase.requestConnection(user.id)
-            when(result) {
-                ConnectResult.Pending -> {
-                    _userMessage.value = R.string.connection_request_wait
-                }
-                ConnectResult.Requested -> {
-                    _userMessage.value = R.string.connection_request_success
-                }
-                ConnectResult.Accepted -> {
-                    _userMessage.value = R.string.connection_request_accepted
-                }
-                ConnectResult.AlreadyConnected -> {
-                    _userMessage.value = R.string.already_connected
-                }
-                is ConnectResult.Error -> {
-                    _userMessage.value = R.string.unexpected_error //TODO: error handling?
-                }
+            val connection = connectionsRepository.getConnectionWithUser(requestedId = user.id)
+            if(connection == null) {
+                val result = connectionsRepository.requestConnection(requestedId = user.id)
+                if(result == ConnectionRequestResult.Success)  _userMessage.value = R.string.connection_request_success
+                else if(result == ConnectionRequestResult.CannotConnectWithSelf) _userMessage.value = R.string.error_request_self
+            } else if(connection.status == "pending" && connection.requested_by == user.id) {
+                connectionsRepository.acceptConnection(user2Id = user.id)
+                _userMessage.value = R.string.connection_request_accepted
+            } else if(connection.status == "accepted") {
+                _userMessage.value = R.string.already_connected
+            } else if(connection.status == "pending" && connection.requested_for == user.id) {
+                _userMessage.value = R.string.connection_request_wait
+            } else {
+                _userMessage.value = R.string.unexpected_error
             }
         }
-    }
-
-    fun bluetoothPermissionDenied() {
-        _userMessage.value = R.string.bluetooth_permission_denied
     }
 
     fun bleDisabled() {

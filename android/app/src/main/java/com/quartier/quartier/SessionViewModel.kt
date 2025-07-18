@@ -2,6 +2,7 @@ package com.quartier.quartier
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.quartier.quartier.database.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -21,7 +22,7 @@ data class SessionInfo(
 )
 
 @HiltViewModel
-class SessionViewModel @Inject constructor() : ViewModel() {
+class SessionViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
     private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
     val isLoggedIn = _isLoggedIn.asStateFlow()
 
@@ -30,6 +31,7 @@ class SessionViewModel @Inject constructor() : ViewModel() {
             supabase.auth.sessionStatus.collect {
                 if(it is SessionStatus.Authenticated) {
                     _isLoggedIn.value = true
+                    authRepository.updateUserId(it.session.user!!.id)
                 } else if(it is SessionStatus.NotAuthenticated || it is SessionStatus.RefreshFailure) {
                     _isLoggedIn.value = false
                 }

@@ -58,5 +58,6 @@
     <string name="profile_title">Profile</string>
     <string name="connections_title">Connections</string>
     <string name="no_nearby_people">No nearby people</string>
+    <string name="error_request_self">Error: You cannot connect with yourself!</string>
 
 </resources>

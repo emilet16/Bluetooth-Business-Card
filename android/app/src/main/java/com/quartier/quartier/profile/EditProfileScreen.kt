@@ -81,6 +81,8 @@ fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnT
                 pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
             }, onSaveProfile = { name, job, linkedin ->
                 viewModel.saveUser(name, job, linkedin)
+            }, matchesLinkedinRegex = { input ->
+                viewModel.matchesLinkedinRegex(input)
             })
         }
 
@@ -115,13 +117,12 @@ fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnT
 }
 
 @Composable
-private fun EditProfileScreen(userData: User?, userSocials: Socials?, shownPfpUri: String?, onChangePfp: ()->Unit, onSaveProfile: (String, String, String)->Unit) {
+private fun EditProfileScreen(userData: User?, userSocials: Socials?, shownPfpUri: String?, onChangePfp: ()->Unit, onSaveProfile: (String, String, String)->Unit, matchesLinkedinRegex: (String)-> Boolean) {
     var newName by rememberSaveable { mutableStateOf("") }
     var newJob by rememberSaveable { mutableStateOf("") }
 
     var newLinkedin by rememberSaveable { mutableStateOf("") }
     var linkedinValid by rememberSaveable { mutableStateOf(true) }
-    val linkedinRegex = Regex("^https://www\\.linkedin\\.com/in/[^/]+/?$")
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxSize()) {
         AsyncImage(model = ImageRequest.Builder(LocalContext.current)
@@ -139,7 +140,7 @@ private fun EditProfileScreen(userData: User?, userSocials: Socials?, shownPfpUr
             placeholder = {Text(userData?.job ?: "")})
         TextField(value = newLinkedin, onValueChange = {
                 newLinkedin = it
-                linkedinValid = newLinkedin.isEmpty() || linkedinRegex.matches(newLinkedin)
+                linkedinValid = newLinkedin.isEmpty() || matchesLinkedinRegex(newLinkedin)
                 }, label = { Text(LocalContext.current.getString(R.string.linkedin_url_label)) },
                 placeholder = {Text(userSocials?.linkedin_url ?: "https://www.linkedin.com/in/[your-username]")},
                 isError = !linkedinValid,
@@ -157,5 +158,5 @@ private fun EditProfileScreen(userData: User?, userSocials: Socials?, shownPfpUr
 @Composable
 fun PreviewEditProfileScreen() {
     EditProfileScreen(userData = User(id = "0", name = "Steve Jobs", job = "CEO"),
-        userSocials = null, shownPfpUri = null, onChangePfp = {}) { _, _, _ -> }
+        userSocials = null, shownPfpUri = null, onChangePfp = {}, onSaveProfile = { _, _, _ -> }, matchesLinkedinRegex = {_ -> true})
 }

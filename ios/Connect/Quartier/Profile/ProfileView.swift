@@ -12,18 +12,18 @@ struct ProfileView : View {
     @StateObject private var viewModel = ProfileViewModel()
     
     var body : some View {
-        VStack {
-            if(viewModel.userProfile != nil) {
-                UserCard(user: viewModel.userProfile!, socials: viewModel.userSocials, onViewProfile: { url in
-                    if(url != nil) {
-                        if let url = URL(string: url!) {
-                            openURL(url)
+        ScrollView {
+            VStack {
+                if(viewModel.userProfile != nil) {
+                    UserCard(user: viewModel.userProfile!, socials: viewModel.userSocials, onViewProfile: { url in
+                        if(url != nil) {
+                            if let url = URL(string: url!) {
+                                openURL(url)
+                            }
                         }
-                    }
-                    
-                })
-            } else {
-                Text("Loading...").font(.roboto(17))
+                        
+                    })
+                }
             }
         }.toolbar {
             ToolbarItem(placement: .principal) {
@@ -36,6 +36,9 @@ struct ProfileView : View {
             }
         }
         .onAppear() {
+            viewModel.fetchProfile()
+        }
+        .refreshable {
             viewModel.fetchProfile()
         }
     }

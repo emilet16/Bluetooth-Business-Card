@@ -14,6 +14,14 @@ import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import com.quartier.quartier.database.AuthRepository
+import com.quartier.quartier.database.ConnectionsDatabase
+import com.quartier.quartier.database.ConnectionsRepository
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +30,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface BleRepository {
+    val userIds: StateFlow<List<String>>
+    fun startAdvertising()
+    fun stopAdvertising()
+    fun startScanning()
+    fun stopScanning()
+}
+
 @Singleton
-class BleServices @Inject constructor(@ApplicationContext val context: Context) {
+class BleManager @Inject constructor(@ApplicationContext val context: Context, authRepository: AuthRepository) : BleRepository {
     private val bleUUID: String = "0000D17B-0000-1000-8000-00805F9B34FB"
 
+    private val userID = authRepository.userId.value!!
+
     private val _userIds: MutableStateFlow<List<String>> = MutableStateFlow<List<String>>(listOf<String>())
-    val userIds: StateFlow<List<String>> = _userIds.asStateFlow()
+    override val userIds: StateFlow<List<String>> = _userIds.asStateFlow()
 
     private val advertisingSetCallback = object : AdvertisingSetCallback() {
         override fun onAdvertisingSetStarted(
@@ -70,7 +88,7 @@ class BleServices @Inject constructor(@ApplicationContext val context: Context) 
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
-    fun startAdvertising(data: String) {
+    override fun startAdvertising() {
         val pUuid = ParcelUuid.fromString(bleUUID)
 
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -82,14 +100,14 @@ class BleServices @Inject constructor(@ApplicationContext val context: Context) 
 
         val advData = AdvertiseData.Builder()
             .addServiceUuid(pUuid)
-            .addServiceUuid(ParcelUuid.fromString(data))
+            .addServiceUuid(ParcelUuid.fromString(userID))
             .build()
 
         advertiser.startAdvertisingSet(parameters, advData, null, null, null, advertisingSetCallback)
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
-    fun stopAdvertising() {
+    override fun stopAdvertising() {
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val advertiser = bluetoothManager.adapter.bluetoothLeAdvertiser
 
@@ -97,7 +115,7 @@ class BleServices @Inject constructor(@ApplicationContext val context: Context) 
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
-    fun startScanning(){
+    override fun startScanning(){
         val pUuid = ParcelUuid.fromString(bleUUID)
 
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -117,10 +135,17 @@ class BleServices @Inject constructor(@ApplicationContext val context: Context) 
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
-    fun stopScanning() {
+    override fun stopScanning() {
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val scanner = bluetoothManager.adapter.bluetoothLeScanner
 
         scanner.stopScan(scanCallback)
     }
+}
+
+@Module
+@InstallIn(ViewModelComponent::class)
+abstract class BleModule {
+    @Binds
+    abstract fun bindBleRepository(bleManager: BleManager): BleRepository
 }

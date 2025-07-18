@@ -6,21 +6,16 @@
 //
 import Foundation
 
-@MainActor
-class AuthManager : ObservableObject {
-    static let shared = AuthManager()
-    
-    @Published var userID: String? = nil
+protocol AuthManager {
+    func login(email:String, pwd: String) async throws
+    func signup(email:String, pwd: String, name: String) async throws
+    func signout() async throws
+}
+
+class AuthManagerImpl : AuthManager {
+    static let shared = AuthManagerImpl()
     
     private var authListener: Task<Void, Never>?
-    
-    init() {
-        authListener = Task {
-            for await (_, session) in supabase.auth.authStateChanges {
-                userID = session?.user.id.uuidString
-            }
-        }
-    }
     
     deinit {
         authListener?.cancel()

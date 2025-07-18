@@ -16,7 +16,14 @@ struct User : Decodable, Hashable {
     var connectionStatus: String? = nil
 }
 
-class UserDatabase {
+protocol UserRepository {
+    func getUser() async throws -> User
+    func getUsers(ids: [String]) async throws -> [User]
+    func updateUser(name: String, jobTitle: String) async throws
+    func uploadPfp(fileName: String, imageData: Data) async throws
+}
+
+class UserDatabase : UserRepository {
     static let shared = UserDatabase()
     
     func getUser() async throws -> User {
@@ -26,21 +33,6 @@ class UserDatabase {
     
     func getUsers(ids: [String]) async throws -> [User] {
         return try await supabase.from("profiles").select("*").in("id", values: ids).execute().value
-    }
-    
-    func getConnectedUsers(connections: [Connection]) async throws -> [User] {
-        let userID = supabase.auth.currentUser!.id.uuidString
-        let connections = try await ConnectionsDatabase.shared.getConnections()
-        var connectedUserStatus: [String: String] = [:]
-        for connection in connections {
-            let connectedID = connection.requested_by == userID.lowercased() ? connection.requested_for : connection.requested_by
-            connectedUserStatus[connectedID] = connection.status
-        }
-        
-        let users = try await getUsers(ids: Array(connectedUserStatus.keys))
-        return users.map({ user in
-            User(id: user.id, name: user.name, job: user.job, pfp_url: user.pfp_url, connectionStatus: connectedUserStatus[user.id])
-        })
     }
     
     func updateUser(name: String, jobTitle: String) async throws {

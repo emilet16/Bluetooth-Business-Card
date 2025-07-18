@@ -10,7 +10,13 @@ struct Socials: Decodable, Hashable {
     var linkedin_url: String?
 }
 
-class SocialsDatabase {
+protocol SocialsRepository {
+    func getUserSocials() async throws -> Socials
+    func getConnectedSocials() async throws -> [Socials]
+    func upsertSocials(linkedInUrl: String) async throws
+}
+
+class SocialsDatabase : SocialsRepository {
     static let shared = SocialsDatabase()
     
     func getUserSocials() async throws -> Socials {

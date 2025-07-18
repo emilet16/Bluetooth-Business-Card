@@ -3,15 +3,16 @@ package com.quartier.quartier.profile
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.quartier.quartier.ImageManager
+import com.quartier.quartier.ImageRepository
+import com.quartier.quartier.R
 import com.quartier.quartier.database.Socials
-import com.quartier.quartier.database.SocialsDatabase
+import com.quartier.quartier.database.SocialsRepository
 import com.quartier.quartier.database.UploadStatus
 import com.quartier.quartier.database.User
-import com.quartier.quartier.database.UserDatabase
-import com.quartier.quartier.supabase
+import com.quartier.quartier.database.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,8 +32,11 @@ data class EditProfileUIState(
 )
 
 @HiltViewModel
-class EditProfileViewModel @Inject constructor(private val userDatabase: UserDatabase,
-    private val socialsDatabase: SocialsDatabase, private val imageManager: ImageManager) : ViewModel() {
+class EditProfileViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val socialsRepository: SocialsRepository,
+    private val imageRepository: ImageRepository
+) : ViewModel() {
     private val _newPfpUri: MutableStateFlow<Uri?> = MutableStateFlow(null)
     private val _userState: MutableStateFlow<User?> = MutableStateFlow(null)
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
@@ -45,13 +49,14 @@ class EditProfileViewModel @Inject constructor(private val userDatabase: UserDat
 
     init {
         viewModelScope.launch {
-            _userState.value = userDatabase.getUser()
+            _userState.value = userRepository.getUser()
         }
         viewModelScope.launch {
-            _socials.value = socialsDatabase.getUserSocials()
+            _socials.value = socialsRepository.getUserSocials()
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     fun saveUser(newName: String, newJob: String, newLinkedin: String) {
         val savedName = newName.ifBlank { _userState.value!!.name }
         val savedJob = newJob.ifBlank { _userState.value!!.job }
@@ -59,42 +64,37 @@ class EditProfileViewModel @Inject constructor(private val userDatabase: UserDat
         _saveStatus.value = UploadStatus.Loading
 
         viewModelScope.launch {
-            _saveStatus.value = saveConcurrently(savedName, savedJob, savedLinkedin)
+            val success = try {
+                coroutineScope {
+                    val profileJob = async { userRepository.updateUser(savedName, savedJob) }
+                    val pfpJob = async {
+                        if(_newPfpUri.value != null) {
+                            val croppedImage = imageRepository.cropImageTo400(uri = _newPfpUri.value!!)
+                            val imageData = imageRepository.convertToWebPByteArray(croppedImage)
+                            userRepository.uploadPfp(Uuid.random().toString() + ".webp", imageData)
+                        }
+                    }
+                    val socialsJob = async {
+                        if(savedLinkedin != null) {
+                            socialsRepository.upsertSocials(savedLinkedin)
+                        }
+                    }
+
+                    awaitAll(profileJob, pfpJob, socialsJob)
+                }
+                true
+            } catch (e: Exception) {
+                _saveStatus.value = UploadStatus.Error
+                false
+            }
+
+            if(success) _saveStatus.value = UploadStatus.Success
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    private suspend fun saveConcurrently(savedName: String, savedJob: String, savedLinkedin: String?) : UploadStatus {
-        var userResult: UploadStatus = UploadStatus.Loading
-        var pfpResult: UploadStatus = UploadStatus.Loading
-        var socialsResult: UploadStatus = UploadStatus.Loading
-
-        coroutineScope {
-            launch {
-                userResult = userDatabase.updateUser(savedName, savedJob)
-            }
-            launch {
-                pfpResult = if(_newPfpUri.value != null) {
-                    val image = imageManager.preparePfpForUpload(_newPfpUri.value!!)
-                    userDatabase.uploadPfp(Uuid.random().toString()+".webp", image)
-                } else {
-                    UploadStatus.Success
-                }
-            }
-            launch { 
-                socialsResult = if(savedLinkedin != null) {
-                    socialsDatabase.upsertSocials(savedLinkedin)
-                } else {
-                    UploadStatus.Success
-                }
-            }
-        }
-
-        return if(userResult == UploadStatus.Success && pfpResult == UploadStatus.Success && socialsResult == UploadStatus.Success) {
-            UploadStatus.Success
-        } else {
-            UploadStatus.Error
-        }
+    fun matchesLinkedinRegex(input: String): Boolean {
+        val linkedinRegex = Regex("^https://www\\.linkedin\\.com/in/[^/]+/?$")
+        return linkedinRegex.matches(input)
     }
 
     fun previewNewPfp(uri: Uri) {

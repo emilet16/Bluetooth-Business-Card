@@ -12,14 +12,19 @@ struct Connection: Codable, Sendable, Hashable {
 }
 
 enum ConnectionResult {
-    case alreadyConnected
+    case cannotConnectWithSelf
     case requested
-    case accepted
-    case error
-    case pending
 }
 
-class ConnectionsDatabase {
+protocol ConnectionsRepository {
+    func getConnections() async throws -> [Connection]
+    func getConnectionWithUser(requestedID: String) async throws -> Connection?
+    func requestConnection(requestedID: String) async throws -> ConnectionResult?
+    func acceptConnection(requestedID: String) async throws
+    func deleteConnection(requestedID: String) async throws
+}
+
+class ConnectionsDatabase : ConnectionsRepository {
     static let shared = ConnectionsDatabase()
     
     func getConnections() async throws -> [Connection] {
@@ -27,25 +32,20 @@ class ConnectionsDatabase {
         return try await supabase.from("connections").select("*").or("and(requested_by.eq.\(userID),status.eq.accepted),requested_for.eq.\(userID)").execute().value as [Connection]
     }
     
+    func getConnectionWithUser(requestedID: String) async throws -> Connection? {
+        let userID = supabase.auth.currentUser!.id.uuidString
+        return try await (supabase.from("connections").select("*")
+            .or("and(requested_for.eq.\(userID), requested_by.eq.\(requestedID)), and(requested_by.eq.\(userID), requested_for.eq.\(requestedID))")
+            .execute().value as [Connection]).first
+    }
+    
     func requestConnection(requestedID: String) async throws -> ConnectionResult? {
         let userID = supabase.auth.currentUser!.id.uuidString
-        var currentConnection: Connection? = nil
         
-        do {
-            currentConnection = try await (supabase.from("connections").select("*").or("and(requested_for.eq.\(userID), requested_by.eq.\(requestedID)), and(requested_by.eq.\(userID), requested_for.eq.\(requestedID))").execute().value as [Connection]).first
-            if(currentConnection == nil) {
-                try await supabase.from("connections").upsert(Connection(requested_by: userID, requested_for: requestedID, status: "pending")).execute()
-                return .requested
-            } else if(currentConnection?.status == "accepted") {
-                return .alreadyConnected
-            } else if (currentConnection?.status == "pending" && currentConnection?.requested_by == requestedID) {
-                try await acceptConnection(requestedID: requestedID)
-                return .accepted
-            }
-        } catch {
-            return .error
-        }
-        return .pending
+        if(userID == requestedID) { return .cannotConnectWithSelf }
+        
+        try await supabase.from("connections").upsert(Connection(requested_by: userID, requested_for: requestedID, status: "pending")).execute()
+        return .requested
     }
     
     func acceptConnection(requestedID: String) async throws {

@@ -10,16 +10,20 @@ import Auth
 
 @MainActor
 class LoginViewModel : ObservableObject {
-    private var authManager: AuthManager = AuthManager.shared
+    private var authManager: any AuthManager
     
     @Published var message: String?
+    
+    init(authManager: any AuthManager = AuthManagerImpl.shared) {
+        self.authManager = authManager
+    }
     
     func login(email: String, pwd: String) {
         Task {
             do {
                 try await authManager.login(email: email, pwd: pwd)
             } catch(let error as AuthError) {
-                message = error.localizedDescription
+                message = error.message
             }
         }
     }
