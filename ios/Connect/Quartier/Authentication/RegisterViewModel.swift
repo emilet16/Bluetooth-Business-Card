@@ -12,7 +12,11 @@ import Auth
 class RegisterViewModel : ObservableObject {
     private var authManager: any AuthManager = AuthManagerImpl.shared
     
-    @Published var message: String?
+    @Published var message: String? = nil
+    
+    init(authManager: any AuthManager = AuthManagerImpl.shared) {
+        self.authManager = authManager
+    }
     
     func signup(email: String, pwd: String, name: String) {
         Task {

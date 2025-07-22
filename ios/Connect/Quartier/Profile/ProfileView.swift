@@ -14,14 +14,13 @@ struct ProfileView : View {
     var body : some View {
         ScrollView {
             VStack {
-                if(viewModel.userProfile != nil) {
-                    UserCard(user: viewModel.userProfile!, socials: viewModel.userSocials, onViewProfile: { url in
-                        if(url != nil) {
-                            if let url = URL(string: url!) {
-                                openURL(url)
+                if let userProfile = viewModel.userProfile {
+                    UserCard(user: userProfile, socials: viewModel.userSocials, onViewProfile: { url in
+                        if let urlString = url {
+                            if let link = URL(string: urlString) {
+                                openURL(link)
                             }
                         }
-                        
                     })
                 }
             }

@@ -17,8 +17,8 @@ struct LoginView : View {
     
     var body : some View {
         ZStack(alignment: .bottom) {
-            if(viewModel.message != nil) {
-                Text(viewModel.message!).font(.roboto(17)).padding().frame(width: 400)
+            if let message = viewModel.message {
+                Text(message).font(.roboto(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }

@@ -12,7 +12,7 @@ import Auth
 class LoginViewModel : ObservableObject {
     private var authManager: any AuthManager
     
-    @Published var message: String?
+    @Published var message: String? = nil
     
     init(authManager: any AuthManager = AuthManagerImpl.shared) {
         self.authManager = authManager

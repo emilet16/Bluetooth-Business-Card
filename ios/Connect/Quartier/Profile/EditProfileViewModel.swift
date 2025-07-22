@@ -40,14 +40,14 @@ class EditProfileViewModel: ObservableObject {
                     group.addTask {
                         try await self.userRepository.updateUser(name: savedName, jobTitle: savedJobTitle)
                     }
-                    if(savedLinkedIn != nil) {
+                    if let linkedin = savedLinkedIn {
                         group.addTask {
-                            try await self.socialsRepository.upsertSocials(linkedInUrl: savedLinkedIn!)
+                            try await self.socialsRepository.upsertSocials(linkedInUrl: linkedin)
                         }
                     }
-                    if(pfp != nil) {
+                    if let pfpImage = pfp {
                         group.addTask {
-                            let scaledImage = await self.imageRepository.resizeTo400(image: pfp!)
+                            let scaledImage = await self.imageRepository.resizeTo400(image: pfpImage)
                             let imageData = await self.imageRepository.encodeToWebP(image: scaledImage)
                             try await self.userRepository.uploadPfp(fileName: UUID().uuidString+".webp", imageData: imageData)
                         }

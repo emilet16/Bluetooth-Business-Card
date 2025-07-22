@@ -15,12 +15,6 @@ protocol AuthManager {
 class AuthManagerImpl : AuthManager {
     static let shared = AuthManagerImpl()
     
-    private var authListener: Task<Void, Never>?
-    
-    deinit {
-        authListener?.cancel()
-    }
-    
     func login(email:String, pwd: String) async throws {
         try await supabase.auth.signIn(email: email, password: pwd)
     }

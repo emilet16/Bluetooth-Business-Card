@@ -18,8 +18,8 @@ struct ProfileImagePicker: View {
     
     var body: some View {
         PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()){
-            if(selectedImage != nil) {
-                Image(uiImage: selectedImage!)
+            if let image = selectedImage {
+                Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 150, height: 150)
@@ -27,8 +27,8 @@ struct ProfileImagePicker: View {
                     .overlay(Circle().stroke(Color.black, lineWidth: 2))
                     .shadow(radius: 5)
                     .padding()
-            } else if(url != nil) {
-                ProfileImage(url: url, size: 150)
+            } else if let imageUrl = url {
+                ProfileImage(url: imageUrl, size: 150)
             }
             else {
                 Image(systemName: "person.circle.fill")

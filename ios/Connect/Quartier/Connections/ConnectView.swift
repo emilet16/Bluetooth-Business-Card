@@ -11,15 +11,15 @@ struct ConnectView : View {
     
     var body : some View {
         ZStack(alignment: .bottom) {
-            if(viewModel.connectionMessage != nil) {
-                Text(viewModel.connectionMessage!).font(.roboto(17)).padding().frame(width: 400)
+            if let connectionMessage = viewModel.connectionMessage {
+                Text(connectionMessage).font(.roboto(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             
             ScrollView {
-                if(viewModel.message != nil) {
-                    Text(viewModel.message!)
+                if let message = viewModel.message {
+                    Text(message)
                 } else if(viewModel.users.isEmpty) {
                     Text("No nearby people").font(.roboto(17))
                 } else {

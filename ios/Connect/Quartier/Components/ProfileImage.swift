@@ -12,8 +12,8 @@ struct ProfileImage: View {
     var size: CGFloat = 60
     
     var body: some View {
-        if(url != nil) {
-            AsyncImage(url: URL(string: url ?? "")) { phase in
+        if let imageLink = url {
+            AsyncImage(url: URL(string: imageLink)) { phase in
                 switch phase {
                 case .empty:
                     ProgressView()
