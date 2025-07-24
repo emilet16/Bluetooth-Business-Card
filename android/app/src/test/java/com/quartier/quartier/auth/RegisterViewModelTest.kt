@@ -1,3 +1,4 @@
+
 package com.quartier.quartier.auth
 
 import com.quartier.quartier.mock_models.MockAuthManager

@@ -74,5 +74,8 @@ struct EditProfileView : View {
                 userMessage = nil
             }
         }
+        .onAppear() {
+            viewModel.refreshUser()
+        }
     }
 }

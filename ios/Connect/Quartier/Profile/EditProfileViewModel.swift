@@ -10,21 +10,35 @@ import PhotosUI
 
 @MainActor
 class EditProfileViewModel: ObservableObject {
-    private var userRepository: any UserRepository = UserDatabase.shared
-    private var socialsRepository: any SocialsRepository = SocialsDatabase.shared
-    private var imageRepository: any ImageRepository = ImageManager()
+    private var userRepository: any UserRepository
+    private var socialsRepository: any SocialsRepository
+    private var imageRepository: any ImageRepository
     
     @Published var userProfile: User? = nil
     @Published var userSocials: Socials? = nil
     @Published var saveStatus: SaveStatus? = nil
     
-    init() {
+    init(userRepository: any UserRepository = UserDatabase.shared, socialsRepository: any SocialsRepository = SocialsDatabase.shared, imageRepository: any ImageRepository = ImageManager()) {
+        self.userRepository = userRepository
+        self.socialsRepository = socialsRepository
+        self.imageRepository = imageRepository
+    }
+    
+    func refreshUser() {
         Task {
-            userProfile = try await userRepository.getUser()
+            try await getUser()
         }
         Task {
-            userSocials = try await socialsRepository.getUserSocials()
+            try await getUserSocials()
         }
+    }
+    
+    func getUser() async throws {
+        userProfile = try await userRepository.getUser()
+    }
+    
+    func getUserSocials() async throws {
+        userSocials = try await socialsRepository.getUserSocials()
     }
     
     func saveUser(name: String, jobTitle: String, linkedInURL: String, pfp: UIImage?) {

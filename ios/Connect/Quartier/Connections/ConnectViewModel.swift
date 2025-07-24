@@ -10,10 +10,10 @@ import Combine
 
 @MainActor
 class ConnectViewModel : ObservableObject {
-    private var blePeripheralManager: any BluetoothPeripheralManager = BluetoothPeripheralManagerImpl.shared
-    private var bleCentralManager: any BluetoothCentralManager = BluetoothCentralManagerImpl.shared
-    private var userRepository: any UserRepository = UserDatabase.shared
-    private var connectionsRepository: any ConnectionsRepository = ConnectionsDatabase.shared
+    private var blePeripheralManager: any BluetoothPeripheralManager
+    private var bleCentralManager: any BluetoothCentralManager
+    private var userRepository: any UserRepository
+    private var connectionsRepository: any ConnectionsRepository
     
     @Published var users: [User] = []
     @Published var message: String? = nil
@@ -22,7 +22,12 @@ class ConnectViewModel : ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var scanTask: Task<Void, Never>? = nil
     
-    init() {
+    init(blePeripheralManager: any BluetoothPeripheralManager = BluetoothPeripheralManagerImpl.shared, bleCentralManager: any BluetoothCentralManager = BluetoothCentralManagerImpl.shared,
+         userRepository: any UserRepository = UserDatabase.shared, connectionsRepository: any ConnectionsRepository = ConnectionsDatabase.shared) {
+        self.blePeripheralManager = blePeripheralManager
+        self.bleCentralManager = bleCentralManager
+        self.userRepository = userRepository
+        self.connectionsRepository = connectionsRepository
         updateBleState()
         updateUsers()
     }

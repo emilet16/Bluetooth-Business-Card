@@ -9,11 +9,16 @@ import Foundation
 
 @MainActor
 class ProfileViewModel: ObservableObject {
-    private var userRepository: any UserRepository = UserDatabase.shared
-    private var socialsRepository: any SocialsRepository = SocialsDatabase.shared
+    private var userRepository: any UserRepository
+    private var socialsRepository: any SocialsRepository
     
     @Published var userProfile: User? = nil
     @Published var userSocials: Socials? = nil
+    
+    init(userRepository: any UserRepository = UserDatabase.shared, socialsRepository: any SocialsRepository = SocialsDatabase.shared) {
+        self.userRepository = userRepository
+        self.socialsRepository = socialsRepository
+    }
     
     func fetchProfile() {
         Task {

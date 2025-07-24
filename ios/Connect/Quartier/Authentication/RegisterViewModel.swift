@@ -10,7 +10,7 @@ import Auth
 
 @MainActor
 class RegisterViewModel : ObservableObject {
-    private var authManager: any AuthManager = AuthManagerImpl.shared
+    private var authManager: any AuthManager
     
     @Published var message: String? = nil
     

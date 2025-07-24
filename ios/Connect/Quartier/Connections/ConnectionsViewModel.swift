@@ -9,13 +9,19 @@ import Foundation
 
 @MainActor
 class ConnectionsViewModel : ObservableObject {
-    private var userRepository: any UserRepository = UserDatabase.shared
-    private var connectionsRepository: any ConnectionsRepository = ConnectionsDatabase.shared
-    private var socialsRepository: any SocialsRepository = SocialsDatabase.shared
+    private var userRepository: any UserRepository
+    private var connectionsRepository: any ConnectionsRepository
+    private var socialsRepository: any SocialsRepository
     
     @Published var connections: [User] = []
     @Published var requests: [User] = []
     @Published var socials: [String: Socials] = [:]
+    
+    init(userRepository: any UserRepository = UserDatabase.shared, connectionsRepository: any ConnectionsRepository = ConnectionsDatabase.shared, socialsRepository: any SocialsRepository = SocialsDatabase.shared) {
+        self.userRepository = userRepository
+        self.connectionsRepository = connectionsRepository
+        self.socialsRepository = socialsRepository
+    }
     
     func refreshConnections() {
         Task {

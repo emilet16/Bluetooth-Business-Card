@@ -10,7 +10,7 @@ import CoreBluetooth
 import os
 import Combine
 
-protocol BluetoothPeripheralManager: NSObject, ObservableObject, CBPeripheralManagerDelegate {
+protocol BluetoothPeripheralManager: ObservableObject, CBPeripheralManagerDelegate {
     var status: AnyPublisher<CBManagerState?, Never> { get }
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager)
     func startAdvertising()
@@ -78,7 +78,7 @@ class BluetoothPeripheralManagerImpl: NSObject, BluetoothPeripheralManager  {
     }
 }
 
-protocol BluetoothCentralManager : NSObject, ObservableObject, CBCentralManagerDelegate {
+protocol BluetoothCentralManager : ObservableObject, CBCentralManagerDelegate {
     var discoveredUIDS: AnyPublisher<[String], Never> { get }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager)
