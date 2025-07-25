@@ -31,3 +31,6 @@ struct PublicUserCard : View {
     }
 }
 	
+#Preview {
+    PublicUserCard(user: User(id: "0", name: "Steve Jobs", job: "CEO"), onConnect: {_ in})
+}

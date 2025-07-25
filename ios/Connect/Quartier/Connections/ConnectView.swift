@@ -56,3 +56,7 @@ struct ConnectView : View {
         }
     }
 }
+
+#Preview {
+    ConnectView()
+}

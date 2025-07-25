@@ -45,3 +45,7 @@ struct ProfileImage: View {
         }
     }
 }
+
+#Preview {
+    ProfileImage(url: "https://picsum.photos/60", size: 60)
+}

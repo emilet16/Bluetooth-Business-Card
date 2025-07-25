@@ -62,3 +62,7 @@ struct ConnectionsView : View {
         }
     }
 }
+
+#Preview {
+    ConnectionsView()
+}

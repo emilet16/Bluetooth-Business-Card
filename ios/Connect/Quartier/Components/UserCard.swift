@@ -34,3 +34,7 @@ struct UserCard : View {
         .padding()
     }
 }
+
+#Preview {
+    UserCard(user: User(id: "0", name: "Steve Jobs", job: "CEO"), socials: nil, onViewProfile: {_ in})
+}

@@ -49,3 +49,7 @@ struct ProfileImagePicker: View {
         }
     }
 }
+
+#Preview {
+    ProfileImagePicker(url: "https://picsum.photos/150", selectedImage: nil, selectedItem: nil, onChange: { _ in})
+}

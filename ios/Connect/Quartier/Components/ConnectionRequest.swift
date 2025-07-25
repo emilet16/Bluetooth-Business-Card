@@ -33,3 +33,8 @@ struct ConnectionRequest : View {
         .cornerRadius(12)
     }
 }
+
+#Preview {
+    ConnectionRequest(user: User(id: "0", name: "Steve Jobs", job: "CEO"), onAccept: {_ in}, onDecline: {_ in})
+        .frame(height: 180)
+}
