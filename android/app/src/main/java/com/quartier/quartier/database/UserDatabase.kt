@@ -52,35 +52,27 @@ class UserDatabase @Inject constructor(private val authRepository: AuthRepositor
 
     override suspend fun updateUser(name: String, job: String) {
         val uid = authRepository.userId.value!!
-        try {
-            supabase.from("profiles").update({
-                User::name setTo name
-                User::job setTo job
-            }) {
-                filter {
-                    User::id eq uid
-                }
+        supabase.from("profiles").update({
+            User::name setTo name
+            User::job setTo job
+        }) {
+            filter {
+                User::id eq uid
             }
-        } catch (e: Exception) { //TODO Better error handling?
-            throw e
         }
     }
 
     override suspend fun uploadPfp(fileName: String, image: ByteArray) { //TODO Delete old unused pfps
         val uid = authRepository.userId.value!!
-        try {
-            supabase.storage.from("pfp").upload(fileName, image)
+        supabase.storage.from("pfp").upload(fileName, image)
 
-            val url = supabase.storage.from("pfp").publicUrl(fileName)
-            supabase.from("profiles").update({
-                User::pfp_url setTo url
-            }) {
-                filter {
-                    User::id eq uid
-                }
+        val url = supabase.storage.from("pfp").publicUrl(fileName)
+        supabase.from("profiles").update({
+            User::pfp_url setTo url
+        }) {
+            filter {
+                User::id eq uid
             }
-        } catch (e: Exception) { //TODO Better error handling?
-            throw e
         }
     }
 }

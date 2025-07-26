@@ -43,12 +43,8 @@ class SocialsDatabase @Inject constructor(private val authRepository: AuthReposi
 
     override suspend fun upsertSocials(linkedinURL: String) {
         val uid = authRepository.userId.value!!
-        try {
-            supabase.from("socials").upsert(Socials(id = uid, linkedin_url = linkedinURL)) {
-                onConflict = "id"
-            }
-        } catch (e: Exception) { //TODO Better error handling?
-            throw e
+        supabase.from("socials").upsert(Socials(id = uid, linkedin_url = linkedinURL)) {
+            onConflict = "id"
         }
     }
 }
