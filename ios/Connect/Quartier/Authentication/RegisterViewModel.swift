@@ -8,8 +8,14 @@
 import Foundation
 import Auth
 
+protocol RegisterViewModel : ObservableObject {
+    var message: String? { get set }
+    func signup(email: String, pwd: String, name: String)
+    func matchEmailRegex(text: String) -> Bool
+}
+
 @MainActor
-class RegisterViewModel : ObservableObject {
+class RegisterViewModelImpl : RegisterViewModel {
     private var authManager: any AuthManager
     
     @Published var message: String? = nil

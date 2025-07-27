@@ -11,7 +11,7 @@ import Testing
 @MainActor
 struct RegisterVMTests {
     @Test func emailSignup_valid() async throws {
-        let viewModel = RegisterViewModel(authManager: MockAuthManager())
+        let viewModel = RegisterViewModelImpl(authManager: MockAuthManager())
         
         let _ = viewModel.$message.dropFirst().sink { message in
             #expect(message == nil)
@@ -21,7 +21,7 @@ struct RegisterVMTests {
     }
     
     @Test func emailLogin_invalid() async throws {
-        let viewModel = RegisterViewModel(authManager: MockAuthManager())
+        let viewModel = RegisterViewModelImpl(authManager: MockAuthManager())
         
         let _ = viewModel.$message.dropFirst().sink { message in
             #expect(viewModel.message == "User already exists")
@@ -31,22 +31,22 @@ struct RegisterVMTests {
     }
     
     @Test func emailRegex_valid() async throws {
-        let viewModel = RegisterViewModel(authManager: MockAuthManager())
+        let viewModel = RegisterViewModelImpl(authManager: MockAuthManager())
         #expect(viewModel.matchEmailRegex(text: "email@gmail.com"))
     }
     
     @Test func emailRegex_invalidEnd() async throws {
-        let viewModel = RegisterViewModel(authManager: MockAuthManager())
+        let viewModel = RegisterViewModelImpl(authManager: MockAuthManager())
         #expect(!viewModel.matchEmailRegex(text: "email@gmail"))
     }
     
     @Test func emailRegex_invalidStart() async throws {
-        let viewModel = RegisterViewModel(authManager: MockAuthManager())
+        let viewModel = RegisterViewModelImpl(authManager: MockAuthManager())
         #expect(!viewModel.matchEmailRegex(text: "em@il@gmail.com"))
     }
     
     @Test func emailRegex_invalidEmail() async throws {
-        let viewModel = RegisterViewModel(authManager: MockAuthManager())
+        let viewModel = RegisterViewModelImpl(authManager: MockAuthManager())
         #expect(!viewModel.matchEmailRegex(text: "emailgmail.com"))
     }
 }

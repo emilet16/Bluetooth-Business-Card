@@ -8,8 +8,18 @@
 import Foundation
 import PhotosUI
 
+protocol EditProfileViewModel : ObservableObject {
+    var userProfile: User? { get set }
+    var userSocials: Socials? { get set }
+    var saveStatus: SaveStatus? { get set }
+    
+    func refreshUser()
+    func saveUser(name: String, jobTitle: String, linkedInURL: String, pfp: UIImage?)
+    func matchesLinkedinRegex(input: String) -> Bool
+}
+
 @MainActor
-class EditProfileViewModel: ObservableObject {
+class EditProfileViewModelImpl : EditProfileViewModel {
     private var userRepository: any UserRepository
     private var socialsRepository: any SocialsRepository
     private var imageRepository: any ImageRepository

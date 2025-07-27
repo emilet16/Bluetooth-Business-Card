@@ -13,7 +13,7 @@ struct ProfileVMTests {
     @Test func refreshUser() async throws {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
-        let viewModel = ProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo)
+        let viewModel = ProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo)
         
         let _ = viewModel.$userProfile.dropFirst().sink { profile in
             #expect(profile == User(id: "0", name: "name", job: "job"))

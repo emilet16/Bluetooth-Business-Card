@@ -8,8 +8,22 @@
 import Foundation
 import Combine
 
+protocol ConnectViewModel : ObservableObject {
+    var users: [User] { get set }
+    var message: String? { get set }
+    var connectionMessage: String? { get set }
+    
+    func connectWithUser(requestedID: String)
+    func startAdvertising()
+    func stopAdvertising()
+    func startScan()
+    func stopScan()
+    func updateBleState()
+    func updateUsers()
+}
+
 @MainActor
-class ConnectViewModel : ObservableObject {
+class ConnectViewModelImpl : ConnectViewModel {
     private var blePeripheralManager: any BluetoothPeripheralManager
     private var bleCentralManager: any BluetoothCentralManager
     private var userRepository: any UserRepository

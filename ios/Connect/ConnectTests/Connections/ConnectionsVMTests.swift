@@ -14,7 +14,7 @@ struct ConnectionsVMTests {
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
         let socialsRepo = MockSocialsRepo()
-        let viewModel = ConnectionsViewModel(userRepository: userRepo, connectionsRepository: connectionsRepo, socialsRepository: socialsRepo)
+        let viewModel = ConnectionsViewModelImpl(userRepository: userRepo, connectionsRepository: connectionsRepo, socialsRepository: socialsRepo)
         
         let _ = viewModel.$connections.dropFirst().sink { users in
             #expect(users == [
@@ -43,7 +43,7 @@ struct ConnectionsVMTests {
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
         let socialsRepo = MockSocialsRepo()
-        let viewModel = ConnectionsViewModel(userRepository: userRepo, connectionsRepository: connectionsRepo, socialsRepository: socialsRepo)
+        let viewModel = ConnectionsViewModelImpl(userRepository: userRepo, connectionsRepository: connectionsRepo, socialsRepository: socialsRepo)
         
         let _ = viewModel.$connections.dropFirst().sink { users in
             #expect(users.contains(where: { $0.id == "4" && $0.connectionStatus == "accepted"}))
@@ -58,7 +58,7 @@ struct ConnectionsVMTests {
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
         let socialsRepo = MockSocialsRepo()
-        let viewModel = ConnectionsViewModel(userRepository: userRepo, connectionsRepository: connectionsRepo, socialsRepository: socialsRepo)
+        let viewModel = ConnectionsViewModelImpl(userRepository: userRepo, connectionsRepository: connectionsRepo, socialsRepository: socialsRepo)
         
         let _ = viewModel.$connections.dropFirst().sink { users in
             #expect(!users.contains(where: { $0.id == "4" }))

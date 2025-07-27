@@ -7,8 +7,18 @@
 
 import Foundation
 
+protocol ConnectionsViewModel : ObservableObject {
+    var connections: [User] { get set }
+    var requests: [User] { get set }
+    var socials: [String: Socials] { get set }
+    
+    func refreshConnections()
+    func acceptConnection(uid: String)
+    func declineConnection(uid: String)
+}
+
 @MainActor
-class ConnectionsViewModel : ObservableObject {
+class ConnectionsViewModelImpl : ConnectionsViewModel {
     private var userRepository: any UserRepository
     private var connectionsRepository: any ConnectionsRepository
     private var socialsRepository: any SocialsRepository

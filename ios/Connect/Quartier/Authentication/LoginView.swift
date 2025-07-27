@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct LoginView : View {
-    @StateObject var viewModel = LoginViewModel()
+struct LoginView<T: LoginViewModel> : View {
+    @StateObject var viewModel: T
     @State var email = ""
     @State var emailValid = false
     
@@ -53,7 +53,7 @@ struct LoginView : View {
                     Text("Login").foregroundStyle(Color("OnAccentColor")).font(.roboto(17))
                 }.disabled(!emailValid || !pwdValid).buttonStyle(.borderedProminent)
                 
-                NavigationLink(destination: RegisterView()) {
+                NavigationLink(destination: RegisterView(viewModel: RegisterViewModelImpl())) {
                     Text("Don't have an account? Register here.").font(.roboto(17))
                 }
             }
@@ -65,5 +65,12 @@ struct LoginView : View {
 }
 
 #Preview {
-    LoginView()
+    LoginView(viewModel: MockLoginVM())
+}
+
+class MockLoginVM : LoginViewModel {
+    var message: String? = nil
+    
+    func login(email: String, pwd: String) {}
+    func matchEmailRegex(text: String) -> Bool {return true}
 }

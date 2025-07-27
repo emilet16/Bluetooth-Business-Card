@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct ConnectionsView : View {
+struct ConnectionsView<T: ConnectionsViewModel> : View {
     @Environment(\.openURL) private var openURL
-    @StateObject var viewModel = ConnectionsViewModel()
+    @StateObject var viewModel: T
     
     var body : some View {
         ScrollView {
@@ -48,7 +48,7 @@ struct ConnectionsView : View {
                 Text("Connections").font(.poppins(24))
             }
             ToolbarItem(placement: .primaryAction) {
-                NavigationLink (destination: ConnectView()) {
+                NavigationLink (destination: ConnectView(viewModel: ConnectViewModelImpl())) {
                     Image(systemName: "plus.circle")
                 }
             }
@@ -64,5 +64,21 @@ struct ConnectionsView : View {
 }
 
 #Preview {
-    ConnectionsView()
+    ConnectionsView(viewModel: MockConnnectionsVM())
+}
+
+class MockConnnectionsVM : ConnectionsViewModel {
+    var connections: [User] = [
+        User(id: "0", name: "Steve Jobs", job: "CEO"),
+        User(id: "1", name: "Bill Gates", job: "Founder")
+    ]
+    var requests: [User] = [
+        User(id: "2", name: "Mark Zuckerberg", job: "Dropout"),
+        User(id: "3", name: "Larry Page", job: "Co-Founder")
+    ]
+    var socials: [String: Socials] = [:]
+    
+    func refreshConnections() {}
+    func acceptConnection(uid: String) {}
+    func declineConnection(uid: String) {}
 }

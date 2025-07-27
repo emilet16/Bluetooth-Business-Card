@@ -7,8 +7,15 @@
 
 import Foundation
 
+protocol ProfileViewModel : ObservableObject {
+    var userProfile: User? { get }
+    var userSocials: Socials? { get }
+    
+    func fetchProfile()
+}
+
 @MainActor
-class ProfileViewModel: ObservableObject {
+class ProfileViewModelImpl: ProfileViewModel {
     private var userRepository: any UserRepository
     private var socialsRepository: any SocialsRepository
     

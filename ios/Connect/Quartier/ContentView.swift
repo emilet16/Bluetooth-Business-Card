@@ -16,14 +16,14 @@ struct ContentView: View {
             case .main:
                 TabView {
                     NavigationStack {
-                        ConnectionsView()
+                        ConnectionsView(viewModel: ConnectionsViewModelImpl())
                     }.tabItem() {
                         Image(systemName: "person.3")
                         Text("Connections")
                     }
                     
                     NavigationStack {
-                        ProfileView()
+                        ProfileView(viewModel: ProfileViewModelImpl())
                     }.tabItem() {
                         Image(systemName: "person.circle")
                         Text("Profile")
@@ -31,7 +31,7 @@ struct ContentView: View {
                 }
             case .login:
                 NavigationStack {
-                    LoginView()
+                    LoginView(viewModel: LoginViewModelImpl())
                 }
             case .loading:
                 LoadingView()

@@ -8,8 +8,15 @@
 import Foundation
 import Auth
 
+protocol LoginViewModel : ObservableObject {
+    var message: String? { get set }
+    
+    func login(email: String, pwd: String)
+    func matchEmailRegex(text: String) -> Bool
+}
+
 @MainActor
-class LoginViewModel : ObservableObject {
+class LoginViewModelImpl : LoginViewModel {
     private var authManager: any AuthManager
     
     @Published var message: String? = nil

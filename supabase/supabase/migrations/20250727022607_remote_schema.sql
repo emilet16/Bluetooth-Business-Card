@@ -107,18 +107,13 @@ CREATE TABLE IF NOT EXISTS "public"."socials" (
 ALTER TABLE "public"."socials" OWNER TO "postgres";
 
 
-ALTER TABLE ONLY "public"."profiles"
-    ADD CONSTRAINT "User_id_key" UNIQUE ("id");
-
-
-
-ALTER TABLE ONLY "public"."profiles"
-    ADD CONSTRAINT "User_pkey" PRIMARY KEY ("id");
-
-
-
 ALTER TABLE ONLY "public"."connections"
     ADD CONSTRAINT "connections_pkey" PRIMARY KEY ("requested_by", "requested_for");
+
+
+
+ALTER TABLE ONLY "public"."profiles"
+    ADD CONSTRAINT "profiles_pkey" PRIMARY KEY ("id");
 
 
 

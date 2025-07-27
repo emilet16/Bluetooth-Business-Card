@@ -6,8 +6,8 @@
 //
 import SwiftUI
 
-struct ConnectView : View {
-    @StateObject var viewModel = ConnectViewModel()
+struct ConnectView<T: ConnectViewModel> : View {
+    @StateObject var viewModel: T
     
     var body : some View {
         ZStack(alignment: .bottom) {
@@ -58,5 +58,22 @@ struct ConnectView : View {
 }
 
 #Preview {
-    ConnectView()
+    ConnectView(viewModel: MockConnectVM())
+}
+
+class MockConnectVM : ConnectViewModel {
+    var users: [User] = [
+        User(id: "0", name: "Steve Jobs", job: "CEO"),
+        User(id: "1", name: "Bill Gates", job: "Founder")
+    ]
+    var message: String? = nil
+    var connectionMessage: String? = nil
+    
+    func connectWithUser(requestedID: String) {}
+    func startAdvertising() {}
+    func stopAdvertising() {}
+    func startScan() {}
+    func stopScan() {}
+    func updateBleState() {}
+    func updateUsers() {}
 }

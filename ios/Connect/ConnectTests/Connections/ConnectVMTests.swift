@@ -16,7 +16,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$users.dropFirst().sink { users in
             #expect(viewModel.users == [
@@ -34,7 +34,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$users.dropFirst().sink { users in
             #expect(viewModel.users == [])
@@ -48,7 +48,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$users.dropFirst().sink { users in
             #expect(viewModel.users == [
@@ -65,7 +65,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$message.dropFirst().sink { message in
             #expect(message == "Bluetooth is powered off")
@@ -79,7 +79,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$message.dropFirst().sink { message in
             #expect(message == "Bluetooth is unauthorized, please allow it in settings.")
@@ -93,7 +93,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$message.dropFirst().sink { message in
             #expect(message == nil)
@@ -107,7 +107,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$connectionMessage.dropFirst().sink { message in
             #expect(message == "You are already connected to this user.")
@@ -121,7 +121,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$connectionMessage.dropFirst().sink { message in
             #expect(message == "You are already connected to this user.")
@@ -135,7 +135,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$connectionMessage.dropFirst().sink { message in
             #expect(message == "Connection request pending...")
@@ -149,7 +149,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$connectionMessage.dropFirst().sink { message in
             #expect(message == "Connection request accepted!")
@@ -165,7 +165,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$connectionMessage.dropFirst().sink { message in
             #expect(message == "You cannot connect with yourself!")
@@ -179,7 +179,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$connectionMessage.dropFirst().sink { message in
             #expect(message == "An error happened, please try again!")
@@ -193,7 +193,7 @@ struct ConnectVMTests {
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
-        let viewModel = ConnectViewModel(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
+        let viewModel = ConnectViewModelImpl(blePeripheralManager: blePRepo, bleCentralManager: bleCRepo, userRepository: userRepo, connectionsRepository: connectionsRepo)
         
         let _ = viewModel.$connectionMessage.dropFirst().sink { message in
             #expect(message == "Connection request sent!")

@@ -8,10 +8,10 @@
 import SwiftUI
 import PhotosUI
 
-struct EditProfileView : View {
+struct EditProfileView<T: EditProfileViewModel> : View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
-    @StateObject var viewModel = EditProfileViewModel()
+    @StateObject var viewModel: T
     
     @State var name : String = ""
     @State var jobTitle : String = ""
@@ -81,5 +81,15 @@ struct EditProfileView : View {
 }
 
 #Preview {
-    EditProfileView()
+    EditProfileView(viewModel: MockEditProfileVM())
+}
+
+class MockEditProfileVM : EditProfileViewModel {
+    var userProfile: User?  = User(id: "0", name: "Steve Jobs", job: "CEO")
+    var userSocials: Socials? = nil
+    var saveStatus: SaveStatus? = nil
+    
+    func refreshUser() {}
+    func saveUser(name: String, jobTitle: String, linkedInURL: String, pfp: UIImage?) {}
+    func matchesLinkedinRegex(input: String) -> Bool {true}
 }

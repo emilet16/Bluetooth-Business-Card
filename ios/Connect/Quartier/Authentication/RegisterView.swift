@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct RegisterView: View {
+struct RegisterView<T: RegisterViewModel>: View {
     @Environment(\.dismiss) private var dismiss
     
-    @StateObject var viewModel = RegisterViewModel()
+    @StateObject var viewModel: T
     @State var email = ""
     @State var emailValid = false
     
@@ -81,5 +81,11 @@ struct RegisterView: View {
 }
 
 #Preview {
-    RegisterView()
+    RegisterView(viewModel: MockRegisterVM())
+}
+
+class MockRegisterVM : RegisterViewModel {
+    var message: String? = nil
+    func signup(email: String, pwd: String, name: String) {}
+    func matchEmailRegex(text: String) -> Bool {true}
 }

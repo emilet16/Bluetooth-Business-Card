@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct ProfileView : View {
+struct ProfileView<T: ProfileViewModel> : View {
     @Environment(\.openURL) private var openURL
-    @StateObject private var viewModel = ProfileViewModel()
+    @StateObject var viewModel: T
     
     var body : some View {
         ScrollView {
@@ -29,7 +29,7 @@ struct ProfileView : View {
                 Text("Profile").font(.poppins(24))
             }
             ToolbarItem(placement: .primaryAction) {
-                NavigationLink (destination: EditProfileView()) {
+                NavigationLink (destination: EditProfileView(viewModel: EditProfileViewModelImpl())) {
                     Image(systemName: "square.and.pencil")
                 }
             }
@@ -44,5 +44,12 @@ struct ProfileView : View {
 }
 
 #Preview {
-    ProfileView()
+    ProfileView(viewModel: MockProfileVM())
+}
+
+class MockProfileVM : ProfileViewModel {
+    var userProfile: User? = User(id: "0", name: "Steve Jobs", job: "CEO")
+    var userSocials: Socials? = nil
+    
+    func fetchProfile() {}
 }

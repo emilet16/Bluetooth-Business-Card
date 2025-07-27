@@ -15,7 +15,7 @@ struct EditProfileVMTests {
     @Test func refreshUser() async throws {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo)
         
         let _ = viewModel.$userProfile.dropFirst().sink { profile in
             #expect(profile == User(id: "0", name: "name", job: "job"))
@@ -32,7 +32,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         
         let _ = viewModel.$saveStatus.dropFirst().sink { status in
             #expect(status == .saving)
@@ -61,7 +61,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         
         socialsRepo.error = true
         
@@ -82,7 +82,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         
         userRepo.profileError = true
         
@@ -103,7 +103,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         
         userRepo.pfpError = true
         
@@ -124,7 +124,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         
         let _ = viewModel.$saveStatus.dropFirst().sink { status in
             #expect(status == .saving)
@@ -153,7 +153,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         
         let _ = viewModel.$saveStatus.dropFirst().sink { status in
             #expect(status == .saving)
@@ -182,7 +182,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         try await viewModel.getUser()
         try await viewModel.getUserSocials()
         
@@ -213,7 +213,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         #expect(viewModel.matchesLinkedinRegex(input: "https://www.linkedin.com/in/user"))
     }
     
@@ -221,7 +221,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         #expect(!viewModel.matchesLinkedinRegex(input: "https://www.google.com/search?query=query"))
     }
     
@@ -229,7 +229,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         #expect(!viewModel.matchesLinkedinRegex(input: "www.linkedin.com/in/user"))
     }
     
@@ -237,7 +237,7 @@ struct EditProfileVMTests {
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
-        let viewModel = EditProfileViewModel(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
+        let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo, imageRepository: imageRepo)
         #expect(!viewModel.matchesLinkedinRegex(input: "https://www.linkedin.com/in/"))
     }
 }
