@@ -17,7 +17,7 @@ import io.github.jan.supabase.storage.Storage
 
 val supabase = createSupabaseClient(
     supabaseUrl = "https://liumhaenwcmzwargxnpv.supabase.co",
-    supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpdW1oYWVud2Ntendhcmd4bnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwNjIzNDUsImV4cCI6MjA2NDYzODM0NX0.UtzshBOjki83CdLOFu1dyu70JKDQOgcaHtxo1WqrpwY"
+    supabaseKey = "sb_publishable_YVhSNGzOosROZp8bY-qzPQ_xJafBP1M"
 ) {
     install(Auth)
     install(Postgrest)
