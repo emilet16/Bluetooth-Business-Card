@@ -1,5 +1,8 @@
 begin;
-select plan(1);
+CREATE EXTENSION "basejump-supabase_test_helpers";
+select plan(2);
+
+select tests.rls_enabled('storage');
 
 select policies_are(
     'storage',
