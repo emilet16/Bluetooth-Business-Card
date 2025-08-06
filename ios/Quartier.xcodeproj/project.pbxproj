@@ -126,8 +126,8 @@
 		8D9AA9BC2E0209E4000945AC = {
 			isa = PBXGroup;
 			children = (
-				8DF1B4862E43DF1E00C23B02 /* QuartierTests */,
 				8D9AA9C72E0209E4000945AC /* Quartier */,
+				8DF1B4862E43DF1E00C23B02 /* QuartierTests */,
 				8D7DEAB92E02385C00F7D7AF /* Frameworks */,
 				8D9AA9C62E0209E4000945AC /* Products */,
 			);
