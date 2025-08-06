@@ -1,8 +1,7 @@
 /*Make sure all the components of the database are present*/
 
 begin;
-CREATE EXTENSION "basejump-supabase_test_helpers";
-select plan(23);
+select plan(25);
 
 select has_table('profiles');
 select has_table('socials');
@@ -57,6 +56,16 @@ select policies_are(
         'Users can create their own rows',
         'Users can select their row and connections',
         'Users can update their own rows'
+    ]
+);
+
+select tests.rls_enabled('storage');
+
+select policies_are(
+    'storage',
+    'objects',
+    ARRAY [
+        'Upload a new pfp only when auth 2dkq_0'
     ]
 );
 

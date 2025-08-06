@@ -1,7 +1,6 @@
 /*Ensure a new user is handled properly*/
 
 begin;
-CREATE EXTENSION "basejump-supabase_test_helpers";
 select plan(3);
 
 select has_function('handle_new_user');
