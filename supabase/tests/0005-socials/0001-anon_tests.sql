@@ -14,7 +14,8 @@ select tests.authenticate_as('test');
 
 select results_eq(
     'SELECT id, linkedin_url FROM public.socials where id = tests.get_supabase_uid(''test'')',
-    $$VALUES (tests.get_supabase_uid('test'), NULL)$$
+    $$VALUES (tests.get_supabase_uid('test'), NULL)$$,
+    'Anon user should not be able to edit socials.'
 );
 
 /*Owner edits linkedin*/
@@ -28,7 +29,8 @@ where id = tests.get_supabase_uid('test');
 select tests.clear_authentication();
 
 select is_empty(
-    'SELECT id, linkedin_url FROM public.socials where id = tests.get_supabase_uid(''test'')'
+    'SELECT id, linkedin_url FROM public.socials where id = tests.get_supabase_uid(''test'')',
+    'Anon users should not be able to select social rows.'
 );
 
 select * from finish();

@@ -15,7 +15,8 @@ where id = tests.get_supabase_uid('test');
 
 select results_eq(
     'SELECT id, name, job, pfp_url FROM public.profiles where id = tests.get_supabase_uid(''test'')',
-    $$VALUES (tests.get_supabase_uid('test'), 'Test', '', NULL)$$
+    $$VALUES (tests.get_supabase_uid('test'), 'Test', '', NULL)$$,
+    'Profile edits made by the wrong user should be ignored.'
 );
 
 select * from finish();

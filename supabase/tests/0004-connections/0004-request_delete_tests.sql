@@ -17,7 +17,8 @@ VALUES(
 
 select results_eq(
     'SELECT requested_by, requested_for, status FROM public.connections where requested_by = tests.get_supabase_uid(''test'') AND requested_for = tests.get_supabase_uid(''deleted'')',
-    $$VALUES (tests.get_supabase_uid('test'), tests.get_supabase_uid('deleted'), 'pending')$$
+    $$VALUES (tests.get_supabase_uid('test'), tests.get_supabase_uid('deleted'), 'pending')$$,
+    'Users should be able to send connection requests.'
 );
 
 select tests.authenticate_as('deleted');
@@ -27,7 +28,8 @@ where requested_by = tests.get_supabase_uid('test')
 AND requested_for = tests.get_supabase_uid('deleted');
 
 select is_empty(
-    'SELECT requested_by, requested_for, status FROM public.connections where requested_by = tests.get_supabase_uid(''test'') AND requested_for = tests.get_supabase_uid(''deleted'')'
+    'SELECT requested_by, requested_for, status FROM public.connections where requested_by = tests.get_supabase_uid(''test'') AND requested_for = tests.get_supabase_uid(''deleted'')',
+    'Ensure the connection request was deleted properly.'
 );
 
 select * from finish();
