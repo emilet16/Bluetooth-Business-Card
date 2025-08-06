@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//A profile picture for a user, loaded from internet
+
 struct ProfileImage: View {
     let url: String?
     var size: CGFloat = 60
@@ -15,7 +17,7 @@ struct ProfileImage: View {
         if let imageLink = url {
             AsyncImage(url: URL(string: imageLink)) { phase in
                 switch phase {
-                case .empty:
+                case .empty: //Loading
                     ProgressView()
                         .frame(width: size, height: size)
                 case .success(let image):
@@ -26,7 +28,7 @@ struct ProfileImage: View {
                         .clipShape(Circle())
                         .overlay(Circle().stroke(Color.black, lineWidth: 2))
                         .shadow(radius: 5)
-                case .failure:
+                case .failure: //Could not open image
                     Image(systemName: "person.circle.fill")
                         .resizable()
                         .scaledToFit()
@@ -36,7 +38,7 @@ struct ProfileImage: View {
                     EmptyView()
                 }
             }
-        } else {
+        } else { //No image available
             Image(systemName: "person.circle.fill")
                 .resizable()
                 .scaledToFit()

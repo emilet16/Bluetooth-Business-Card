@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+//Viewmodel class for the connect screen, fetch nearby users and send requests
+
 protocol ConnectViewModel : ObservableObject {
     var users: [User] { get set }
     var message: String? { get set }
@@ -51,17 +53,22 @@ class ConnectViewModelImpl : ConnectViewModel {
             let connection = try await connectionsRepository.getConnectionWithUser(requestedID: requestedID)
             
             if(connection == nil) {
+                //No connection exist with this user, make sure the user isn't trying to connect with themselves, then send request
                 let result = try await connectionsRepository.requestConnection(requestedID: requestedID)
                 if(result == .cannotConnectWithSelf) { connectionMessage = "You cannot connect with yourself!" }
                 else { connectionMessage = "Connection request sent!" }
             } else if(connection?.status == "pending" && connection?.requested_by == requestedID) {
+                //Connection request was sent by the other user, accept it
                 try await connectionsRepository.acceptConnection(requestedID: requestedID)
                 connectionMessage = "Connection request accepted!"
             } else if(connection?.status == "accepted") {
+                //A connection already exists between the users
                 connectionMessage = "You are already connected to this user."
             } else if(connection?.status == "pending" && connection?.requested_for == requestedID) {
+                //Connection request was already sent, wait for confirmation on the other side
                 connectionMessage = "Connection request pending..."
             } else {
+                //Show the user if something unexpected happens
                 connectionMessage = "An error happened, please try again!"
             }
             
@@ -81,7 +88,7 @@ class ConnectViewModelImpl : ConnectViewModel {
     func startScan() {
         bleCentralManager.startScan()
         scanTask?.cancel()
-        scanTask = Task {
+        scanTask = Task { //Stop scanning after 10 seconds for resource optimization
             try? await Task.sleep(for: .seconds(10))
             if (Task.isCancelled) {
                 return
@@ -98,6 +105,7 @@ class ConnectViewModelImpl : ConnectViewModel {
     }
     
     func updateBleState() {
+        //Notify the user if bluetooth is disabled/unauthorized
         blePeripheralManager.status.map({ state in
             switch state {
             case .poweredOff:
@@ -111,6 +119,7 @@ class ConnectViewModelImpl : ConnectViewModel {
     }
     
     func updateUsers() {
+        //Fetch the nearby users' profiles
         bleCentralManager.discoveredUIDS
             .sink { [weak self] uids in
                 Task {

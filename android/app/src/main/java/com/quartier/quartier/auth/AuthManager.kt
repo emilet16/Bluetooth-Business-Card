@@ -23,6 +23,8 @@ import kotlinx.serialization.json.put
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//A class handling authentication with supabase
+
 interface AuthManager {
     suspend fun emailSignIn(eml: String, pwd: String): AuthResult
     suspend fun emailSignUp(name: String, eml: String, pwd: String): AuthResult

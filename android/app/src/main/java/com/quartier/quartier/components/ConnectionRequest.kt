@@ -34,6 +34,8 @@ import com.quartier.quartier.R
 import com.quartier.quartier.database.User
 import com.quartier.quartier.ui.theme.Typography
 
+//A component showcasing a user who sent a connection request
+
 @Composable
 fun ConnectionRequest(onAcceptConnection: (User) -> Unit, onDeclineConnection: (User)->Unit, user: User) {
     Card(

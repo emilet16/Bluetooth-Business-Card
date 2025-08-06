@@ -6,6 +6,8 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.ktor.client.statement.HttpResponse
 
+//Imitates the Socials table in supabase, test cases where some has "links" and others don't
+
 class MockSocialsRepo : SocialsRepository {
     var error = false
     private val socials: MutableList<Socials> = mutableListOf(
@@ -20,7 +22,11 @@ class MockSocialsRepo : SocialsRepository {
     }
 
     override suspend fun getUserSocialsList(): List<Socials> {
-        return listOf(socials[2])
+        val connectionsRepo = MockConnectionsRepo()
+        return socials.filter {
+            val connection = connectionsRepo.getConnectionWithUser(it.id)
+            connection?.status == "accepted" //Imitate the behavior in supabase that only connected users can access socials
+        }
     }
 
     override suspend fun upsertSocials(linkedinURL: String) {

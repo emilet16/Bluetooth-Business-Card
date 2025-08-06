@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//Registration screen for the app
+
 struct RegisterView<T: RegisterViewModel>: View {
     @Environment(\.dismiss) private var dismiss
     
@@ -23,6 +25,7 @@ struct RegisterView<T: RegisterViewModel>: View {
     
     var body : some View {
         ZStack(alignment: .bottom) {
+            //Show a message if something goes wrong, ex. user already exists
             if let message = viewModel.message {
                 Text(message).font(.roboto(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))

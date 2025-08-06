@@ -35,7 +35,7 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun emailSignUp_valid() = runTest {
+    fun emailSignUp_valid() = runTest { //Normal registration
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -46,7 +46,7 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun emailSignUp_alreadyExists() = runTest {
+    fun emailSignUp_alreadyExists() = runTest { //User already exists
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -57,25 +57,25 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun emailRegex_valid() = runTest {
+    fun emailRegex_valid() = runTest { //Valid email
         val email = "email@gmail.com"
         assertEquals(viewModel.matchesEmailRegex(email), true)
     }
 
     @Test
-    fun emailRegex_invalidEnd() = runTest {
+    fun emailRegex_invalidEnd() = runTest { //Missing TLD
         val email = "email@gmail"
         assertEquals(viewModel.matchesEmailRegex(email), false)
     }
 
     @Test
-    fun emailRegex_invalidStart() = runTest {
+    fun emailRegex_invalidStart() = runTest { //Extra @
         val email = "em@ail@gmail.com"
         assertEquals(viewModel.matchesEmailRegex(email), false)
     }
 
     @Test
-    fun emailRegex_invalidEmail() = runTest {
+    fun emailRegex_invalidEmail() = runTest { //Missing @
         val email = "emailgmail.com"
         assertEquals(viewModel.matchesEmailRegex(email), false)
     }

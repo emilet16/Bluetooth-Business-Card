@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//Screen for the user to see their profile
+
 struct ProfileView<T: ProfileViewModel> : View {
     @Environment(\.openURL) private var openURL
     @StateObject var viewModel: T

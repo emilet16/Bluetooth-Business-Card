@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//The viewmodel class for the login screen, handles the sign in function
+
 @HiltViewModel
 class LoginViewModel @Inject constructor(val authManager: AuthManager) : ViewModel() {
     private val _userMessage = MutableStateFlow<Int?>(null)
@@ -24,7 +26,7 @@ class LoginViewModel @Inject constructor(val authManager: AuthManager) : ViewMod
         }
     }
 
-    fun matchesEmailRegex(input: String): Boolean {
+    fun matchesEmailRegex(input: String): Boolean { //The email must be valid
         val emailRegex = Regex("^[^@]+@[^@]+\\.[^@]+\$")
         return emailRegex.matches(input)
     }

@@ -8,10 +8,12 @@
 import Testing
 @testable import Quartier
 
+//Test the Connect viewmodel
+
 @MainActor
 struct ConnectVMTests {
 
-    @Test func validUserIds() async throws {
+    @Test func validUserIds() async throws { //Nearby users are all valid ids
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -29,7 +31,7 @@ struct ConnectVMTests {
         bleCRepo.uids = ["1", "2", "3"]
     }
     
-    @Test func emptyUserIds() async throws {
+    @Test func emptyUserIds() async throws { //No nearby users
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -43,7 +45,7 @@ struct ConnectVMTests {
         bleCRepo.uids = []
     }
     
-    @Test func invalidUserId() async throws {
+    @Test func invalidUserId() async throws { //One user has an invalid user ID
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -60,7 +62,7 @@ struct ConnectVMTests {
         bleCRepo.uids = ["-1", "1", "2"]
     }
     
-    @Test func bleOff() async throws {
+    @Test func bleOff() async throws { //Notify the user Bluetooth is turned off
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -74,7 +76,7 @@ struct ConnectVMTests {
         blePRepo.state = .poweredOff
     }
     
-    @Test func bleUnauth() async throws {
+    @Test func bleUnauth() async throws { //Notify the user Bluetooth is unauthorized
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -88,7 +90,7 @@ struct ConnectVMTests {
         blePRepo.state = .unauthorized
     }
     
-    @Test func bleStatus() async throws {
+    @Test func bleStatus() async throws { //Don't show anything when Bluetooth is working as expected
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -102,7 +104,7 @@ struct ConnectVMTests {
         blePRepo.state = .poweredOn
     }
     
-    @Test func connectWithAlreadyConnected_askedBySelf() async throws {
+    @Test func connectWithAlreadyConnected_askedBySelf() async throws { //User already connected
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -116,7 +118,7 @@ struct ConnectVMTests {
         viewModel.connectWithUser(requestedID: "1")
     }
     
-    @Test func connectWithAlreadyConnected_askedByOther() async throws {
+    @Test func connectWithAlreadyConnected_askedByOther() async throws { //User already connected
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -130,7 +132,7 @@ struct ConnectVMTests {
         viewModel.connectWithUser(requestedID: "2")
     }
     
-    @Test func connectWithPending_askedBySelf() async throws {
+    @Test func connectWithPending_askedBySelf() async throws { //Connection was already requested, ask the user to wait
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -144,7 +146,7 @@ struct ConnectVMTests {
         viewModel.connectWithUser(requestedID: "3")
     }
     
-    @Test func connectWithPending_askedByOther() async throws {
+    @Test func connectWithPending_askedByOther() async throws { //Accept the connection request
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -160,7 +162,7 @@ struct ConnectVMTests {
         viewModel.connectWithUser(requestedID: "4")
     }
     
-    @Test func connectWithSelf() async throws {
+    @Test func connectWithSelf() async throws { //Prevent the user from connecting with themselves
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -174,7 +176,7 @@ struct ConnectVMTests {
         viewModel.connectWithUser(requestedID: "0")
     }
     
-    @Test func connectWithInvalidStatus() async throws {
+    @Test func connectWithInvalidStatus() async throws { //Invalid connection status, notify the user of the error
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()
@@ -188,7 +190,7 @@ struct ConnectVMTests {
         viewModel.connectWithUser(requestedID: "5")
     }
     
-    @Test func connectWithNewUser() async throws {
+    @Test func connectWithNewUser() async throws { //Send a connection request
         let blePRepo = MockBlePeripheralManager()
         let bleCRepo = MockBleCentralManager()
         let userRepo = MockUserRepo()

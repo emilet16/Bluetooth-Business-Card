@@ -8,9 +8,11 @@
 import Testing
 @testable import Quartier
 
+//Tests for the Connections viewmodel
+
 @MainActor
 struct ConnectionsVMTests {
-    @Test func refreshConnections() async throws {
+    @Test func refreshConnections() async throws { //Big test containing multiple test cases defined in MockUserRepo (includes pending, accepted and invalid requests)
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
         let socialsRepo = MockSocialsRepo()
@@ -32,6 +34,7 @@ struct ConnectionsVMTests {
         
         let _ = viewModel.$socials.dropFirst().sink { socials in
             #expect(socials == [
+                "1": Socials(id: "1", linkedin_url: nil),
                 "2": Socials(id: "2", linkedin_url: "link")
             ])
         }
@@ -39,7 +42,7 @@ struct ConnectionsVMTests {
         viewModel.refreshConnections()
     }
     
-    @Test func acceptConnection() async throws {
+    @Test func acceptConnection() async throws { //Make sure connection is accepted properly
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
         let socialsRepo = MockSocialsRepo()
@@ -54,7 +57,7 @@ struct ConnectionsVMTests {
         viewModel.acceptConnection(uid: "4")
     }
     
-    @Test func deleteConnection() async throws {
+    @Test func deleteConnection() async throws { //Make sure a connection is deleted properly
         let userRepo = MockUserRepo()
         let connectionsRepo = MockConnectionsRepo()
         let socialsRepo = MockSocialsRepo()

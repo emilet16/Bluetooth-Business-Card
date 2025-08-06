@@ -4,6 +4,8 @@ import com.quartier.quartier.auth.AuthManager
 import com.quartier.quartier.auth.AuthResult
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 
+//Imitate the behavior of supabase authentication
+
 class MockAuthManager : AuthManager {
     val accounts = mutableMapOf(
         Pair("email@gmail.com", "Password")

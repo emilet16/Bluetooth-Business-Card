@@ -19,6 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.quartier.quartier.R
 
+//The tab bar at the bottom of the app
+
 interface SelectedScreen {
     object Connections: SelectedScreen
     object Profile: SelectedScreen
@@ -29,7 +31,7 @@ fun MainBottomAppBar(onNavToConnections: ()->Unit = {}, onNavToProfile: ()->Unit
     var connectionsIcon = painterResource(R.drawable.outline_business_center_24)
     var profileIcon = Icons.Outlined.AccountCircle
 
-    when(selectedScreen) {
+    when(selectedScreen) { //Fill the selected screen's icon
         is SelectedScreen.Connections -> {
             connectionsIcon = painterResource(R.drawable.baseline_business_center_24)
         }

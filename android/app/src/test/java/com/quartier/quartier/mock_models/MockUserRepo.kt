@@ -4,6 +4,8 @@ import com.quartier.quartier.database.UploadStatus
 import com.quartier.quartier.database.User
 import com.quartier.quartier.database.UserRepository
 
+//Imitate the profiles table in supabase, with different users as test cases
+
 class MockUserRepo : UserRepository {
     var profileError = false
     var pfpError = false

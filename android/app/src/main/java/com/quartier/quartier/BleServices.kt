@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//Helper class to handle Bluetooth methods/events
+
 interface BleRepository {
     val userIds: StateFlow<List<String>>
     fun startAdvertising()
@@ -40,6 +42,7 @@ interface BleRepository {
 
 @Singleton
 class BleManager @Inject constructor(@ApplicationContext val context: Context, authRepository: AuthRepository) : BleRepository {
+    //Service uuid to filter out other bluetooth devices
     private val bleUUID: String = "0000D17B-0000-1000-8000-00805F9B34FB"
 
     private val userID = authRepository.userId.value!!
@@ -74,6 +77,8 @@ class BleManager @Inject constructor(@ApplicationContext val context: Context, a
             super.onScanResult(callbackType, result)
 
             val serviceIds = result?.scanRecord?.serviceUuids
+            //Workaround to make the app work with ios devices, the packet sends 2 service uuids, the actual one, and the user ID.
+            //Remove the known service uuid from the packet to keep the "useful" user ID. (Cannot index because iOS has a diff order than Android)
             serviceIds?.remove(ParcelUuid.fromString(bleUUID))
 
             val userId = serviceIds?.get(0)
@@ -94,10 +99,12 @@ class BleManager @Inject constructor(@ApplicationContext val context: Context, a
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val advertiser = bluetoothManager.adapter.bluetoothLeAdvertiser
 
+        //Enable legacy mode for compatibility with iOS
         val parameters = AdvertisingSetParameters.Builder()
             .setLegacyMode(true)
             .build()
 
+        //Workaround to make the app work with ios devices, the packet sends 2 service uuids, the actual one, and the user ID.
         val advData = AdvertiseData.Builder()
             .addServiceUuid(pUuid)
             .addServiceUuid(ParcelUuid.fromString(userID))
@@ -125,12 +132,14 @@ class BleManager @Inject constructor(@ApplicationContext val context: Context, a
             .setLegacy(true)
             .build()
 
+        //Filter the packets to only get the wanted ble devices
         val filter = ScanFilter.Builder()
             .setServiceUuid(pUuid)
             .build()
 
         _userIds.value = emptyList<String>()
 
+        //When the scanner finds a device matching the filter, it calls the scanCallback method
         scanner.startScan(listOf(filter), settings, scanCallback)
     }
 

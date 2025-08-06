@@ -7,6 +7,8 @@
 
 import Foundation
 
+//A view model for the connections screen, sorts the connected users and handles connection requests
+
 protocol ConnectionsViewModel : ObservableObject {
     var connections: [User] { get set }
     var requests: [User] { get set }
@@ -33,7 +35,7 @@ class ConnectionsViewModelImpl : ConnectionsViewModel {
         self.socialsRepository = socialsRepository
     }
     
-    func refreshConnections() {
+    func refreshConnections() { //Load connections and sort them to display
         Task {
             let connectionsArray = try await connectionsRepository.getConnections()
             
@@ -50,6 +52,7 @@ class ConnectionsViewModelImpl : ConnectionsViewModel {
         }
     }
     
+    //Get connected users profiles
     private func connectionsToUsers(connections: [Connection]) async throws -> [User] {
         let userID = supabase.auth.currentUser!.id.uuidString
         var connectedUserStatus: [String: String] = [:]

@@ -7,6 +7,8 @@
 
 import Foundation
 
+//Viewmodel for the profile screen, fecthes the user's profile
+
 protocol ProfileViewModel : ObservableObject {
     var userProfile: User? { get }
     var userSocials: Socials? { get }

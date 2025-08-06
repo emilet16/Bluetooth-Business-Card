@@ -6,6 +6,8 @@
 //
 import Foundation
 
+//Class handling authentication with supabase
+
 protocol AuthManager {
     func login(email:String, pwd: String) async throws
     func signup(email:String, pwd: String, name: String) async throws

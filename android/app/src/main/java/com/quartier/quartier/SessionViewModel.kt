@@ -16,10 +16,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class SessionInfo(
-    val sessionStatus: SessionStatus = SessionStatus.Initializing,
-    val userID: String? = null
-)
+//Listens to the supabase auth status and inform the navigation of the status
+//Stores the user id top prevent weird behaviors when supabase checks the userId on app refresh
 
 @HiltViewModel
 class SessionViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {

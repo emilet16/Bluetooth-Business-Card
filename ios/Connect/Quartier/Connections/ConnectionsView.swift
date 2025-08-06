@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//A screen showing all connected users
+
 struct ConnectionsView<T: ConnectionsViewModel> : View {
     @Environment(\.openURL) private var openURL
     @StateObject var viewModel: T

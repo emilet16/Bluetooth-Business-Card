@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//Login screen for the app
+
 struct LoginView<T: LoginViewModel> : View {
     @StateObject var viewModel: T
     @State var email = ""
@@ -17,6 +19,7 @@ struct LoginView<T: LoginViewModel> : View {
     
     var body : some View {
         ZStack(alignment: .bottom) {
+            //Show a message to the user if something goes wrong (ex. wrong password)
             if let message = viewModel.message {
                 Text(message).font(.roboto(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))

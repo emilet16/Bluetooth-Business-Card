@@ -8,6 +8,8 @@
 import Foundation
 import Auth
 
+//Viewmodel for the registration screen, handles the sign up process
+
 protocol RegisterViewModel : ObservableObject {
     var message: String? { get set }
     func signup(email: String, pwd: String, name: String)

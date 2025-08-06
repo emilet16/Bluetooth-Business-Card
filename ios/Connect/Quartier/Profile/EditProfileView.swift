@@ -8,6 +8,8 @@
 import SwiftUI
 import PhotosUI
 
+//A screen allowing the user to change their profile
+
 struct EditProfileView<T: EditProfileViewModel> : View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL

@@ -26,6 +26,8 @@ import com.quartier.quartier.R
 import com.quartier.quartier.database.User
 import com.quartier.quartier.ui.theme.Typography
 
+//A card for the public profile of a user
+
 @Composable
 fun PublicUserCard(onClick: () -> Unit, user: User) {
     Card(onClick = onClick, modifier = Modifier.padding(5.dp).wrapContentHeight()) {

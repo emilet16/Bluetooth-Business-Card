@@ -50,7 +50,7 @@ class ConnectionsViewModelTest {
     }
 
     @Test
-    fun refreshConnections() = runTest {
+    fun refreshConnections() = runTest { //Test if the refresh connections method works (big tests testing for normal & unexpected behavior all at once), check MockUserRepo for cases
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -68,12 +68,13 @@ class ConnectionsViewModelTest {
         ), viewModel.uiState.value.requests)
 
         assertEquals(mapOf(
+            Pair("1", Socials("1", null)),
             Pair("2", Socials("2", "link"))
         ), viewModel.uiState.value.connectionsSocials)
     }
 
     @Test
-    fun acceptConnection() = runTest {
+    fun acceptConnection() = runTest { //Make sure a connection is accepted properly
         viewModel.acceptConnection(User("4", "name", "job"))
         testScheduler.advanceUntilIdle()
 
@@ -81,7 +82,7 @@ class ConnectionsViewModelTest {
     }
 
     @Test
-    fun deleteConnection() = runTest {
+    fun deleteConnection() = runTest { //Make sure a connection is deleted properly
         viewModel.declineConnection(User("4", "name", "job"))
         testScheduler.advanceUntilIdle()
 

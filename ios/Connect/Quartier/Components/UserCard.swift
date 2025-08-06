@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//User card shown to connected users
+
 struct UserCard : View {
     let user: User
     let socials: Socials?

@@ -1,3 +1,5 @@
+/*Make sure all the policies for storage are present*/
+
 begin;
 CREATE EXTENSION "basejump-supabase_test_helpers";
 select plan(2);

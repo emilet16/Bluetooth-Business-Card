@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//The viewmodel for the Connections screen, handles connections fetching and status modification
 data class ConnectionsUIState(
     val requests: List<User>,
     val connections: List<User>,

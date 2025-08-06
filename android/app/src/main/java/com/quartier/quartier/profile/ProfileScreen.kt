@@ -36,6 +36,7 @@ import com.quartier.quartier.components.SelectedScreen
 import com.quartier.quartier.database.User
 import com.quartier.quartier.components.UserCard
 
+//Screen used to display the user's profile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

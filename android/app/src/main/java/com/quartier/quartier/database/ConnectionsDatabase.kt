@@ -13,6 +13,8 @@ import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//Class to interface with the Connections table in the supabase database
+
 @Serializable
 data class Connection(
     val requested_by: String,
@@ -35,10 +37,10 @@ class ConnectionsDatabase @Inject constructor(private val authRepository: AuthRe
             filter {
                 or{
                     and{
-                        Connection::requested_by eq uid
+                        Connection::requested_by eq uid //only show the connections requested for the user, not the ones sent by them
                         Connection::status eq "accepted"
                     }
-                    Connection::requested_for eq uid
+                    Connection::requested_for eq uid //show all accepted connections
                 }
             }
         }.decodeList()
@@ -48,7 +50,7 @@ class ConnectionsDatabase @Inject constructor(private val authRepository: AuthRe
         val userId = authRepository.userId.value!!
         return supabase.from("connections").select(Columns.ALL) {
             filter {
-                or {
+                or { //Try to any connections matching both users, no matter who requested it
                     and {
                         Connection::requested_by eq userId
                         Connection::requested_for eq requestedId
@@ -64,7 +66,7 @@ class ConnectionsDatabase @Inject constructor(private val authRepository: AuthRe
 
     override suspend fun requestConnection(requestedId: String) : ConnectionRequestResult {
         val userId = authRepository.userId.value!!
-        if(userId == requestedId) return ConnectionRequestResult.CannotConnectWithSelf
+        if(userId == requestedId) return ConnectionRequestResult.CannotConnectWithSelf //Prevent the user from making a connection with themselves
         supabase.from("connections").upsert(Connection(userId, requestedId, "pending")) {
             ignoreDuplicates = true
         }

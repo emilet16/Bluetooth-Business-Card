@@ -62,6 +62,8 @@ import com.quartier.quartier.database.Socials
 import com.quartier.quartier.database.User
 import com.quartier.quartier.ui.theme.Typography
 
+//A screen display all connections and requests for the user
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavToConnect: ()->Unit, onNavToProfile: ()->Unit, onNavToLinkedin: (String) -> Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
@@ -75,6 +77,7 @@ fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavTo
         ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
     } else true
 
+    //Check permissions before opening the screen that uses Bluetooth
     val requestScanPerm = rememberLauncherForActivityResult(RequestPermission()) { granted ->
         if(granted) {
             onNavToConnect()
@@ -85,7 +88,7 @@ fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavTo
 
     val requestAdvPerm = rememberLauncherForActivityResult(RequestPermission()) { granted ->
         if(granted) {
-            if(scanAllowed) {
+            if(scanAllowed) { //check permissions in chain to make sure both are allowed
                 onNavToConnect()
             }
             else {
@@ -127,6 +130,7 @@ fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavTo
                     viewModel.refreshConnections()
                 })
 
+            //Display message for the user (ex. when Bluetooth isn't available)
             uiState.userMessage?.let { userMessage ->
                 val snackbarText = LocalContext.current.getString(userMessage)
                 LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {

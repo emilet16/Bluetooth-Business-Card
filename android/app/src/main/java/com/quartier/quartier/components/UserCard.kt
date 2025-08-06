@@ -30,6 +30,7 @@ import com.quartier.quartier.R
 import com.quartier.quartier.database.User
 import com.quartier.quartier.ui.theme.Typography
 
+//A card shown to the connected users
 
 @Composable
 fun UserCard(onClick: () -> Unit, user: User) {

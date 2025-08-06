@@ -20,6 +20,8 @@ import org.junit.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
+//Test the viewmodel for the connect screen
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConnectViewModelTest {
     private lateinit var viewModel: ConnectViewModel
@@ -43,7 +45,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun validUserIds() = runTest {
+    fun validUserIds() = runTest { //All valid user ids
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -60,7 +62,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun emptyUserIds() = runTest {
+    fun emptyUserIds() = runTest { //No user ids
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -71,7 +73,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun invalidUserId() = runTest {
+    fun invalidUserId() = runTest { //One user id doesn't exist
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -87,7 +89,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun connectWithAlreadyConnected_requestedBySelf() = runTest {
+    fun connectWithAlreadyConnected_requestedBySelf() = runTest { //Try connecting with someone already connected
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -99,7 +101,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun connectWithAlreadyConnected_requestedByOther() = runTest {
+    fun connectWithAlreadyConnected_requestedByOther() = runTest { //Try connecting with someone already connected
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -111,7 +113,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun connectWithPending_requestedBySelf() = runTest {
+    fun connectWithPending_requestedBySelf() = runTest { //Try sending a request when one is pending
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -123,7 +125,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun connectWithPending_requestedByOther() = runTest {
+    fun connectWithPending_requestedByOther() = runTest { //Accept the connection request
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -136,7 +138,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun connectionWithSelf() = runTest {
+    fun connectionWithSelf() = runTest { //Try connecting with self
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -148,7 +150,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun connectionWithInvalidStatus() = runTest {
+    fun connectionWithInvalidStatus() = runTest { //Try connecting with someone with an invalid_status connection (see MockConnectionsRepo)
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -160,7 +162,7 @@ class ConnectViewModelTest {
     }
 
     @Test
-    fun requestConnectionWithNewUser() = runTest {
+    fun requestConnectionWithNewUser() = runTest { //Send a connection request
         backgroundScope.launch {
             viewModel.uiState.collect()
         }

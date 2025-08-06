@@ -53,6 +53,7 @@ import com.quartier.quartier.database.UploadStatus
 import com.quartier.quartier.database.User
 import com.quartier.quartier.ui.theme.Typography
 
+//Compose function defining a screen for users to edit their profiles
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +72,7 @@ fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnT
         TopAppBar(title = {
             Text("Edit profile")
         }, navigationIcon = {
+            //Close the screen
             IconButton(onClick = returnToProfile) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = LocalContext.current.getString(R.string.back))
             }
@@ -86,14 +88,7 @@ fun EditProfileScreen(viewModel: EditProfileViewModel = hiltViewModel(), returnT
             })
         }
 
-        uiState.userMessage?.let { userMessage ->
-            val snackbarText = LocalContext.current.getString(userMessage)
-            LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {
-                snackbarHostState.showSnackbar(snackbarText)
-                viewModel.snackbarMessageShown()
-            }
-        }
-
+        //Display the save status for the user & close the screen if saving is successful
         uiState.saveStatus?.let { status ->
             when(status) {
                 UploadStatus.Success -> {

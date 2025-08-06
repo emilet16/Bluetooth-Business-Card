@@ -26,6 +26,8 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.serialization.Serializable
 import androidx.core.net.toUri
 
+//App navigation using Compose Navigation, each screen is defined by an object
+
 interface Screen {
     @Serializable
     object Connect: Screen
@@ -55,6 +57,7 @@ fun Navigation(viewModel: SessionViewModel = hiltViewModel()) {
         "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
     }
 
+    //The app entry point depends on the login status, behavior is defined in the SessionViewModel
     val startDestination = if(isLoggedIn.value == null) {
         Screen.Loading
     } else if(isLoggedIn.value!!) {
@@ -88,6 +91,7 @@ fun Navigation(viewModel: SessionViewModel = hiltViewModel()) {
             }, onNavToProfile = {
                 navController.navigate(Screen.Profile)
             }, onNavToLinkedin = { url ->
+                //Open the linkedin url
                 context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
             })
         }
@@ -98,6 +102,7 @@ fun Navigation(viewModel: SessionViewModel = hiltViewModel()) {
             }, onNavToConnections = {
                 navController.navigate(Screen.Connections)
             }, onNavToLinkedin = { url ->
+                //Open the linkedin url
                 context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
             })
         }

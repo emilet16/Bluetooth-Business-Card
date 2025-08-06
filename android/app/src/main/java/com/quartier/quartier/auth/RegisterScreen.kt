@@ -34,6 +34,8 @@ import com.quartier.quartier.components.EmailTextField
 import com.quartier.quartier.components.PasswordTextField
 import com.quartier.quartier.ui.theme.Typography
 
+//The registration screen for the app
+
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel(),
@@ -50,6 +52,7 @@ fun RegisterScreen(
                 viewModel.matchesEmailRegex(it)
             })
 
+            //Notify the user if something goes wrong during registration (ex. the user already exists)
             userMessage?.let { userMessage ->
                 val snackbarText = LocalContext.current.getString(userMessage)
                 LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {

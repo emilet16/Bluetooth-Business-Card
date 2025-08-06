@@ -15,6 +15,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
+//Test cases for the login view model
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
     private lateinit var authManager: MockAuthManager
@@ -34,7 +36,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun emailSignIn_valid() = runTest {
+    fun emailSignIn_valid() = runTest { //Normal test case
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -45,7 +47,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun emailSignIn_invalid() = runTest {
+    fun emailSignIn_invalid() = runTest { //Wrong password
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -56,7 +58,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun emailSignIn_nonExistent() = runTest {
+    fun emailSignIn_nonExistent() = runTest { //Account doesn't exist
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -67,25 +69,25 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun emailRegex_valid() = runTest {
+    fun emailRegex_valid() = runTest { //Valid email
         val email = "email@gmail.com"
         assertEquals(viewModel.matchesEmailRegex(email), true)
     }
 
     @Test
-    fun emailRegex_invalidEnd() = runTest {
+    fun emailRegex_invalidEnd() = runTest { //Missing TLD
         val email = "email@gmail"
         assertEquals(viewModel.matchesEmailRegex(email), false)
     }
 
     @Test
-    fun emailRegex_invalidStart() = runTest {
+    fun emailRegex_invalidStart() = runTest { //Extra @
         val email = "em@ail@gmail.com"
         assertEquals(viewModel.matchesEmailRegex(email), false)
     }
 
     @Test
-    fun emailRegex_invalidEmail() = runTest {
+    fun emailRegex_invalidEmail() = runTest { //Missing @
         val email = "emailgmail.com"
         assertEquals(viewModel.matchesEmailRegex(email), false)
     }

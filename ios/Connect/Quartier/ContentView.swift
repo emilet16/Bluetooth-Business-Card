@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//Navigation control for the app, behavior controlled by MainViewModel
+
 struct ContentView: View {
     @StateObject private var viewModel = MainViewModel()
     
@@ -34,7 +36,7 @@ struct ContentView: View {
                     LoginView(viewModel: LoginViewModelImpl())
                 }
             case .loading:
-                LoadingView()
+                ProgressView()
             }
         }
     }

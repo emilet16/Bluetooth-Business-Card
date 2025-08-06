@@ -7,6 +7,8 @@
 
 import Foundation
 
+//Viewmodel for the navigation, controlled by supabase auth status
+
 @MainActor
 class MainViewModel : ObservableObject {
     @Published var page: ContentPage = .loading
@@ -24,7 +26,7 @@ class MainViewModel : ObservableObject {
         authStateTask = Task {
             for await (event, session) in supabase.auth.authStateChanges {
                 switch event {
-                case .initialSession:
+                case .initialSession: //On load find out if user is already logged in
                     if(session?.isExpired ?? true || session?.user == nil) {
                         page = .login
                     } else {

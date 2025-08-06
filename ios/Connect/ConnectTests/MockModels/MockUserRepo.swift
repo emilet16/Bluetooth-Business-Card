@@ -10,6 +10,8 @@ import Supabase
 import Testing
 @testable import Quartier
 
+//Mock the behavior of the profiles table in the supabase db
+
 class MockUserRepo: UserRepository {
     var profileError = false
     var pfpError = false
@@ -23,11 +25,11 @@ class MockUserRepo: UserRepository {
         User(id: "5", name: "name", job: "job"),
     ]
     
-    func getUser() async throws -> Quartier.User {
+    func getUser() async throws -> Quartier.User { //Return user's profile
         return users[0]
     }
     
-    func getUsers(ids: [String]) async throws -> [Quartier.User] {
+    func getUsers(ids: [String]) async throws -> [Quartier.User] { //Get a list of users from ids
         users.filter { ids.contains($0.id) }
     }
     
@@ -42,7 +44,7 @@ class MockUserRepo: UserRepository {
         if(profileError) {
             throw PostgrestError(message: "Error!")
         }
-        let path = imageData.base64EncodedString(options: .endLineWithLineFeed)
+        let path = imageData.base64EncodedString(options: .endLineWithLineFeed) //Decode the fake image (containing a string for the path)
         users[0] = User(id: "0", name: users[0].name, job: users[0].job, pfp_url: path)
     }
 }

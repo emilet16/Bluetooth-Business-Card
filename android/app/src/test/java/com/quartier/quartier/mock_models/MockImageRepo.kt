@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.net.Uri
 import com.quartier.quartier.ImageRepository
 
+//Fake image repo, bypass behavior in VM tests
+
 class MockImageRepo : ImageRepository {
     var path: String = ""
 

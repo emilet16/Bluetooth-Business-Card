@@ -10,9 +10,11 @@ import CoreBluetooth
 import Combine
 @testable import Quartier
 
+//Mocking the behavior of the Bluetooth managers
+
 class MockBlePeripheralManager : NSObject, BluetoothPeripheralManager {
     @Published var state: CBManagerState? = nil
-    var status: AnyPublisher<CBManagerState?, Never> {
+    var status: AnyPublisher<CBManagerState?, Never> { //status can be set by the tests
         $state.eraseToAnyPublisher()
     }
     
@@ -23,7 +25,7 @@ class MockBlePeripheralManager : NSObject, BluetoothPeripheralManager {
 
 class MockBleCentralManager : NSObject, BluetoothCentralManager {
     @Published var uids: [String] = []
-    var discoveredUIDS: AnyPublisher<[String], Never> {
+    var discoveredUIDS: AnyPublisher<[String], Never> { //uids can be set by the tests
         $uids.eraseToAnyPublisher()
     }
     

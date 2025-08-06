@@ -8,6 +8,8 @@
 import Testing
 @testable import Quartier
 
+//Mock the behavior of the connections table in the supabase DB
+
 class MockConnectionsRepo : ConnectionsRepository {
     private(set) var connections = [
         Connection(requested_by: "0", requested_for: "1", status: "accepted"),
@@ -17,7 +19,7 @@ class MockConnectionsRepo : ConnectionsRepository {
         Connection(requested_by: "0", requested_for: "5", status: "invalid_status")
     ]
     
-    func getConnections() async throws -> [Connection] {
+    func getConnections() async throws -> [Connection] { //Normally should filter for ones containing the user ID ("0") but for the sake of simplicity it is omitted
         return connections
     }
     
@@ -28,13 +30,13 @@ class MockConnectionsRepo : ConnectionsRepository {
         })
     }
     
-    func requestConnection(requestedID: String) async throws -> ConnectionResult? {
+    func requestConnection(requestedID: String) async throws -> ConnectionResult? { //Create connection request
         if(requestedID == "0") { return .cannotConnectWithSelf }
         connections.append(Connection(requested_by: "0", requested_for: requestedID, status: "pending"))
         return .requested
     }
     
-    func acceptConnection(requestedID: String) async throws {
+    func acceptConnection(requestedID: String) async throws { //Accept connection request
         let nullableIndex = connections.firstIndex(where: {
             $0.requested_by == requestedID && $0.requested_for == "0"
         })
@@ -43,7 +45,7 @@ class MockConnectionsRepo : ConnectionsRepository {
         }
     }
     
-    func deleteConnection(requestedID: String) async throws {
+    func deleteConnection(requestedID: String) async throws { //Delete connection request
         connections.removeAll {
             $0.requested_by == requestedID && $0.requested_for == "0" && $0.status == "pending"
         }

@@ -1,3 +1,6 @@
+/*Public schema, main user db*/
+
+/*Each user has a profile*/
 CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "id" "uuid" DEFAULT "auth"."uid"() NOT NULL PRIMARY KEY REFERENCES "auth"."users"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
@@ -6,6 +9,7 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "pfp_url" "text"
 );
 
+/*Connection tables identifies which users have connected to another*/
 CREATE TABLE IF NOT EXISTS "public"."connections" (
     "requested_by" "uuid" NOT NULL REFERENCES "public"."profiles"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     "requested_for" "uuid" NOT NULL REFERENCES "public"."profiles"("id") ON UPDATE CASCADE ON DELETE CASCADE,
@@ -15,15 +19,13 @@ CREATE TABLE IF NOT EXISTS "public"."connections" (
     PRIMARY KEY ("requested_by", "requested_for")
 );
 
+/*Restricted table containing socials of users, only connected users can read*/
 CREATE TABLE IF NOT EXISTS "public"."socials" (
     "id" "uuid" DEFAULT "auth"."uid"() NOT NULL PRIMARY KEY REFERENCES "public"."profiles"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     "linkedin_url" "text"
 );
 
-ALTER TABLE "public"."profiles" OWNER TO "postgres";
-ALTER TABLE "public"."connections" OWNER TO "postgres";
-ALTER TABLE "public"."socials" OWNER TO "postgres";
-
+/*Profile access policies*/
 create policy "Enable insert for users based on user_id"
 on "public"."profiles"
 as permissive
@@ -48,6 +50,7 @@ with check ((( SELECT auth.uid() AS uid) = id));
 
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 
+/*Connections access policies*/
 create policy "Create requested_by, status pending"
 on "public"."connections"
 as permissive
@@ -79,6 +82,7 @@ with check (((( SELECT auth.uid() AS uid) = requested_for) AND (status = 'accept
 
 ALTER TABLE "public"."connections" ENABLE ROW LEVEL SECURITY;
 
+/*Socials access policies*/
 create policy "Users can create their own rows"
 on "public"."socials"
 as permissive
@@ -105,6 +109,7 @@ with check ((( SELECT auth.uid() AS uid) = id));
 
 ALTER TABLE "public"."socials" ENABLE ROW LEVEL SECURITY;
 
+/*When a new user is created, add their name to the profiles table and create an empty entry in the socials table*/
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''

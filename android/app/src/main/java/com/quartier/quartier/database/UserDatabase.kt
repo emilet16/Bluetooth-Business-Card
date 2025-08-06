@@ -16,6 +16,8 @@ import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//Class to interface with the profiles table in the supabase database
+
 @Serializable
 data class User(
     val id: String,
@@ -34,7 +36,7 @@ interface UserRepository {
 @Singleton
 class UserDatabase @Inject constructor(private val authRepository: AuthRepository) : UserRepository {
     override suspend fun getUsers(uids: List<String>): List<User> {
-        return supabase.from("profiles").select(columns = Columns.ALL) {
+        return supabase.from("profiles").select(columns = Columns.ALL) { //Get a list of profiles from the user IDs.
             filter {
                 User::id isIn uids
             }
@@ -43,7 +45,7 @@ class UserDatabase @Inject constructor(private val authRepository: AuthRepositor
 
     override suspend fun getUser(): User {
         val uid = authRepository.userId.value!!
-        return supabase.from("profiles").select(columns = Columns.ALL) {
+        return supabase.from("profiles").select(columns = Columns.ALL) { //Get the user's profile
             filter {
                 User::id eq uid
             }
@@ -52,7 +54,7 @@ class UserDatabase @Inject constructor(private val authRepository: AuthRepositor
 
     override suspend fun updateUser(name: String, job: String) {
         val uid = authRepository.userId.value!!
-        supabase.from("profiles").update({
+        supabase.from("profiles").update({ //Edit the user's profile
             User::name setTo name
             User::job setTo job
         }) {
@@ -64,10 +66,10 @@ class UserDatabase @Inject constructor(private val authRepository: AuthRepositor
 
     override suspend fun uploadPfp(fileName: String, image: ByteArray) { //TODO Delete old unused pfps
         val uid = authRepository.userId.value!!
-        supabase.storage.from("pfp").upload(fileName, image)
+        supabase.storage.from("pfp").upload(fileName, image) //Upload the pfp to the storage bucket
 
-        val url = supabase.storage.from("pfp").publicUrl(fileName)
-        supabase.from("profiles").update({
+        val url = supabase.storage.from("pfp").publicUrl(fileName) //Get the public URL to the image
+        supabase.from("profiles").update({ //Add the url to the user's profile
             User::pfp_url setTo url
         }) {
             filter {

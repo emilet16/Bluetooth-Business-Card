@@ -10,6 +10,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.quartier.quartier.R
 
+//A component responsible for the styling of email fields
+
 @Composable
 fun EmailTextField(email: String, showError: Boolean, onValueChange: (String) -> Unit) {
     TextField(email, onValueChange = onValueChange, label = {Text(LocalContext.current.getString(R.string.email_label))}, singleLine = true,

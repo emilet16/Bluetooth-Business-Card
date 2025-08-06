@@ -39,6 +39,8 @@ import com.quartier.quartier.components.PublicUserCard
 import com.quartier.quartier.components.UserCard
 import com.quartier.quartier.database.User
 
+//A screen displaying the nearby users
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectScreen(viewModel: ConnectViewModel = hiltViewModel(), returnToConnections: ()->Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
@@ -73,6 +75,7 @@ fun ConnectScreen(viewModel: ConnectViewModel = hiltViewModel(), returnToConnect
         Box(modifier = Modifier.padding(innerPadding)) {
             ConnectScreen(uiState.users, onSendProfileRequest = { viewModel.connectWith(it) })
 
+            //Display messages for the user, like the status of a connection when clicking on a user
             uiState.userMessage?.let { userMessage ->
                 val snackbarText = LocalContext.current.getString(userMessage)
                 LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {
@@ -99,6 +102,7 @@ private fun ConnectScreen(users: List<User>, onSendProfileRequest: (User)->Unit)
     }
 }
 
+//Add lifecycle events for this screen, letting the viewmodel know when the screen is resumed/paused
 @Composable
 fun <LO : LifecycleObserver> LO.ObserveLifecycle(lifecycle: Lifecycle) {
     DisposableEffect(lifecycle) {

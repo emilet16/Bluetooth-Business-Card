@@ -19,12 +19,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.quartier.quartier.R
 
+//A component responsible for the styling of password input fields
+
 @Composable
 fun PasswordTextField(pwd: String, showError: Boolean, onValueChange: (String) -> Unit) {
     var showPwd by rememberSaveable { mutableStateOf(false) }
 
     TextField(value = pwd, onValueChange = onValueChange, label = {Text(LocalContext.current.getString(R.string.password_label))}, singleLine = true, placeholder = {Text(LocalContext.current.getString(R.string.password_placeholder))},
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done), visualTransformation = if(showPwd) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+        visualTransformation = if(showPwd) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
             val icon = if(showPwd) painterResource(R.drawable.outline_visibility_off_24)
             else painterResource(R.drawable.outline_visibility_24)

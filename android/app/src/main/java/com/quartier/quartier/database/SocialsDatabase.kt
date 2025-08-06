@@ -14,6 +14,8 @@ import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//Class to interface with the Socials table in the supabase database
+
 @Serializable
 data class Socials(
     val id: String,
@@ -38,13 +40,13 @@ class SocialsDatabase @Inject constructor(private val authRepository: AuthReposi
     }
 
     override suspend fun getUserSocialsList() : List<Socials> {
-        return supabase.from("socials").select(columns = Columns.ALL).decodeList<Socials>() //RLS returns all friended users
+        return supabase.from("socials").select(columns = Columns.ALL).decodeList<Socials>() //RLS returns all connected users
     }
 
     override suspend fun upsertSocials(linkedinURL: String) {
         val uid = authRepository.userId.value!!
         supabase.from("socials").upsert(Socials(id = uid, linkedin_url = linkedinURL)) {
-            onConflict = "id"
+            onConflict = "id" //When modifying, overwrite based on the user ID.
         }
     }
 }

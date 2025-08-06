@@ -10,6 +10,8 @@ import CoreBluetooth
 import os
 import Combine
 
+//Bluetooth peripheral manager, advertises user id to the nearby devices
+
 protocol BluetoothPeripheralManager: ObservableObject, CBPeripheralManagerDelegate {
     var status: AnyPublisher<CBManagerState?, Never> { get }
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager)
@@ -39,13 +41,13 @@ class BluetoothPeripheralManagerImpl: NSObject, BluetoothPeripheralManager  {
         switch peripheral.state {
        case .poweredOn:
            print("Peripheral Manager is powered on.")
-           if shouldAdvertise {
+           if shouldAdvertise { //Start advertising if it was delayed
                startAdvertising()
            }
         case .poweredOff:
             print("Bluetooth is powered off.")
             stopAdvertising()
-            shouldAdvertise = true
+            shouldAdvertise = true //Restart advertising when Bluetooth is turned back on
        case .unauthorized:
            print("Bluetooth not authorized.")
        case .unsupported:
@@ -67,7 +69,7 @@ class BluetoothPeripheralManagerImpl: NSObject, BluetoothPeripheralManager  {
             let userUUID = CBUUID(string: supabase.auth.currentUser!.id.uuidString)
             
             peripheralManager?.startAdvertising([
-                CBAdvertisementDataServiceUUIDsKey: [serviceUUID, userUUID],
+                CBAdvertisementDataServiceUUIDsKey: [serviceUUID, userUUID], //Advertise both service uuid and user ID as a workaround for not sending service key data
             ])
         }
     }
@@ -77,6 +79,8 @@ class BluetoothPeripheralManagerImpl: NSObject, BluetoothPeripheralManager  {
         shouldAdvertise = false
     }
 }
+
+//Bluetooth peripheral manager, scans for nearby users
 
 protocol BluetoothCentralManager : ObservableObject, CBCentralManagerDelegate {
     var discoveredUIDS: AnyPublisher<[String], Never> { get }
@@ -109,7 +113,7 @@ class BluetoothCentralManagerImpl: NSObject, BluetoothCentralManager {
         switch central.state {
         case .poweredOn:
             print("Bluetooth is powered on.")
-            if shouldScan {
+            if shouldScan { //Restart scanning if it was stopped by Bluetooth being turned off
                 startScan()
             }
         case .poweredOff:
@@ -132,7 +136,7 @@ class BluetoothCentralManagerImpl: NSObject, BluetoothCentralManager {
     func startScan() {
         if(centralManager.state == .poweredOn) {
             uids = []
-            centralManager.scanForPeripherals(withServices: [targetServiceUUID], options: [
+            centralManager.scanForPeripherals(withServices: [targetServiceUUID], options: [ //Filter using withServices, to remove unwanted devices
                 CBCentralManagerScanOptionAllowDuplicatesKey: false
             ])
         }
@@ -146,7 +150,7 @@ class BluetoothCentralManagerImpl: NSObject, BluetoothCentralManager {
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         var services = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
-        services.removeAll(where: { $0 == targetServiceUUID})
+        services.removeAll(where: { $0 == targetServiceUUID}) //Both the userId and the service uuid are being sent in the packet, so remove the service key to get the user ID (the order can vary so indexing doesn't work)
         let uid = services.first?.uuidString
         if(uid != nil) {
             if(!uids.contains(where: {$0 == uid})) {

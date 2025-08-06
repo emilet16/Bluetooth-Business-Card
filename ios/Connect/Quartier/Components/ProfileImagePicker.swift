@@ -8,6 +8,8 @@
 import SwiftUI
 import PhotosUI
 
+//Component to open the image picker and change the pfp
+
 struct ProfileImagePicker: View {
     let url: String?
     
@@ -18,7 +20,7 @@ struct ProfileImagePicker: View {
     
     var body: some View {
         PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()){
-            if let image = selectedImage {
+            if let image = selectedImage { //New pfp
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -27,10 +29,10 @@ struct ProfileImagePicker: View {
                     .overlay(Circle().stroke(Color.black, lineWidth: 2))
                     .shadow(radius: 5)
                     .padding()
-            } else if let imageUrl = url {
+            } else if let imageUrl = url { //Old pfp
                 ProfileImage(url: imageUrl, size: 150)
             }
-            else {
+            else { //No pfp
                 Image(systemName: "person.circle.fill")
                     .resizable()
                     .padding()
@@ -38,7 +40,7 @@ struct ProfileImagePicker: View {
                     .frame(width: 150, height: 150)
             }
         }.onChange(of: selectedItem) {
-            Task {
+            Task { //Load the pfp
                 if let data = try? await selectedItem?.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data)
                 {

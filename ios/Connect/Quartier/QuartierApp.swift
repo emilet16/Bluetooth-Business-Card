@@ -10,6 +10,8 @@ import Supabase
 import SDWebImage
 import SDWebImageWebPCoder
 
+//Entry point for the app, load some libraries
+
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://liumhaenwcmzwargxnpv.supabase.co")!,
   supabaseKey: "sb_publishable_YVhSNGzOosROZp8bY-qzPQ_xJafBP1M"

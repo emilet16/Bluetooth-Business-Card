@@ -4,6 +4,8 @@ import com.quartier.quartier.database.Connection
 import com.quartier.quartier.database.ConnectionRequestResult
 import com.quartier.quartier.database.ConnectionsRepository
 
+//Contains fake connections, test behavior for all of them, imitates the Connections table in DB
+
 class MockConnectionsRepo : ConnectionsRepository {
     private val connections: MutableList<Connection> = mutableListOf(
         Connection("0", "1", "accepted"),

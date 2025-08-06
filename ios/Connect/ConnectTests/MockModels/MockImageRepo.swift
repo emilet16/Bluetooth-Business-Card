@@ -9,6 +9,8 @@ import PhotosUI
 import Testing
 @testable import Quartier
 
+//Encode and decode the image path to bypass this in the tests
+
 class MockImageRepo : ImageRepository {
     func resizeTo400(image: UIImage) -> UIImage {
         return image

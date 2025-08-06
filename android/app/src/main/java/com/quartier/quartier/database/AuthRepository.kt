@@ -17,6 +17,9 @@ import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//This class holds the user ID for the entire app
+//Work around weird bugs with supabase when the app is in background making it crash
+
 interface AuthRepository {
     val userId: StateFlow<String?>
     fun updateUserId(newUserId: String)

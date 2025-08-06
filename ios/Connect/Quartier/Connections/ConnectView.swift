@@ -6,11 +6,14 @@
 //
 import SwiftUI
 
+//Screen to connect with other users
+
 struct ConnectView<T: ConnectViewModel> : View {
     @StateObject var viewModel: T
     
     var body : some View {
         ZStack(alignment: .bottom) {
+            //Show a message to the user about the connection status (ex. connection request sent)
             if let connectionMessage = viewModel.connectionMessage {
                 Text(connectionMessage).font(.roboto(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))
@@ -18,7 +21,7 @@ struct ConnectView<T: ConnectViewModel> : View {
             }
             
             ScrollView {
-                if let message = viewModel.message {
+                if let message = viewModel.message { //Show a message if an error happens (ex. Bluetooth not available)
                     Text(message)
                 } else if(viewModel.users.isEmpty) {
                     Text("No nearby people").font(.roboto(17))

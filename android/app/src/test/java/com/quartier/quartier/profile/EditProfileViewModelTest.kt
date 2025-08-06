@@ -23,6 +23,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.net.URI
 
+//Test the viewmodel for the edit profile screen
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class EditProfileViewModelTest {
@@ -47,7 +49,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun saveUser_success() = runTest {
+    fun saveUser_success() = runTest { //Save user, normal case
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -62,7 +64,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun saveUser_socialsError() = runTest {
+    fun saveUser_socialsError() = runTest { //Save user, error saving socials
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -74,7 +76,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun saveUser_profileError() = runTest {
+    fun saveUser_profileError() = runTest { //Save user, error saving profile details
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -86,7 +88,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun saveUser_pfpError() = runTest {
+    fun saveUser_pfpError() = runTest { //Save user, error saving pfp
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -98,7 +100,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun saveUser_noChangeSocials() = runTest {
+    fun saveUser_noChangeSocials() = runTest { //Save user, but don't change socials
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -110,7 +112,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun saveUser_noChangePfp() = runTest {
+    fun saveUser_noChangePfp() = runTest { //Save user but don't change pfp
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -121,7 +123,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun saveUser_noChangeProfile() = runTest {
+    fun saveUser_noChangeProfile() = runTest { //Save user but don't change profile details
         backgroundScope.launch {
             viewModel.uiState.collect()
         }
@@ -134,25 +136,25 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun linkedinRegex_valid() = runTest {
+    fun linkedinRegex_valid() = runTest { //Valid linkedin
         val linkedin = "https://www.linkedin.com/in/user"
         assertEquals(viewModel.matchesLinkedinRegex(linkedin), true)
     }
 
     @Test
-    fun linkedinRegex_google() = runTest {
+    fun linkedinRegex_google() = runTest { //Not linkedin link
         val linkedin = "https://www.google.com/search?query=query"
         assertEquals(viewModel.matchesLinkedinRegex(linkedin), false)
     }
 
     @Test
-    fun linkedinRegex_invalidLink() = runTest {
+    fun linkedinRegex_invalidLink() = runTest { //Missing https, could change in the future
         val linkedin = "www.linkedin.com/in/user"
         assertEquals(viewModel.matchesLinkedinRegex(linkedin), false)
     }
 
     @Test
-    fun linkedinRegex_noUser() = runTest {
+    fun linkedinRegex_noUser() = runTest { //Missing username
         val linkedin = "https://www.linkedin.com/in/"
         assertEquals(viewModel.matchesLinkedinRegex(linkedin), false)
     }

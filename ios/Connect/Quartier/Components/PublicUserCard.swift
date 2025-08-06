@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//User card, available to everyone, shown to nearby users
+
 struct PublicUserCard : View {
     let user: User
     var onConnect: (String) -> Void = { _ in }

@@ -8,6 +8,8 @@
 import Foundation
 import Auth
 
+//Viewmodel for the login screen, handles the sign in process
+
 protocol LoginViewModel : ObservableObject {
     var message: String? { get set }
     

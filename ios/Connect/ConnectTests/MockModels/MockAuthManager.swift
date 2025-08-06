@@ -9,6 +9,8 @@ import Auth
 import Foundation
 @testable import Quartier
 
+//Mock the behavior of the auth manager for viewmodel tests, checked against the accounts dictionary
+
 class MockAuthManager: AuthManager {
     let accounts = ["email@gmail.com": "Password"]
     

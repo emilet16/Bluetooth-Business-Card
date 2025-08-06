@@ -17,6 +17,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
+//Viewmodel tests for the profile screen
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProfileViewModelTest {
     private lateinit var viewModel: ProfileViewModel
@@ -38,7 +40,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun refreshUser() = runTest {
+    fun refreshUser() = runTest { //Ensure user profile is loaded properly
         backgroundScope.launch {
             viewModel.uiState.collect()
         }

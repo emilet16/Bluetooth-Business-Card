@@ -15,6 +15,8 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 
+//Main activity, defined global scope vars
+
 val supabase = createSupabaseClient(
     supabaseUrl = "https://liumhaenwcmzwargxnpv.supabase.co",
     supabaseKey = "sb_publishable_YVhSNGzOosROZp8bY-qzPQ_xJafBP1M"

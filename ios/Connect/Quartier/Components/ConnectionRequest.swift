@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+//Shows a connection request from another user
+
 struct ConnectionRequest : View {
     let user: User
     var onAccept: (String) -> Void = { _ in }

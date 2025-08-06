@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//View model for the profile screen, used to fetch the user's profile
+
 data class ProfileScreenState(
     val user: User?,
     val socials: Socials?,

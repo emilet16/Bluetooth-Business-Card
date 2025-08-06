@@ -8,9 +8,11 @@
 import Testing
 @testable import Quartier
 
+//Profile viewmodel tests
+
 @MainActor
 struct ProfileVMTests {
-    @Test func refreshUser() async throws {
+    @Test func refreshUser() async throws { //Fetch user profile properly
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let viewModel = ProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo)

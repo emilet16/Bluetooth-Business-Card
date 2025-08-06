@@ -1,3 +1,5 @@
+/*Make sure all the components of the database are present*/
+
 begin;
 CREATE EXTENSION "basejump-supabase_test_helpers";
 select plan(23);

@@ -10,9 +10,11 @@ import Foundation
 import Testing
 @testable import Quartier
 
+//Test the edit profile view model
+
 @MainActor
 struct EditProfileVMTests {
-    @Test func refreshUser() async throws {
+    @Test func refreshUser() async throws { //Fetch the user's profile
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let viewModel = EditProfileViewModelImpl(userRepository: userRepo, socialsRepository: socialsRepo)
@@ -28,7 +30,7 @@ struct EditProfileVMTests {
         viewModel.refreshUser()
     }
     
-    @Test func saveUser_success() async throws {
+    @Test func saveUser_success() async throws { //Everything saves as expected
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -52,12 +54,12 @@ struct EditProfileVMTests {
             }
         }
         
-        if let data = Data(base64Encoded: "https://google.com", options: .ignoreUnknownCharacters) {
+        if let data = Data(base64Encoded: "https://google.com", options: .ignoreUnknownCharacters) { //Encode the path as a UIImage, so it can be decoded by the mock classes later
             viewModel.saveUser(name: "newname", jobTitle: "newjob", linkedInURL: "linkedin", pfp: UIImage(data: data))
         }
     }
     
-    @Test func saveUser_socialsError() async throws {
+    @Test func saveUser_socialsError() async throws { //Error while saving socials
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -78,7 +80,7 @@ struct EditProfileVMTests {
         }
     }
     
-    @Test func saveUser_profileError() async throws {
+    @Test func saveUser_profileError() async throws { //Error while saving profile
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -99,7 +101,7 @@ struct EditProfileVMTests {
         }
     }
     
-    @Test func saveUser_pfpError() async throws {
+    @Test func saveUser_pfpError() async throws { //Error while saving pfp
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -120,7 +122,7 @@ struct EditProfileVMTests {
         }
     }
     
-    @Test func saveUser_noChangeSocials() async throws {
+    @Test func saveUser_noChangeSocials() async throws { //Keep socials the same!
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -149,7 +151,7 @@ struct EditProfileVMTests {
         }
     }
     
-    @Test func saveUser_noChangePfp() async throws {
+    @Test func saveUser_noChangePfp() async throws { //Keep pfp the same!
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -178,7 +180,7 @@ struct EditProfileVMTests {
         }
     }
     
-    @Test func saveUser_noChangeProfile() async throws {
+    @Test func saveUser_noChangeProfile() async throws { //Keep profile the same!
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -209,7 +211,7 @@ struct EditProfileVMTests {
         }
     }
     
-    @Test func linkedinRegex_valid() async throws {
+    @Test func linkedinRegex_valid() async throws { //Valid linkedin profile link
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -217,7 +219,7 @@ struct EditProfileVMTests {
         #expect(viewModel.matchesLinkedinRegex(input: "https://www.linkedin.com/in/user"))
     }
     
-    @Test func linkedinRegex_google() async throws {
+    @Test func linkedinRegex_google() async throws { //Not a linkedin link
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -225,7 +227,7 @@ struct EditProfileVMTests {
         #expect(!viewModel.matchesLinkedinRegex(input: "https://www.google.com/search?query=query"))
     }
     
-    @Test func linkedinRegex_invalidLink() async throws {
+    @Test func linkedinRegex_invalidLink() async throws { //Missing https, could be changed in the future
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()
@@ -233,7 +235,7 @@ struct EditProfileVMTests {
         #expect(!viewModel.matchesLinkedinRegex(input: "www.linkedin.com/in/user"))
     }
     
-    @Test func linkedinRegex_noUser() async throws {
+    @Test func linkedinRegex_noUser() async throws { //Missing user in the profile link
         let userRepo = MockUserRepo()
         let socialsRepo = MockSocialsRepo()
         let imageRepo = MockImageRepo()

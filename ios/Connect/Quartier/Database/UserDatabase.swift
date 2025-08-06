@@ -5,6 +5,8 @@
 //  Created by Emile Turcotte on 2025-07-04.
 //
 
+//A class handling methods for the Profiles table in supabase DB
+
 import Supabase
 import Foundation
 
@@ -26,12 +28,12 @@ protocol UserRepository {
 class UserDatabase : UserRepository {
     static let shared = UserDatabase()
     
-    func getUser() async throws -> User {
+    func getUser() async throws -> User { //Get current user's profile
         let id = supabase.auth.currentUser!.id.uuidString
         return try await (supabase.from("profiles").select("*").eq("id", value: id).execute().value as [User]).first!
     }
     
-    func getUsers(ids: [String]) async throws -> [User] {
+    func getUsers(ids: [String]) async throws -> [User] { //Get a list of profiles from a list of ids
         return try await supabase.from("profiles").select("*").in("id", values: ids).execute().value
     }
     
@@ -42,9 +44,9 @@ class UserDatabase : UserRepository {
     
     func uploadPfp(fileName: String, imageData: Data) async throws {
         let userID = supabase.auth.currentUser!.id.uuidString
-        try await supabase.storage.from("pfp").upload(fileName, data: imageData)
+        try await supabase.storage.from("pfp").upload(fileName, data: imageData) //Upload the pfp to the bucket
         
-        let url = try supabase.storage.from("pfp").getPublicURL(path: fileName)
-        try await supabase.from("profiles").update(["pfp_url": url]).eq("id", value: userID).execute()
+        let url = try supabase.storage.from("pfp").getPublicURL(path: fileName) //Get the public url for the image
+        try await supabase.from("profiles").update(["pfp_url": url]).eq("id", value: userID).execute() //Add the image's url to the user's profile
     }
 }

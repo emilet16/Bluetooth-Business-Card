@@ -30,6 +30,8 @@ import com.quartier.quartier.components.EmailTextField
 import com.quartier.quartier.components.PasswordTextField
 import com.quartier.quartier.ui.theme.Typography
 
+//The login screen for the app
+
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onNavToRegister: () -> Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
     val userMessage by viewModel.uiState.collectAsStateWithLifecycle()
@@ -42,6 +44,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onNavToRegister: ()
                 viewModel.matchesEmailRegex(it)
             })
 
+            //Tell the user if something happened during login (ex. wrong password)
             userMessage?.let { userMessage ->
                 val snackbarText = LocalContext.current.getString(userMessage)
                 LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {
