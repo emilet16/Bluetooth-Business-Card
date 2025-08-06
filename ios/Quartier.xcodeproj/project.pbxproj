@@ -13,6 +13,18 @@
 		8D7DEAFE2E0601A900F7D7AF /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 8D7DEAFD2E0601A900F7D7AF /* PostgREST */; };
 		8D7DEB002E0601A900F7D7AF /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 8D7DEAFF2E0601A900F7D7AF /* Storage */; };
 		8D7DEB022E0601A900F7D7AF /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 8D7DEB012E0601A900F7D7AF /* Supabase */; };
+		8DF1B4872E43DF1E00C23B02 /* MockImageRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47F2E43DF1E00C23B02 /* MockImageRepo.swift */; };
+		8DF1B4882E43DF1E00C23B02 /* RegisterVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4772E43DF1E00C23B02 /* RegisterVMTests.swift */; };
+		8DF1B4892E43DF1E00C23B02 /* MockAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47C2E43DF1E00C23B02 /* MockAuthManager.swift */; };
+		8DF1B48A2E43DF1E00C23B02 /* MockConnectionsRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47E2E43DF1E00C23B02 /* MockConnectionsRepo.swift */; };
+		8DF1B48B2E43DF1E00C23B02 /* ConnectVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47A2E43DF1E00C23B02 /* ConnectVMTests.swift */; };
+		8DF1B48C2E43DF1E00C23B02 /* ConnectionsVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4792E43DF1E00C23B02 /* ConnectionsVMTests.swift */; };
+		8DF1B48D2E43DF1E00C23B02 /* MockBleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47D2E43DF1E00C23B02 /* MockBleManager.swift */; };
+		8DF1B48E2E43DF1E00C23B02 /* EditProfileVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4832E43DF1E00C23B02 /* EditProfileVMTests.swift */; };
+		8DF1B48F2E43DF1E00C23B02 /* MockUserRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4812E43DF1E00C23B02 /* MockUserRepo.swift */; };
+		8DF1B4902E43DF1E00C23B02 /* LoginVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4762E43DF1E00C23B02 /* LoginVMTests.swift */; };
+		8DF1B4912E43DF1E00C23B02 /* ProfileVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4842E43DF1E00C23B02 /* ProfileVMTests.swift */; };
+		8DF1B4922E43DF1E00C23B02 /* MockSocialsRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4802E43DF1E00C23B02 /* MockSocialsRepo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +49,18 @@
 		8D9AA9C52E0209E4000945AC /* Quartier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quartier.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D9AA9D22E0209E5000945AC /* QuartierTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuartierTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D9AA9DC2E0209E5000945AC /* QuartierUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuartierUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DF1B4762E43DF1E00C23B02 /* LoginVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVMTests.swift; sourceTree = "<group>"; };
+		8DF1B4772E43DF1E00C23B02 /* RegisterVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVMTests.swift; sourceTree = "<group>"; };
+		8DF1B4792E43DF1E00C23B02 /* ConnectionsVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionsVMTests.swift; sourceTree = "<group>"; };
+		8DF1B47A2E43DF1E00C23B02 /* ConnectVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectVMTests.swift; sourceTree = "<group>"; };
+		8DF1B47C2E43DF1E00C23B02 /* MockAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAuthManager.swift; sourceTree = "<group>"; };
+		8DF1B47D2E43DF1E00C23B02 /* MockBleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBleManager.swift; sourceTree = "<group>"; };
+		8DF1B47E2E43DF1E00C23B02 /* MockConnectionsRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConnectionsRepo.swift; sourceTree = "<group>"; };
+		8DF1B47F2E43DF1E00C23B02 /* MockImageRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockImageRepo.swift; sourceTree = "<group>"; };
+		8DF1B4802E43DF1E00C23B02 /* MockSocialsRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocialsRepo.swift; sourceTree = "<group>"; };
+		8DF1B4812E43DF1E00C23B02 /* MockUserRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUserRepo.swift; sourceTree = "<group>"; };
+		8DF1B4832E43DF1E00C23B02 /* EditProfileVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVMTests.swift; sourceTree = "<group>"; };
+		8DF1B4842E43DF1E00C23B02 /* ProfileVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVMTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -56,16 +80,6 @@
 				8D7C72222E24971E00F012FD /* Exceptions for "Quartier" folder in "Quartier" target */,
 			);
 			path = Quartier;
-			sourceTree = "<group>";
-		};
-		8D9AA9D52E0209E5000945AC /* ConnectTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ConnectTests;
-			sourceTree = "<group>";
-		};
-		8D9AA9DF2E0209E5000945AC /* ConnectUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ConnectUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -112,9 +126,8 @@
 		8D9AA9BC2E0209E4000945AC = {
 			isa = PBXGroup;
 			children = (
+				8DF1B4862E43DF1E00C23B02 /* QuartierTests */,
 				8D9AA9C72E0209E4000945AC /* Quartier */,
-				8D9AA9D52E0209E5000945AC /* ConnectTests */,
-				8D9AA9DF2E0209E5000945AC /* ConnectUITests */,
 				8D7DEAB92E02385C00F7D7AF /* Frameworks */,
 				8D9AA9C62E0209E4000945AC /* Products */,
 			);
@@ -128,6 +141,57 @@
 				8D9AA9DC2E0209E5000945AC /* QuartierUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8DF1B4782E43DF1E00C23B02 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				8DF1B4762E43DF1E00C23B02 /* LoginVMTests.swift */,
+				8DF1B4772E43DF1E00C23B02 /* RegisterVMTests.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		8DF1B47B2E43DF1E00C23B02 /* Connections */ = {
+			isa = PBXGroup;
+			children = (
+				8DF1B4792E43DF1E00C23B02 /* ConnectionsVMTests.swift */,
+				8DF1B47A2E43DF1E00C23B02 /* ConnectVMTests.swift */,
+			);
+			path = Connections;
+			sourceTree = "<group>";
+		};
+		8DF1B4822E43DF1E00C23B02 /* MockModels */ = {
+			isa = PBXGroup;
+			children = (
+				8DF1B47C2E43DF1E00C23B02 /* MockAuthManager.swift */,
+				8DF1B47D2E43DF1E00C23B02 /* MockBleManager.swift */,
+				8DF1B47E2E43DF1E00C23B02 /* MockConnectionsRepo.swift */,
+				8DF1B47F2E43DF1E00C23B02 /* MockImageRepo.swift */,
+				8DF1B4802E43DF1E00C23B02 /* MockSocialsRepo.swift */,
+				8DF1B4812E43DF1E00C23B02 /* MockUserRepo.swift */,
+			);
+			path = MockModels;
+			sourceTree = "<group>";
+		};
+		8DF1B4852E43DF1E00C23B02 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				8DF1B4832E43DF1E00C23B02 /* EditProfileVMTests.swift */,
+				8DF1B4842E43DF1E00C23B02 /* ProfileVMTests.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		8DF1B4862E43DF1E00C23B02 /* QuartierTests */ = {
+			isa = PBXGroup;
+			children = (
+				8DF1B4782E43DF1E00C23B02 /* Auth */,
+				8DF1B47B2E43DF1E00C23B02 /* Connections */,
+				8DF1B4822E43DF1E00C23B02 /* MockModels */,
+				8DF1B4852E43DF1E00C23B02 /* Profile */,
+			);
+			path = QuartierTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -173,9 +237,6 @@
 			dependencies = (
 				8D9AA9D42E0209E5000945AC /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				8D9AA9D52E0209E5000945AC /* ConnectTests */,
-			);
 			name = QuartierTests;
 			packageProductDependencies = (
 			);
@@ -195,9 +256,6 @@
 			);
 			dependencies = (
 				8D9AA9DE2E0209E5000945AC /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				8D9AA9DF2E0209E5000945AC /* ConnectUITests */,
 			);
 			name = QuartierUITests;
 			packageProductDependencies = (
@@ -291,6 +349,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8DF1B4872E43DF1E00C23B02 /* MockImageRepo.swift in Sources */,
+				8DF1B4882E43DF1E00C23B02 /* RegisterVMTests.swift in Sources */,
+				8DF1B4892E43DF1E00C23B02 /* MockAuthManager.swift in Sources */,
+				8DF1B48A2E43DF1E00C23B02 /* MockConnectionsRepo.swift in Sources */,
+				8DF1B48B2E43DF1E00C23B02 /* ConnectVMTests.swift in Sources */,
+				8DF1B48C2E43DF1E00C23B02 /* ConnectionsVMTests.swift in Sources */,
+				8DF1B48D2E43DF1E00C23B02 /* MockBleManager.swift in Sources */,
+				8DF1B48E2E43DF1E00C23B02 /* EditProfileVMTests.swift in Sources */,
+				8DF1B48F2E43DF1E00C23B02 /* MockUserRepo.swift in Sources */,
+				8DF1B4902E43DF1E00C23B02 /* LoginVMTests.swift in Sources */,
+				8DF1B4912E43DF1E00C23B02 /* ProfileVMTests.swift in Sources */,
+				8DF1B4922E43DF1E00C23B02 /* MockSocialsRepo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -513,7 +583,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Quartier.ConnectTests;
+				PRODUCT_BUNDLE_IDENTIFIER = Quartier.QuartierTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -534,7 +604,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Quartier.ConnectTests;
+				PRODUCT_BUNDLE_IDENTIFIER = Quartier.QuartierTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
