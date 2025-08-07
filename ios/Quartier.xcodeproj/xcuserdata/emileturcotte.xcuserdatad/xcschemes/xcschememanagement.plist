@@ -9,10 +9,33 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-		<key>Quartier.xcscheme_^#shared#^_</key>
+		<key>Quartier (Debug).xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+		<key>Quartier (Release).xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>8D9AA9C42E0209E4000945AC</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>8D9AA9D12E0209E5000945AC</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>8D9AA9DB2E0209E5000945AC</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

@@ -517,7 +517,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Quartier/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Quartier;
+				INFOPLIST_KEY_CFBundleDisplayName = "Quartier (dev)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Access bluetooth to advertise and scan for nearby users";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Access bluetooth to advertise and scan for nearby users";
@@ -531,7 +531,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.quartier.quartier;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quartier.quartier.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
