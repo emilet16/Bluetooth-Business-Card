@@ -44,7 +44,7 @@ class ConnectionsDatabase : ConnectionsRepository {
     func requestConnection(requestedID: String) async throws -> ConnectionResult? { //Create a connection request
         let userID = supabase.auth.currentUser!.id.uuidString
         
-        if(userID == requestedID) { return .cannotConnectWithSelf }
+        if(userID.lowercased() == requestedID) { return .cannotConnectWithSelf }
         
         try await supabase.from("connections").upsert(Connection(requested_by: userID, requested_for: requestedID, status: "pending")).execute()
         return .requested

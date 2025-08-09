@@ -25,6 +25,7 @@
 		8DF1B4902E43DF1E00C23B02 /* LoginVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4762E43DF1E00C23B02 /* LoginVMTests.swift */; };
 		8DF1B4912E43DF1E00C23B02 /* ProfileVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4842E43DF1E00C23B02 /* ProfileVMTests.swift */; };
 		8DF1B4922E43DF1E00C23B02 /* MockSocialsRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4802E43DF1E00C23B02 /* MockSocialsRepo.swift */; };
+		8DF1B68E2E46D34B00C23B02 /* SupabaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B68D2E46D34700C23B02 /* SupabaseTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		8DF1B4812E43DF1E00C23B02 /* MockUserRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUserRepo.swift; sourceTree = "<group>"; };
 		8DF1B4832E43DF1E00C23B02 /* EditProfileVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVMTests.swift; sourceTree = "<group>"; };
 		8DF1B4842E43DF1E00C23B02 /* ProfileVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVMTests.swift; sourceTree = "<group>"; };
+		8DF1B68D2E46D34700C23B02 /* SupabaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -186,6 +188,7 @@
 		8DF1B4862E43DF1E00C23B02 /* QuartierTests */ = {
 			isa = PBXGroup;
 			children = (
+				8DF1B68D2E46D34700C23B02 /* SupabaseTests.swift */,
 				8DF1B4782E43DF1E00C23B02 /* Auth */,
 				8DF1B47B2E43DF1E00C23B02 /* Connections */,
 				8DF1B4822E43DF1E00C23B02 /* MockModels */,
@@ -354,6 +357,7 @@
 				8DF1B4892E43DF1E00C23B02 /* MockAuthManager.swift in Sources */,
 				8DF1B48A2E43DF1E00C23B02 /* MockConnectionsRepo.swift in Sources */,
 				8DF1B48B2E43DF1E00C23B02 /* ConnectVMTests.swift in Sources */,
+				8DF1B68E2E46D34B00C23B02 /* SupabaseTests.swift in Sources */,
 				8DF1B48C2E43DF1E00C23B02 /* ConnectionsVMTests.swift in Sources */,
 				8DF1B48D2E43DF1E00C23B02 /* MockBleManager.swift in Sources */,
 				8DF1B48E2E43DF1E00C23B02 /* EditProfileVMTests.swift in Sources */,
