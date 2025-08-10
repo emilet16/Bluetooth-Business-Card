@@ -26,6 +26,9 @@ android {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
             resValue("string", "app_name", "Quartier (dev)")
+
+            buildConfigField("String", "SUPABASE_URL", "\"https://summary-toucan-chief.ngrok-free.app\"")
+            buildConfigField("String", "SUPABASE_KEY", "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0\"")
         }
         release {
             isMinifyEnabled = true
@@ -34,6 +37,9 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
+
+            buildConfigField("String", "SUPABASE_URL", "\"https://liumhaenwcmzwargxnpv.supabase.co\"")
+            buildConfigField("String", "SUPABASE_KEY", "\"sb_publishable_YVhSNGzOosROZp8bY-qzPQ_xJafBP1M\"")
         }
     }
     compileOptions {

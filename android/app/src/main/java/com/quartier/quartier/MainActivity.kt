@@ -17,9 +17,11 @@ import io.github.jan.supabase.storage.Storage
 
 //Main activity, defined global scope vars
 
+//The Supabase client connects to prod server on release builds and locally hosted on debug builds
+//The url/api key can be changed in the environment vars in build.gradle.kts (:app)
 val supabase = createSupabaseClient(
-    supabaseUrl = "https://liumhaenwcmzwargxnpv.supabase.co",
-    supabaseKey = "sb_publishable_YVhSNGzOosROZp8bY-qzPQ_xJafBP1M"
+    supabaseUrl = BuildConfig.SUPABASE_URL,
+    supabaseKey = BuildConfig.SUPABASE_KEY
 ) {
     install(Auth)
     install(Postgrest)
