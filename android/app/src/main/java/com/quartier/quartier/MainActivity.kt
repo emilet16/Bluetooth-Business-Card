@@ -11,9 +11,12 @@ import androidx.compose.ui.Modifier
 import com.quartier.quartier.ui.theme.QuarierTheme
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.MemoryCodeVerifierCache
+import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 
 //Main activity, defined global scope vars
 
@@ -23,9 +26,20 @@ val supabase = createSupabaseClient(
     supabaseUrl = BuildConfig.SUPABASE_URL,
     supabaseKey = BuildConfig.SUPABASE_KEY
 ) {
-    install(Auth)
+    install(Auth) {
+        if(BuildConfig.DEBUG) { //Don't cache anything for debug builds, easier testing
+            sessionManager = MemorySessionManager()
+            codeVerifierCache = MemoryCodeVerifierCache()
+        }
+    }
     install(Postgrest)
-    install(Storage)
+    install(Storage) {
+        if(BuildConfig.DEBUG) { //Don't cache anything for debug builds, easier testing
+            resumable {
+                cache = MemoryResumableCache()
+            }
+        }
+    }
 }
 
 const val TAG: String = "Quartier"
