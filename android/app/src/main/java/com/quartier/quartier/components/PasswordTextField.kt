@@ -1,8 +1,10 @@
 package com.quartier.quartier.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -10,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -25,7 +28,10 @@ import com.quartier.quartier.R
 fun PasswordTextField(pwd: String, showError: Boolean, onValueChange: (String) -> Unit) {
     var showPwd by rememberSaveable { mutableStateOf(false) }
 
-    TextField(value = pwd, onValueChange = onValueChange, label = {Text(LocalContext.current.getString(R.string.password_label))}, singleLine = true, placeholder = {Text(LocalContext.current.getString(R.string.password_placeholder))},
+    OutlinedTextField(value = pwd, onValueChange = onValueChange,
+        label = {Text(LocalContext.current.getString(R.string.password_label))},
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
         visualTransformation = if(showPwd) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
@@ -38,17 +44,17 @@ fun PasswordTextField(pwd: String, showError: Boolean, onValueChange: (String) -
                 Icon(icon, LocalContext.current.getString(description))
             }
         }, supportingText = {
-            if(showError) Text(LocalContext.current.getString(R.string.invalid_input))
+            Text(LocalContext.current.getString(R.string.pwd_invalid))
         }, isError = showError)
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PreviewValidPassword() {
     PasswordTextField(pwd = "password", showError = false) { }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PreviewInvalidPassword() {
     PasswordTextField(pwd = "pass", showError = true) { }

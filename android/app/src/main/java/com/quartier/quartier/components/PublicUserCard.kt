@@ -2,9 +2,12 @@ package com.quartier.quartier.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -16,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,10 +34,10 @@ import com.quartier.quartier.ui.theme.Typography
 
 @Composable
 fun PublicUserCard(onClick: () -> Unit, user: User) {
-    Card(onClick = onClick, modifier = Modifier.padding(5.dp).wrapContentHeight()) {
+    Card(onClick = onClick, modifier = Modifier.size(150.dp)) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .fillMaxSize()
-            .padding(5.dp)) {
+            .padding(10.dp)) {
             AsyncImage(model = ImageRequest.Builder(LocalContext.current)
                 .data(user.pfp_url ?: R.drawable.baseline_account_circle)
                 .crossfade(true)
@@ -42,8 +46,14 @@ fun PublicUserCard(onClick: () -> Unit, user: User) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(60.dp).border(2.dp ,Color.Black, CircleShape).padding(2.dp).clip(CircleShape)
             )
-            Text(user.name, style = Typography.titleSmall, textAlign = TextAlign.Center)
-            Text(user.job, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(10.dp))
+            Text(
+                user.name,
+                style = Typography.titleSmall,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+            Text(user.job, textAlign = TextAlign.Center, fontWeight = FontWeight.Normal)
         }
     }
 }

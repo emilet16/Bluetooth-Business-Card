@@ -9,22 +9,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,33 +44,81 @@ import com.quartier.quartier.components.MainBottomAppBar
 import com.quartier.quartier.components.SelectedScreen
 import com.quartier.quartier.database.User
 import com.quartier.quartier.components.UserCard
+import com.quartier.quartier.database.UploadStatus
+import kotlinx.coroutines.launch
 
 //Screen used to display the user's profile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel(), onNavToEditProfile: ()->Unit, onNavToConnections: ()->Unit, onNavToLinkedin: (String)->Unit) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel(),
+                  onNavToConnections: ()->Unit, onNavToLinkedin: (String)->Unit,
+                  snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
 
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        TopAppBar(title = {
-            Text(LocalContext.current.getString(R.string.profile_title))
-        }, actions = {
-            IconButton(onClick = {
-                onNavToEditProfile()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val editState by viewModel.editState.collectAsStateWithLifecycle()
+
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    Scaffold(modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            MainBottomAppBar(onNavToConnections = onNavToConnections, selectedScreen = SelectedScreen.Profile)
+        }, floatingActionButton = {
+            Button(onClick = {
+                viewModel.showEdit()
             }) {
-                Icon(
-                    Icons.Default.Edit,
-                    contentDescription = LocalContext.current.getString(R.string.edit_profile),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                Icon(Icons.Outlined.Edit, LocalContext.current.getString(R.string.edit_profile))
             }
-        })
-    }, bottomBar = {
-        MainBottomAppBar(onNavToConnections = onNavToConnections, selectedScreen = SelectedScreen.Profile)
     }) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             ProfileScreen(uiState.isRefreshing, uiState.user, uiState.socials, onNavToLinkedin = onNavToLinkedin, onRefresh = {viewModel.refreshUser()})
+        }
+    }
+
+    val shownPfpUri = editState.newPfpUri?.toString() ?: uiState.user?.pfp_url
+
+    if(editState.shown) {
+        EditProfileScreen(
+            shownPfpUri,
+            onDismiss = {
+                viewModel.hideEdit()
+            },
+            onPreviewPfp = { uri ->
+                viewModel.previewNewPfp(uri)
+            },
+            onSaveProfile = { name, job, linkedin ->
+                viewModel.saveUser(name, job,linkedin)
+            }, linkedinRegexCheck = { linkedin ->
+                viewModel.matchesLinkedinRegex(linkedin)
+            }, snackbarHostState = snackbarHostState,
+            sheetState = sheetState, scope = scope
+        )
+    }
+
+    //Display the save status for the user & close the screen if saving is successful
+    editState.saveStatus?.let { status ->
+        when(status) {
+            UploadStatus.Success -> {
+                viewModel.snackbarMessageShown()
+                scope.launch {
+                    sheetState.hide()
+                    viewModel.hideEdit()
+                }
+            }
+            UploadStatus.Loading -> {
+                val snackbarText = LocalContext.current.getString(R.string.saving)
+                LaunchedEffect(snackbarHostState, viewModel, status, snackbarText) {
+                    snackbarHostState.showSnackbar(snackbarText)
+                }
+            }
+            UploadStatus.Error -> {
+                val snackbarText = LocalContext.current.getString(R.string.saving_error)
+                LaunchedEffect(snackbarHostState, viewModel, status, snackbarText) {
+                    snackbarHostState.showSnackbar(snackbarText)
+                    viewModel.snackbarMessageShown()
+                }
+            }
         }
     }
 }

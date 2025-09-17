@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SessionViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
-    private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
+    private val _isLoggedIn = MutableStateFlow<Boolean>(false)
     val isLoggedIn = _isLoggedIn.asStateFlow()
 
     init {

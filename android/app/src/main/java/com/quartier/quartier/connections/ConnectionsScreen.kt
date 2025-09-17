@@ -5,57 +5,60 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.compose.foundation.border
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quartier.quartier.R
 import com.quartier.quartier.components.ConnectionRequest
 import com.quartier.quartier.components.MainBottomAppBar
+import com.quartier.quartier.components.Placeholder
 import com.quartier.quartier.components.SelectedScreen
 import com.quartier.quartier.components.UserCard
 import com.quartier.quartier.database.Socials
@@ -66,109 +69,186 @@ import com.quartier.quartier.ui.theme.Typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavToConnect: ()->Unit, onNavToProfile: ()->Unit, onNavToLinkedin: (String) -> Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
+fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavToProfile: ()->Unit, onNavToLinkedin: (String) -> Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val advAllowed = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
-    } else true
+    val nearbyUsersState by viewModel.nearbyUsersState.collectAsStateWithLifecycle()
 
-    val scanAllowed = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
-    } else true
+    val context = LocalContext.current
 
-    //Check permissions before opening the screen that uses Bluetooth
     val requestScanPerm = rememberLauncherForActivityResult(RequestPermission()) { granted ->
         if(granted) {
-            onNavToConnect()
+            viewModel.openNearbyUsers()
         } else {
             viewModel.bluetoothPermissionsDeclined()
         }
     }
 
     val requestAdvPerm = rememberLauncherForActivityResult(RequestPermission()) { granted ->
-        if(granted) {
-            if(scanAllowed) { //check permissions in chain to make sure both are allowed
-                onNavToConnect()
-            }
-            else {
+        if(granted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if(ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
+                viewModel.openNearbyUsers()
+            } else {
                 requestScanPerm.launch(Manifest.permission.BLUETOOTH_SCAN)
             }
-        }
-        else {
+        } else {
             viewModel.bluetoothPermissionsDeclined()
         }
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize(), snackbarHost = { SnackbarHost(snackbarHostState) }, topBar = {
-        TopAppBar(title = {
-            Text(LocalContext.current.getString(R.string.connections_title))
-        }, actions = {
-            IconButton(onClick = {
-                if(advAllowed && scanAllowed) {
-                    onNavToConnect()
-                } else if(!advAllowed) {
-                    requestAdvPerm.launch(Manifest.permission.BLUETOOTH_ADVERTISE)
-                }
-                else if(!scanAllowed) {
-                    requestScanPerm.launch(Manifest.permission.BLUETOOTH_SCAN)
+    Scaffold(modifier = Modifier.fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
+        bottomBar = {
+            MainBottomAppBar(onNavToProfile = onNavToProfile, selectedScreen = SelectedScreen.Connections)
+        }, floatingActionButton = {
+            Button(onClick = {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val advAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
+                    val scanAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+                    if(advAllowed && scanAllowed) {
+                        viewModel.openNearbyUsers()
+                    } else {
+                        if(!advAllowed) {
+                            requestAdvPerm.launch(Manifest.permission.BLUETOOTH_ADVERTISE)
+                        } else {
+                            requestScanPerm.launch(Manifest.permission.BLUETOOTH_SCAN)
+                        }
+                    }
+                } else {
+                    viewModel.openNearbyUsers()
                 }
             }) {
-                Icon(
-                    Icons.Default.AddCircle,
-                    contentDescription = LocalContext.current.getString(R.string.add_connections),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                Icon(Icons.Outlined.Add, LocalContext.current.getString(R.string.add_connections))
             }
-        })
-    }, bottomBar = {
-        MainBottomAppBar(onNavToProfile = onNavToProfile, selectedScreen = SelectedScreen.Connections)
-    }) { innerPadding ->
+        }
+    ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             ConnectionsScreen(uiState.requests, uiState.connections, uiState.connectionsSocials, onAcceptConnection = {viewModel.acceptConnection(it)},
                 onDeclineConnection = {viewModel.declineConnection(it)}, onNavToLinkedin = onNavToLinkedin, isRefreshing = uiState.isRefreshing, onRefresh = {
                     viewModel.refreshConnections()
+                }, onOpenNearbyConnections = {
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        val advAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
+                        val scanAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+                        if(advAllowed && scanAllowed) {
+                            viewModel.openNearbyUsers()
+                        } else {
+                            if(!advAllowed) {
+                                requestAdvPerm.launch(Manifest.permission.BLUETOOTH_ADVERTISE)
+                            }
+                            if(!scanAllowed) {
+                                requestScanPerm.launch(Manifest.permission.BLUETOOTH_SCAN)
+                            }
+                        }
+                    } else {
+                        viewModel.openNearbyUsers()
+                    }
                 })
+        }
+    }
 
-            //Display message for the user (ex. when Bluetooth isn't available)
-            uiState.userMessage?.let { userMessage ->
-                val snackbarText = LocalContext.current.getString(userMessage)
-                LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {
-                    snackbarHostState.showSnackbar(snackbarText)
-                    viewModel.snackbarMessageShown()
+    if(nearbyUsersState.show) {
+        NearbyUsers(users = nearbyUsersState.users, onSendProfileRequest = {
+            viewModel.connectWith(it)
+        }, onDismiss = {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val advAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
+                val scanAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+                if(advAllowed && scanAllowed) {
+                    viewModel.closeNearbyUsers()
                 }
+            } else {
+                viewModel.closeNearbyUsers()
             }
+        }, snackbarHostState = snackbarHostState)
+    }
+
+    //Display message for the user (ex. when Bluetooth isn't available)
+    uiState.userMessage?.let { userMessage ->
+        val snackbarText = LocalContext.current.getString(userMessage)
+        LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {
+            snackbarHostState.showSnackbar(snackbarText)
+            viewModel.snackbarMessageShown()
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ConnectionsScreen(requests: List<User>, connections: List<User>, socials: Map<String, Socials>, onAcceptConnection: (User)->Unit, onDeclineConnection: (User)->Unit, onNavToLinkedin: (String)->Unit,
-isRefreshing: Boolean, onRefresh: ()->Unit) {
-    PullToRefreshBox(isRefreshing = isRefreshing,
+private fun ConnectionsScreen(
+    requests: List<User>, connections: List<User>, socials: Map<String, Socials>,
+    onAcceptConnection: (User)->Unit, onDeclineConnection: (User)->Unit, onNavToLinkedin: (String)->Unit,
+    isRefreshing: Boolean, onRefresh: ()->Unit, onOpenNearbyConnections: ()->Unit
+) {
+    var showRequests by rememberSaveable { mutableStateOf(true) }
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
         onRefresh = onRefresh,
         modifier = Modifier
-        .fillMaxSize()
-        .padding(10.dp)) {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            .fillMaxSize()
+            .padding(20.dp)
+    ) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(15.dp)) {
             item {
-                Text("Connection requests", fontWeight = FontWeight.Bold)
-            }
-            if (requests.isEmpty()) {
-                item {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .clickable(onClick = {
+                            showRequests = !showRequests
+                        }),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(
-                        "You have no connection requests",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        "Connection requests",
+                        style = Typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
+                    IconButton(onClick = {
+                        showRequests = !showRequests
+                    }) {
+                        val icon = if (showRequests) {
+                            Icons.Outlined.KeyboardArrowUp
+                        } else {
+                            Icons.Outlined.KeyboardArrowDown
+                        }
+
+                        val iconDesc = if (showRequests) {
+                            R.string.hide_requests
+                        } else {
+                            R.string.show_requests
+                        }
+
+                        Icon(
+                            icon,
+                            LocalContext.current.getString(iconDesc)
+                        )
+                    }
                 }
-            } else {
-                item {
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        for (request in requests) {
-                            item {
-                                ConnectionRequest(onAcceptConnection = onAcceptConnection, onDeclineConnection = onDeclineConnection, user = request)
+            }
+
+            if (showRequests) {
+                if (requests.isEmpty()) {
+                    item {
+                        Placeholder(
+                            title = LocalContext.current.getString(R.string.requests_empty),
+                            body = LocalContext.current.getString(R.string.encouragement_networking),
+                            icon = painterResource(R.drawable.outline_business_center_24)
+                        )
+                    }
+                } else {
+                    item {
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            for (request in requests) {
+                                item {
+                                    ConnectionRequest(
+                                        onAcceptConnection = onAcceptConnection,
+                                        onDeclineConnection = onDeclineConnection,
+                                        user = request
+                                    )
+                                }
                             }
                         }
                     }
@@ -176,12 +256,23 @@ isRefreshing: Boolean, onRefresh: ()->Unit) {
             }
 
             item {
-                Text("Connections", fontWeight = FontWeight.Bold)
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            }
+
+            item {
+                Text("Connections", style = Typography.titleMedium, fontWeight = FontWeight.Bold)
             }
 
             if (connections.isEmpty()) {
                 item {
-                    Text("You have no connections", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    Placeholder(
+                        title = LocalContext.current.getString(R.string.grow_network),
+                        body = LocalContext.current.getString(R.string.connect_nearby_users),
+                        icon = Icons.Outlined.Person,
+                        buttonText = LocalContext.current.getString(R.string.add_connections),
+                        buttonIcon = Icons.Outlined.Add,
+                        action = onOpenNearbyConnections
+                    )
                 }
             } else {
                 for (connection in connections) {
@@ -200,9 +291,9 @@ isRefreshing: Boolean, onRefresh: ()->Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewConnectionsScreen() {
-    ConnectionsScreen(requests = listOf<User>(User("0", "Steve Jobs", "CEO")),
-        connections = listOf<User>(User("1", "Bill Gates", "Philanthropist")),
-        socials = mapOf<String, Socials>(),
+    ConnectionsScreen(requests = listOf(User("0", "Steve Jobs", "CEO")),
+        connections = listOf(User("1", "Bill Gates", "Philanthropist")),
+        socials = mapOf(),
         onAcceptConnection = {_ ->}, onDeclineConnection = {_ -> }, onNavToLinkedin = {_ ->},
-        isRefreshing = false, onRefresh = {})
+        isRefreshing = false, onRefresh = {}, onOpenNearbyConnections = {})
 }

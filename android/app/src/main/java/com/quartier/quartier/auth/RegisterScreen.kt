@@ -1,12 +1,19 @@
 package com.quartier.quartier.auth
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -22,12 +29,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.quartier.quartier.R
 import com.quartier.quartier.components.EmailTextField
@@ -75,39 +85,40 @@ private fun RegisterScreen(onEmailSignUp: (String, String, String) -> Unit, onNa
     var pwd by rememberSaveable { mutableStateOf("") }
     var pwdValid by rememberSaveable { mutableStateOf(false) }
 
-    Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(LocalContext.current.getString(R.string.greeting_new_user), style = Typography.displayMedium, textAlign = TextAlign.Center)
-            Text(LocalContext.current.getString(R.string.register_request), style = Typography.headlineMedium, textAlign = TextAlign.Center)
+    Column(modifier = Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.Center) {
+        Text(LocalContext.current.getString(R.string.greeting_new_user), style = Typography.headlineMedium, textAlign = TextAlign.Left)
+        Text(LocalContext.current.getString(R.string.register_request), style = Typography.headlineMedium, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold)
+
+        Spacer(Modifier.height(15.dp))
+
+        OutlinedTextField(name, onValueChange = {
+            name = it
+            nameValid = it.isNotBlank()
+        }, label = {Text(LocalContext.current.getString(R.string.name_label))}, singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
+            supportingText = {
+                if(!nameValid && name.isNotEmpty()) Text(LocalContext.current.getString(R.string.invalid_input))
+            }, isError = !nameValid && name.isNotEmpty(), modifier = Modifier.fillMaxWidth())
+
+        EmailTextField(email, showError = (email.isNotEmpty() && !emailValid), onValueChange = {
+            email = it
+            emailValid = (it.isNotBlank() && matchesEmailRegex(it))
+        })
+
+        PasswordTextField(pwd, showError = (pwd.isNotEmpty() && !pwdValid), onValueChange = {
+            pwd = it
+            pwdValid = it.isNotBlank() && it.length >= 6
+        })
+
+        Spacer(Modifier.height(15.dp))
+
+        Button({onEmailSignUp(name, email, pwd)},
+            enabled = nameValid && emailValid && pwdValid, modifier = Modifier.fillMaxWidth()) {
+            Text(LocalContext.current.getString(R.string.register))
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            TextField(name, onValueChange = {
-                name = it
-                nameValid = it.isNotBlank()
-            }, label = {Text(LocalContext.current.getString(R.string.name_label))}, singleLine = true,
-                placeholder = {Text(LocalContext.current.getString(R.string.name_placeholder))},
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                supportingText = {
-                    if(!nameValid && name.isNotEmpty()) Text(LocalContext.current.getString(R.string.invalid_input))
-                }, isError = !nameValid && name.isNotEmpty())
 
-            EmailTextField(email, showError = (email.isNotEmpty() && !emailValid), onValueChange = {
-                email = it
-                emailValid = (it.isNotBlank() && matchesEmailRegex(it))
-            })
-
-            PasswordTextField(pwd, showError = (pwd.isNotEmpty() && !pwdValid), onValueChange = {
-                pwd = it
-                pwdValid = it.isNotBlank() && it.length >= 6
-            })
-
-            Button({onEmailSignUp(name, email, pwd)}, enabled = nameValid && emailValid && pwdValid) {
-                Text(LocalContext.current.getString(R.string.register))
-            }
-
-            TextButton(onClick = onNavToLogin) {
-                Text(LocalContext.current.getString(R.string.login_suggest))
-            }
+        TextButton(onClick = onNavToLogin, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            Text(LocalContext.current.getString(R.string.login_suggest))
         }
     }
 }

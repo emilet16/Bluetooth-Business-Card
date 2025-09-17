@@ -5,6 +5,7 @@ import com.quartier.quartier.database.Connection
 import com.quartier.quartier.database.Socials
 import com.quartier.quartier.database.User
 import com.quartier.quartier.mock_models.MockAuthRepo
+import com.quartier.quartier.mock_models.MockBleRepo
 import com.quartier.quartier.mock_models.MockConnectionsRepo
 import com.quartier.quartier.mock_models.MockSocialsRepo
 import com.quartier.quartier.mock_models.MockUserRepo
@@ -17,7 +18,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertContains
@@ -31,6 +31,7 @@ class ConnectionsViewModelTest {
     private lateinit var connectionsRepo: MockConnectionsRepo
     private lateinit var socialsRepo: MockSocialsRepo
     private lateinit var authRepo: MockAuthRepo
+    private lateinit var bleRepo: MockBleRepo
 
     private val testDispatcher = StandardTestDispatcher()
 
@@ -41,7 +42,8 @@ class ConnectionsViewModelTest {
         connectionsRepo = MockConnectionsRepo()
         socialsRepo = MockSocialsRepo()
         authRepo = MockAuthRepo()
-        viewModel = ConnectionsViewModel(userRepo, connectionsRepo, socialsRepo, authRepo)
+        bleRepo = MockBleRepo()
+        viewModel = ConnectionsViewModel(userRepo, connectionsRepo, socialsRepo, authRepo, bleRepo)
     }
 
     @After
@@ -87,5 +89,135 @@ class ConnectionsViewModelTest {
         testScheduler.advanceUntilIdle()
 
         assertEquals(null, connectionsRepo.getConnectionWithUser("4"))
+    }
+
+    @Test
+    fun validUserIds() = runTest { //All valid user ids
+        backgroundScope.launch {
+            viewModel.nearbyUsersState.collect()
+        }
+        bleRepo.setUserIds(listOf("1", "2", "3"))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(
+            listOf(
+                User("1", "name", "job"),
+                User("2", "name", "job"),
+                User("3", "name", "job")
+            ), viewModel.nearbyUsersState.value.users
+        )
+    }
+
+    @Test
+    fun emptyUserIds() = runTest { //No user ids
+        backgroundScope.launch {
+            viewModel.nearbyUsersState.collect()
+        }
+        bleRepo.setUserIds(emptyList())
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(emptyList(), viewModel.nearbyUsersState.value.users)
+    }
+
+    @Test
+    fun invalidUserId() = runTest { //One user id doesn't exist
+        backgroundScope.launch {
+            viewModel.nearbyUsersState.collect()
+        }
+        bleRepo.setUserIds(listOf("-1", "1", "2")) //-1 doesn't exist
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(
+            listOf(
+                User("1", "name", "job"),
+                User("2", "name", "job"),
+            ), viewModel.nearbyUsersState.value.users
+        )
+    }
+
+    @Test
+    fun connectWithAlreadyConnected_requestedBySelf() = runTest { //Try connecting with someone already connected
+        backgroundScope.launch {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.connectWith(User("1", "name", "job"))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(R.string.already_connected, viewModel.uiState.value.userMessage)
+    }
+
+    @Test
+    fun connectWithAlreadyConnected_requestedByOther() = runTest { //Try connecting with someone already connected
+        backgroundScope.launch {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.connectWith(User("2", "name", "job"))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(R.string.already_connected, viewModel.uiState.value.userMessage)
+    }
+
+    @Test
+    fun connectWithPending_requestedBySelf() = runTest { //Try sending a request when one is pending
+        backgroundScope.launch {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.connectWith(User(id = "3", "name", "job"))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(R.string.connection_request_wait, viewModel.uiState.value.userMessage)
+    }
+
+    @Test
+    fun connectWithPending_requestedByOther() = runTest { //Accept the connection request
+        backgroundScope.launch {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.connectWith(User(id = "4", "name", "job"))
+        testScheduler.advanceUntilIdle()
+
+        assertContains(connectionsRepo.getConnections(), Connection("4", "0", "accepted"))
+        assertEquals(R.string.connection_request_accepted, viewModel.uiState.value.userMessage)
+    }
+
+    @Test
+    fun connectionWithSelf() = runTest { //Try connecting with self
+        backgroundScope.launch {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.connectWith(User(id = "0", "name", "job"))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(R.string.error_request_self, viewModel.uiState.value.userMessage)
+    }
+
+    @Test
+    fun connectionWithInvalidStatus() = runTest { //Try connecting with someone with an invalid_status connection (see MockConnectionsRepo)
+        backgroundScope.launch {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.connectWith(User(id = "5", "name", "job"))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(R.string.unexpected_error, viewModel.uiState.value.userMessage)
+    }
+
+    @Test
+    fun requestConnectionWithNewUser() = runTest { //Send a connection request
+        backgroundScope.launch {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.connectWith(User("6", "name", "job"))
+        testScheduler.advanceUntilIdle()
+
+        assertContains(connectionsRepo.getConnections(), Connection("0", "6", "pending"))
+        assertEquals(R.string.connection_request_success, viewModel.uiState.value.userMessage)
     }
 }

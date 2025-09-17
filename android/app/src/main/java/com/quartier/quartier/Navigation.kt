@@ -10,13 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.quartier.quartier.connections.ConnectScreen
 import com.quartier.quartier.connections.ConnectionsScreen
 import com.quartier.quartier.profile.EditProfileScreen
 import com.quartier.quartier.auth.LoginScreen
@@ -30,10 +29,6 @@ import androidx.core.net.toUri
 
 interface Screen {
     @Serializable
-    object Connect: Screen
-    @Serializable
-    object Loading: Screen
-    @Serializable
     object Login: Screen
     @Serializable
     object Register: Screen
@@ -41,8 +36,6 @@ interface Screen {
     object Connections: Screen
     @Serializable
     object Profile: Screen
-    @Serializable
-    object EditProfile: Screen
 }
 
 @Composable
@@ -58,9 +51,7 @@ fun Navigation(viewModel: SessionViewModel = hiltViewModel()) {
     }
 
     //The app entry point depends on the login status, behavior is defined in the SessionViewModel
-    val startDestination = if(isLoggedIn.value == null) {
-        Screen.Loading
-    } else if(isLoggedIn.value!!) {
+    val startDestination = if(isLoggedIn.value) {
         Screen.Connections
     } else {
         Screen.Login
@@ -79,16 +70,8 @@ fun Navigation(viewModel: SessionViewModel = hiltViewModel()) {
             })
         }
 
-        composable<Screen.Connect> {
-            ConnectScreen(viewModel = hiltViewModel(viewModelStoreOwner), returnToConnections = {
-                navController.navigateUp()
-            })
-        }
-
         composable<Screen.Connections> {
-            ConnectionsScreen(onNavToConnect = {
-                navController.navigate(Screen.Connect)
-            }, onNavToProfile = {
+            ConnectionsScreen(onNavToProfile = {
                 navController.navigate(Screen.Profile)
             }, onNavToLinkedin = { url ->
                 //Open the linkedin url
@@ -97,28 +80,12 @@ fun Navigation(viewModel: SessionViewModel = hiltViewModel()) {
         }
 
         composable<Screen.Profile> {
-            ProfileScreen(onNavToEditProfile = {
-                navController.navigate(Screen.EditProfile)
-            }, onNavToConnections = {
+            ProfileScreen(onNavToConnections = {
                 navController.navigate(Screen.Connections)
             }, onNavToLinkedin = { url ->
                 //Open the linkedin url
                 context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
             })
-        }
-
-        composable<Screen.EditProfile> {
-            EditProfileScreen(returnToProfile = {
-                navController.navigateUp()
-            })
-        }
-
-        composable<Screen.Loading> {
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-                    Text(LocalContext.current.getString(R.string.loading), modifier = Modifier.align(Alignment.Center))
-                }
-            }
         }
     }
 }
