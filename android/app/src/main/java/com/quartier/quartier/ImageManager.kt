@@ -8,12 +8,9 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.net.Uri
 import androidx.core.graphics.createBitmap
-import com.quartier.quartier.database.ConnectionsDatabase
-import com.quartier.quartier.database.ConnectionsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream

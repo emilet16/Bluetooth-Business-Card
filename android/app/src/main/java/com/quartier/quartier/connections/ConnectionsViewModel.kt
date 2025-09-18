@@ -7,15 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quartier.quartier.BleRepository
 import com.quartier.quartier.R
-import com.quartier.quartier.database.AuthRepository
-import com.quartier.quartier.database.Connection
 import com.quartier.quartier.database.ConnectionRequestResult
 import com.quartier.quartier.database.ConnectionsRepository
 import com.quartier.quartier.database.Socials
 import com.quartier.quartier.database.SocialsRepository
+import com.quartier.quartier.database.SupabaseException
 import com.quartier.quartier.database.User
 import com.quartier.quartier.database.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.exceptions.HttpRequestException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -47,7 +47,6 @@ class ConnectionsViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val connectionsRepository: ConnectionsRepository,
     private val socialsRepository: SocialsRepository,
-    private val authRepository: AuthRepository,
     private val bleRepository: BleRepository
 ) : ViewModel() {
     private val _requests: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
@@ -63,7 +62,15 @@ class ConnectionsViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ConnectionsUIState(emptyList(), emptyList(), emptyMap(),false, null))
 
     private val _users = bleRepository.userIds.map { ids ->
-        userRepository.getUsers(ids)
+        try {
+            userRepository.getUsers(ids)
+        } catch (e: SupabaseException) {
+            _userMessage.value = R.string.no_internet
+            emptyList()
+        } catch (e: HttpRequestException) {
+            _userMessage.value = R.string.no_internet
+            emptyList()
+        }
     }
     private val _showNearbyUsers = MutableStateFlow(false)
 
@@ -78,49 +85,62 @@ class ConnectionsViewModel @Inject constructor(
     }
 
     fun refreshConnections() {
-        _isRefreshing.value = true
         viewModelScope.launch {
-            val connections = connectionsRepository.getConnections()
+            try {
+                _isRefreshing.value = true
 
-            val connectedUsers = connectionsToUsers(connections)
+                val connections = connectionsRepository.getConnections()
+                val connectedUsers =
+                    connectionsRepository.connectionsToUsers(connections, userRepository)
 
-            _requests.value = connectedUsers.filter { user -> user.connectionStatus == "pending" }
-            _connections.value = connectedUsers.filter { user -> user.connectionStatus == "accepted" }
-            _isRefreshing.value = false
+                _requests.value =
+                    connectedUsers.filter { user -> user.connectionStatus == "pending" }
+                _connections.value =
+                    connectedUsers.filter { user -> user.connectionStatus == "accepted" }
+                _isRefreshing.value = false
+            } catch (e: SupabaseException) {
+                _userMessage.value = R.string.no_internet
+                _isRefreshing.value = false
+            } catch (e: HttpRequestException) {
+                _userMessage.value = R.string.no_internet
+                _isRefreshing.value = false
+            }
         }
         viewModelScope.launch {
-            val socials = socialsRepository.getUserSocialsList()
-            _connectionsSocials.value = socials.associateBy { it.id }
-        }
-    }
-
-    suspend fun connectionsToUsers(connections: List<Connection>) : List<User> {
-        val uid = authRepository.userId.value!!
-        val connectionsMap = connections.associateBy(
-            {if (it.requested_by == uid) it.requested_for else it.requested_by}, //find the other user's id
-            {it.status}
-        )
-        val users = userRepository.getUsers(connectionsMap.keys.toList())
-        return users.map { user ->
-            User(user.id, user.name, user.job, user.pfp_url, connectionsMap[user.id])
+            try {
+                val socials = socialsRepository.getUserSocialsList()
+                _connectionsSocials.value = socials.associateBy { it.id }
+            } catch (e: SupabaseException) {
+                _userMessage.value = R.string.no_internet
+            } catch (e: HttpRequestException) {
+                _userMessage.value = R.string.no_internet
+            }
         }
     }
 
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
     fun openNearbyUsers() {
-        showNearbyUsers()
-        viewModelScope.launch {
-            bleRepository.startAdvertising()
-        }
-        viewModelScope.launch {
-            bleRepository.startScanning()
-        }
-        //Scan for only 10 seconds to optimize resource usage
-        viewModelScope.launch {
-            stopScanJob?.cancelAndJoin()
-            delay(10000)
-            bleRepository.stopScanning()
-            stopScanJob = null
+        try {
+            viewModelScope.launch {
+                bleRepository.startAdvertising()
+            }
+            viewModelScope.launch {
+                bleRepository.startScanning()
+            }
+            //Scan for only 10 seconds to optimize resource usage
+            viewModelScope.launch {
+                stopScanJob?.cancelAndJoin()
+                delay(10000)
+                bleRepository.stopScanning()
+                stopScanJob = null
+            }
+            showNearbyUsers()
+        } catch (e: SupabaseException) {
+            _userMessage.value = R.string.no_internet
+            closeNearbyUsers()
+        } catch (e: HttpRequestException) {
+            _userMessage.value = R.string.no_internet
+            closeNearbyUsers()
         }
     }
 
@@ -142,39 +162,59 @@ class ConnectionsViewModel @Inject constructor(
 
     fun connectWith(user: User) {
         viewModelScope.launch {
-            val connection = connectionsRepository.getConnectionWithUser(requestedId = user.id)
-            if(connection == null) {
-                //No connection was found, check if the user tried connecting with themselves
-                val result = connectionsRepository.requestConnection(requestedId = user.id)
-                if(result == ConnectionRequestResult.Success)  _userMessage.value = R.string.connection_request_success
-                else if(result == ConnectionRequestResult.CannotConnectWithSelf) _userMessage.value = R.string.error_request_self
-            } else if(connection.status == "pending" && connection.requested_by == user.id) {
-                //A connection has been sent by this user, accept it.
-                connectionsRepository.acceptConnection(user2Id = user.id)
-                _userMessage.value = R.string.connection_request_accepted
-            } else if(connection.status == "accepted") {
-                //The users are already connected
-                _userMessage.value = R.string.already_connected
-            } else if(connection.status == "pending" && connection.requested_for == user.id) {
-                //The connection request has been sent, wait for the other to accept.
-                _userMessage.value = R.string.connection_request_wait
-            } else {
-                //Notify the user if something unexpected happens
-                _userMessage.value = R.string.unexpected_error
+            try {
+                val connection = connectionsRepository.getConnectionWithUser(requestedId = user.id)
+                if (connection == null) {
+                    //No connection was found, check if the user tried connecting with themselves
+                    val result = connectionsRepository.requestConnection(requestedId = user.id)
+                    if (result == ConnectionRequestResult.Success) _userMessage.value =
+                        R.string.connection_request_success
+                    else if (result == ConnectionRequestResult.CannotConnectWithSelf) _userMessage.value =
+                        R.string.error_request_self
+                } else if (connection.status == "pending" && connection.requested_by == user.id) {
+                    //A connection has been sent by this user, accept it.
+                    connectionsRepository.acceptConnection(user2Id = user.id)
+                    _userMessage.value = R.string.connection_request_accepted
+                } else if (connection.status == "accepted") {
+                    //The users are already connected
+                    _userMessage.value = R.string.already_connected
+                } else if (connection.status == "pending" && connection.requested_for == user.id) {
+                    //The connection request has been sent, wait for the other to accept.
+                    _userMessage.value = R.string.connection_request_wait
+                } else {
+                    //Notify the user if something unexpected happens
+                    _userMessage.value = R.string.unexpected_error
+                }
+            } catch (e: SupabaseException) {
+                _userMessage.value = R.string.no_internet
+            } catch (e: HttpRequestException) {
+                _userMessage.value = R.string.no_internet
             }
         }
     }
 
     fun acceptConnection(user: User) {
         viewModelScope.launch {
-            connectionsRepository.acceptConnection(user.id)
+            try {
+                connectionsRepository.acceptConnection(user.id)
+            } catch (e: SupabaseException) {
+                _userMessage.value = R.string.no_internet
+            } catch (e: HttpRequestException) {
+                _userMessage.value = R.string.no_internet
+            }
             refreshConnections()
         }
     }
 
     fun declineConnection(user: User) {
         viewModelScope.launch {
-            connectionsRepository.deleteConnection(user.id)
+            try {
+                connectionsRepository.deleteConnection(user.id)
+            } catch (e: SupabaseException) {
+                _userMessage.value = R.string.no_internet
+            } catch (e: HttpRequestException) {
+                _userMessage.value = R.string.no_internet
+            }
             refreshConnections()
         }
     }

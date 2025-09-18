@@ -1,29 +1,20 @@
 package com.quartier.quartier
 
 import android.content.Intent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.quartier.quartier.connections.ConnectionsScreen
-import com.quartier.quartier.profile.EditProfileScreen
 import com.quartier.quartier.auth.LoginScreen
-import com.quartier.quartier.profile.ProfileScreen
 import com.quartier.quartier.auth.RegisterScreen
-import io.github.jan.supabase.auth.status.SessionStatus
+import com.quartier.quartier.connections.ConnectionsScreen
+import com.quartier.quartier.profile.ProfileScreen
 import kotlinx.serialization.Serializable
-import androidx.core.net.toUri
 
 //App navigation using Compose Navigation, each screen is defined by an object
 
@@ -45,10 +36,6 @@ fun Navigation(viewModel: SessionViewModel = hiltViewModel()) {
     val isLoggedIn = viewModel.isLoggedIn.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-
-    val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-    }
 
     //The app entry point depends on the login status, behavior is defined in the SessionViewModel
     val startDestination = if(isLoggedIn.value) {

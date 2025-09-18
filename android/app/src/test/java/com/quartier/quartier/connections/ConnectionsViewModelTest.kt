@@ -4,7 +4,6 @@ import com.quartier.quartier.R
 import com.quartier.quartier.database.Connection
 import com.quartier.quartier.database.Socials
 import com.quartier.quartier.database.User
-import com.quartier.quartier.mock_models.MockAuthRepo
 import com.quartier.quartier.mock_models.MockBleRepo
 import com.quartier.quartier.mock_models.MockConnectionsRepo
 import com.quartier.quartier.mock_models.MockSocialsRepo
@@ -30,7 +29,6 @@ class ConnectionsViewModelTest {
     private lateinit var userRepo: MockUserRepo
     private lateinit var connectionsRepo: MockConnectionsRepo
     private lateinit var socialsRepo: MockSocialsRepo
-    private lateinit var authRepo: MockAuthRepo
     private lateinit var bleRepo: MockBleRepo
 
     private val testDispatcher = StandardTestDispatcher()
@@ -41,9 +39,8 @@ class ConnectionsViewModelTest {
         userRepo = MockUserRepo()
         connectionsRepo = MockConnectionsRepo()
         socialsRepo = MockSocialsRepo()
-        authRepo = MockAuthRepo()
         bleRepo = MockBleRepo()
-        viewModel = ConnectionsViewModel(userRepo, connectionsRepo, socialsRepo, authRepo, bleRepo)
+        viewModel = ConnectionsViewModel(userRepo, connectionsRepo, socialsRepo, bleRepo)
     }
 
     @After

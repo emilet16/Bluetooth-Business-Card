@@ -1,8 +1,8 @@
 package com.quartier.quartier.mock_models
 
+import com.quartier.quartier.R
 import com.quartier.quartier.auth.AuthManager
 import com.quartier.quartier.auth.AuthResult
-import io.github.jan.supabase.auth.exception.AuthErrorCode
 
 //Imitate the behavior of supabase authentication
 
@@ -16,7 +16,7 @@ class MockAuthManager : AuthManager {
         pwd: String
     ): AuthResult {
         return if(accounts[eml] == pwd) AuthResult.Success
-        else AuthResult.Error(AuthErrorCode.InvalidCredentials)
+        else AuthResult.Error(R.string.auth_invalid_credentials)
     }
 
     override suspend fun emailSignUp(
@@ -24,7 +24,7 @@ class MockAuthManager : AuthManager {
         eml: String,
         pwd: String
     ): AuthResult {
-        return if(accounts[eml] != null) AuthResult.Error(AuthErrorCode.UserAlreadyExists)
+        return if(accounts[eml] != null) AuthResult.Error(R.string.auth_user_exists)
         else AuthResult.Success
     }
 }

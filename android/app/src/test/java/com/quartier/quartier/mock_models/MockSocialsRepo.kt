@@ -2,9 +2,6 @@ package com.quartier.quartier.mock_models
 
 import com.quartier.quartier.database.Socials
 import com.quartier.quartier.database.SocialsRepository
-import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnknownRestException
-import io.ktor.client.statement.HttpResponse
 
 //Imitates the Socials table in supabase, test cases where some has "links" and others don't
 

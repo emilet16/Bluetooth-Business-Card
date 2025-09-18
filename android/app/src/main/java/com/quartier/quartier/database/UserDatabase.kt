@@ -1,13 +1,10 @@
 package com.quartier.quartier.database
 
-import androidx.lifecycle.ViewModel
 import com.quartier.quartier.supabase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -34,7 +31,7 @@ interface UserRepository {
     suspend fun uploadPfp(fileName: String, image: ByteArray)
 }
 @Singleton
-class UserDatabase @Inject constructor(private val authRepository: AuthRepository) : UserRepository {
+class UserDatabase @Inject constructor() : UserRepository {
     override suspend fun getUsers(uids: List<String>): List<User> {
         return supabase.from("profiles").select(columns = Columns.ALL) { //Get a list of profiles from the user IDs.
             filter {
@@ -44,16 +41,22 @@ class UserDatabase @Inject constructor(private val authRepository: AuthRepositor
     }
 
     override suspend fun getUser(): User {
-        val uid = authRepository.userId.value!!
+        val uid = supabase.auth.currentUserOrNull()?.id
+
+        if(uid == null) throw SupabaseException("No internet connection!")
+
         return supabase.from("profiles").select(columns = Columns.ALL) { //Get the user's profile
             filter {
                 User::id eq uid
             }
-        }.decodeSingle<User>()
+        }.decodeSingle()
     }
 
     override suspend fun updateUser(name: String, job: String) {
-        val uid = authRepository.userId.value!!
+        val uid = supabase.auth.currentUserOrNull()?.id
+
+        if(uid == null) throw SupabaseException("No internet connection!")
+
         supabase.from("profiles").update({ //Edit the user's profile
             User::name setTo name
             User::job setTo job
@@ -64,8 +67,11 @@ class UserDatabase @Inject constructor(private val authRepository: AuthRepositor
         }
     }
 
-    override suspend fun uploadPfp(fileName: String, image: ByteArray) { //TODO Delete old unused pfps
-        val uid = authRepository.userId.value!!
+    override suspend fun uploadPfp(fileName: String, image: ByteArray) {
+        val uid = supabase.auth.currentUserOrNull()?.id
+
+        if(uid == null) throw SupabaseException("No internet connection!")
+
         supabase.storage.from("pfp").upload(fileName, image) //Upload the pfp to the storage bucket
 
         val url = supabase.storage.from("pfp").publicUrl(fileName) //Get the public URL to the image

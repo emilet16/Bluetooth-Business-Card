@@ -1,6 +1,5 @@
 package com.quartier.quartier.mock_models
 
-import com.quartier.quartier.database.UploadStatus
 import com.quartier.quartier.database.User
 import com.quartier.quartier.database.UserRepository
 

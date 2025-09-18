@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 //Imitate the ble repo behavior
 
 class MockBleRepo() : BleRepository {
-    private val _userIds: MutableStateFlow<List<String>> = MutableStateFlow<List<String>>(emptyList())
+    private val _userIds: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
     override val userIds: StateFlow<List<String>> = _userIds.asStateFlow()
 
     override fun startAdvertising() {

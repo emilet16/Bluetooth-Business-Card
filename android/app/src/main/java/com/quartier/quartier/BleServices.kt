@@ -14,13 +14,10 @@ import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import com.quartier.quartier.database.AuthRepository
-import com.quartier.quartier.database.ConnectionsDatabase
-import com.quartier.quartier.database.ConnectionsRepository
+import com.quartier.quartier.database.SupabaseException
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.auth.auth
@@ -41,13 +38,11 @@ interface BleRepository {
 }
 
 @Singleton
-class BleManager @Inject constructor(@ApplicationContext val context: Context, authRepository: AuthRepository) : BleRepository {
+class BleManager @Inject constructor(@param: ApplicationContext val context: Context) : BleRepository {
     //Service uuid to filter out other bluetooth devices
     private val bleUUID: String = "0000D17B-0000-1000-8000-00805F9B34FB"
 
-    private val userID = authRepository.userId.value!!
-
-    private val _userIds: MutableStateFlow<List<String>> = MutableStateFlow<List<String>>(listOf<String>())
+    private val _userIds: MutableStateFlow<List<String>> = MutableStateFlow(listOf())
     override val userIds: StateFlow<List<String>> = _userIds.asStateFlow()
 
     private val advertisingSetCallback = object : AdvertisingSetCallback() {
@@ -94,6 +89,10 @@ class BleManager @Inject constructor(@ApplicationContext val context: Context, a
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
     override fun startAdvertising() {
+        val userID = supabase.auth.currentUserOrNull()?.id
+
+        if(userID == null) throw SupabaseException("No internet connection!")
+
         val pUuid = ParcelUuid.fromString(bleUUID)
 
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -137,7 +136,7 @@ class BleManager @Inject constructor(@ApplicationContext val context: Context, a
             .setServiceUuid(pUuid)
             .build()
 
-        _userIds.value = emptyList<String>()
+        _userIds.value = emptyList()
 
         //When the scanner finds a device matching the filter, it calls the scanCallback method
         scanner.startScan(listOf(filter), settings, scanCallback)

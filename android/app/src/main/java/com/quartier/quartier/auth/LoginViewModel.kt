@@ -22,7 +22,7 @@ class LoginViewModel @Inject constructor(val authManager: AuthManager) : ViewMod
     fun emailSignIn(email: String, pwd: String) = viewModelScope.launch {
         val result = authManager.emailSignIn(email, pwd)
         if(result is AuthResult.Error) {
-            _userMessage.value = messageFromErrorCode(result.error)
+            _userMessage.value = result.error
         }
     }
 

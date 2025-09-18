@@ -4,10 +4,8 @@ import com.quartier.quartier.supabase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.ViewModelComponent
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.Serializable
@@ -29,9 +27,12 @@ interface SocialsRepository {
 }
 
 @Singleton
-class SocialsDatabase @Inject constructor(private val authRepository: AuthRepository) : SocialsRepository {
+class SocialsDatabase @Inject constructor() : SocialsRepository {
     override suspend fun getUserSocials(): Socials {
-        val id = authRepository.userId.value!!
+        val id = supabase.auth.currentUserOrNull()?.id
+
+        if(id == null) throw SupabaseException("No internet connection!")
+
         return supabase.from("socials").select(columns = Columns.ALL) {
             filter {
                 Socials::id eq id
@@ -44,7 +45,10 @@ class SocialsDatabase @Inject constructor(private val authRepository: AuthReposi
     }
 
     override suspend fun upsertSocials(linkedinURL: String) {
-        val uid = authRepository.userId.value!!
+        val uid = supabase.auth.currentUserOrNull()?.id
+
+        if(uid == null) throw SupabaseException("No internet connection!")
+
         supabase.from("socials").upsert(Socials(id = uid, linkedin_url = linkedinURL)) {
             onConflict = "id" //When modifying, overwrite based on the user ID.
         }

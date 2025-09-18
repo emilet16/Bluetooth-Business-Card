@@ -8,13 +8,10 @@
     <string name="hide_password">Hide Password</string>
     <string name="show_password">Show Password</string>
     <string name="bluetooth_permission_denied">Please allow bluetooth permissions to connect with people nearby</string>
-    <string name="bluetooth_disabled">Bluetooth is disabled, please enable it</string>
-    <string name="refresh_desc">Refresh</string>
     <string name="signin">Sign In</string>
     <string name="register">Register</string>
     <string name="greeting">Welcome back!</string>
     <string name="signin_request">Please sign in</string>
-    <string name="loading">Loading...</string>
     <string name="auth_email_exists">Email already exists, try to sign in instead</string>
     <string name="auth_user_not_found">User not found, please register</string>
     <string name="auth_user_banned">User banned, if this is a mistake, contact administrators</string>
@@ -28,14 +25,13 @@
     <string name="register_request">Register now</string>
     <string name="register_suggestion">Don\'t have an account? Register</string>
     <string name="name_label">Name</string>
-    <string name="name_placeholder">Enter your name here</string>
     <string name="auth_otp_expired">Link has expired, you can request another one!</string>
     <string name="login_suggest">Already have an account? Log in</string>
     <string name="pfp_description">Profile picture</string>
     <string name="edit_profile">Edit profile</string>
     <string name="job_label">Job</string>
     <string name="save_profile">Save profile</string>
-    <string name="saving">Saving...</string>
+    <string name="saving">Saving…</string>
     <string name="saving_error">An error happened while saving your profile. Please try again</string>
     <string name="accept_request">Accept connection request</string>
     <string name="decline_request">Decline connection request</string>
@@ -44,10 +40,7 @@
     <string name="connection_request_success">Connection successfully requested!</string>
     <string name="connection_request_accepted">Connection accepted!</string>
     <string name="already_connected">You are already connected with this person</string>
-    <string name="back">Back</string>
     <string name="add_connections">Connect with users</string>
-    <string name="profile_title">Profile</string>
-    <string name="connections_title">Connections</string>
     <string name="no_nearby_users">No nearby users</string>
     <string name="error_request_self">Error: You cannot connect with yourself!</string>
     <string name="email_invalid">This is not a valid email address</string>
@@ -60,5 +53,6 @@
     <string name="connect_nearby_users">Connect with nearby users and start networking!</string>
     <string name="alone">You are alone</string>
     <string name="dont_save_profile">Don\'t save profile</string>
+    <string name="no_internet">No internet connection</string>
 
 </resources>

@@ -8,8 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
-import com.quartier.quartier.ui.theme.QuarierTheme
+import com.quartier.quartier.ui.theme.QuartierTheme
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.MemoryCodeVerifierCache
@@ -52,7 +51,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            QuarierTheme {
+            QuartierTheme {
                 Surface(modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surface) {
                     Navigation()

@@ -1,23 +1,16 @@
 package com.quartier.quartier.auth
 
 import com.quartier.quartier.R
-import com.quartier.quartier.database.AuthRepository
-import com.quartier.quartier.database.AuthRepositoryImpl
 import com.quartier.quartier.supabase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import io.github.jan.supabase.exceptions.HttpRequestException
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import javax.inject.Inject
@@ -39,7 +32,9 @@ class AuthManagerImpl @Inject constructor() : AuthManager {
                 password = pwd
             }
         } catch(e: AuthRestException) {
-            return AuthResult.Error(e.errorCode ?: AuthErrorCode.UnexpectedFailure)
+            return AuthResult.Error(messageFromErrorCode(e.errorCode ?: AuthErrorCode.UnexpectedFailure))
+        } catch(e: HttpRequestException) {
+            return AuthResult.Error(R.string.no_internet)
         }
         return AuthResult.Success
     }
@@ -54,7 +49,9 @@ class AuthManagerImpl @Inject constructor() : AuthManager {
                 }
             }
         } catch(e: AuthRestException) {
-            return AuthResult.Error(e.errorCode ?: AuthErrorCode.UnexpectedFailure)
+            return AuthResult.Error(messageFromErrorCode(e.errorCode ?: AuthErrorCode.UnexpectedFailure))
+        } catch(e: HttpRequestException) {
+            return AuthResult.Error(R.string.no_internet)
         }
         return AuthResult.Success
     }
@@ -69,7 +66,7 @@ abstract class AuthManagerModule {
 
 interface AuthResult {
     data object Success: AuthResult
-    data class Error(val error: AuthErrorCode): AuthResult
+    data class Error(val error: Int): AuthResult
 }
 
 fun messageFromErrorCode(errorCode: AuthErrorCode) : Int {

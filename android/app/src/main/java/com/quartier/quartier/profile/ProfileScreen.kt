@@ -2,26 +2,17 @@ package com.quartier.quartier.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -34,17 +25,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.quartier.quartier.R
-import com.quartier.quartier.database.Socials
 import com.quartier.quartier.components.MainBottomAppBar
 import com.quartier.quartier.components.SelectedScreen
-import com.quartier.quartier.database.User
 import com.quartier.quartier.components.UserCard
+import com.quartier.quartier.database.Socials
 import com.quartier.quartier.database.UploadStatus
+import com.quartier.quartier.database.User
 import kotlinx.coroutines.launch
 
 //Screen used to display the user's profile
@@ -62,6 +50,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel(),
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Scaffold(modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             MainBottomAppBar(onNavToConnections = onNavToConnections, selectedScreen = SelectedScreen.Profile)
         }, floatingActionButton = {
@@ -94,6 +83,15 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel(),
             }, snackbarHostState = snackbarHostState,
             sheetState = sheetState, scope = scope
         )
+    }
+
+    //Display message for the user (ex. when Bluetooth isn't available)
+    uiState.userMessage?.let { userMessage ->
+        val snackbarText = LocalContext.current.getString(userMessage)
+        LaunchedEffect(snackbarHostState, viewModel, userMessage, snackbarText) {
+            snackbarHostState.showSnackbar(snackbarText)
+            viewModel.snackbarMessageShown()
+        }
     }
 
     //Display the save status for the user & close the screen if saving is successful

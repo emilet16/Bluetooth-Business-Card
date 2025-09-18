@@ -22,7 +22,7 @@ class RegisterViewModel @Inject constructor(val authManager: AuthManager) : View
     fun emailSignUp(name: String, email: String, pwd: String) = viewModelScope.launch {
         val result = authManager.emailSignUp(name, email, pwd)
         if(result is AuthResult.Error) {
-            _userMessage.value = messageFromErrorCode(result.error)
+            _userMessage.value = result.error
         }
     }
 
