@@ -32,6 +32,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Configure Supabase
+      uses: supabase/setup-cli@v1
+      with:
+        version: latest
     - name: set up JDK 21
       uses: actions/setup-java@v4
       with:
@@ -41,7 +45,9 @@ jobs:
     - name: Install Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Start Supabase
+      run: supabase start
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
+    - name: Build and test with Gradle
       run: ./gradlew testDebug -PSUPABASE_URL_DEBUG="\"http://localhost:54321\""
