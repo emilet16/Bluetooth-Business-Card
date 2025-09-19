@@ -27,8 +27,8 @@ android {
             versionNameSuffix = "-dev"
             resValue("string", "app_name", "Quartier (dev)")
 
-            buildConfigField("String", "SUPABASE_URL", "\"https://summary-toucan-chief.ngrok-free.app\"")
-            buildConfigField("String", "SUPABASE_KEY", "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0\"")
+            buildConfigField("String", "SUPABASE_URL", project.property("SUPABASE_URL_DEBUG").toString()) //Defined in local.properties or command line build
+            buildConfigField("String", "SUPABASE_KEY", project.property("SUPABASE_KEY_DEBUG").toString()) //Defined in local.properties or command line build
         }
         release {
             isMinifyEnabled = true
@@ -38,8 +38,8 @@ android {
             )
             signingConfig = signingConfigs.getByName("debug")
 
-            buildConfigField("String", "SUPABASE_URL", "\"https://liumhaenwcmzwargxnpv.supabase.co\"")
-            buildConfigField("String", "SUPABASE_KEY", "\"sb_publishable_YVhSNGzOosROZp8bY-qzPQ_xJafBP1M\"")
+            buildConfigField("String", "SUPABASE_URL", project.property("SUPABASE_URL_RELEASE").toString()) //Defined in local.properties or command line build
+            buildConfigField("String", "SUPABASE_KEY", project.property("SUPABASE_KEY_RELEASE").toString()) //Defined in local.properties or command line build
         }
     }
     compileOptions {

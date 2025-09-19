@@ -24,7 +24,7 @@ interface ImageRepository {
     fun convertToWebPByteArray(bitmap: Bitmap) : ByteArray
 }
 
-class ImageManager @Inject constructor(@ApplicationContext val context: Context) : ImageRepository {
+class ImageManager @Inject constructor(@param: ApplicationContext val context: Context) : ImageRepository {
     override fun cropImageTo400(uri: Uri) : Bitmap {
         val source = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, _, _ ->
             decoder.isMutableRequired = true
