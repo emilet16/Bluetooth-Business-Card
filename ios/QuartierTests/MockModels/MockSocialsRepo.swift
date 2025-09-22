@@ -11,7 +11,7 @@ import Supabase
 
 //Mock the supabase db socials table
 
-class MockSocialsRepo : SocialsRepository {
+class MockSocialsRepo : SocialsRepository, @unchecked Sendable {
     var error = false
     
     private(set) var socials: [Socials] = [

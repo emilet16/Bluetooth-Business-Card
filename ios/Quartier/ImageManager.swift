@@ -11,12 +11,12 @@ import SDWebImageWebPCoder
 
 //Wrapper class for image manipulation methods
 
-protocol ImageRepository  {
+protocol ImageRepository : Sendable {
     func resizeTo400(image: UIImage) -> UIImage
     func encodeToWebP(image: UIImage) -> Data
 }
 
-class ImageManager : ImageRepository {
+final class ImageManager : ImageRepository {
     func resizeTo400(image: UIImage) -> UIImage {
         let size = image.size
         

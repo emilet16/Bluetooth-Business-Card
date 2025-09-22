@@ -10,7 +10,7 @@ import Testing
 
 //Mock the behavior of the connections table in the supabase DB
 
-class MockConnectionsRepo : ConnectionsRepository {
+class MockConnectionsRepo : ConnectionsRepository, @unchecked Sendable {
     private(set) var connections = [
         Connection(requested_by: "0", requested_for: "1", status: "accepted"),
         Connection(requested_by: "2", requested_for: "0", status: "accepted"),

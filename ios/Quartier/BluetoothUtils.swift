@@ -11,7 +11,6 @@ import os
 import Combine
 
 //Bluetooth peripheral manager, advertises user id to the nearby devices
-
 protocol BluetoothPeripheralManager: ObservableObject, CBPeripheralManagerDelegate {
     var status: AnyPublisher<CBManagerState?, Never> { get }
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager)
@@ -20,8 +19,6 @@ protocol BluetoothPeripheralManager: ObservableObject, CBPeripheralManagerDelega
 }
 
 class BluetoothPeripheralManagerImpl: NSObject, BluetoothPeripheralManager  {
-    static let shared = BluetoothPeripheralManagerImpl()
-    
     private var peripheralManager: CBPeripheralManager?
     private var shouldAdvertise: Bool = false
     
@@ -92,8 +89,6 @@ protocol BluetoothCentralManager : ObservableObject, CBCentralManagerDelegate {
 }
 
 class BluetoothCentralManagerImpl: NSObject, BluetoothCentralManager {
-    static let shared = BluetoothCentralManagerImpl()
-    
     @Published private(set) var uids: [String] = []
     var discoveredUIDS: AnyPublisher<[String], Never> {
         $uids.eraseToAnyPublisher()

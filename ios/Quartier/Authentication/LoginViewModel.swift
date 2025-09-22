@@ -9,15 +9,14 @@ import Foundation
 import Auth
 
 //Viewmodel for the login screen, handles the sign in process
-
+@MainActor
 protocol LoginViewModel : ObservableObject {
-    var message: String? { get set }
+    var message: String? { get }
     
     func login(email: String, pwd: String)
     func matchEmailRegex(text: String) -> Bool
 }
 
-@MainActor
 class LoginViewModelImpl : LoginViewModel {
     private var authManager: any AuthManager
     
@@ -37,7 +36,7 @@ class LoginViewModelImpl : LoginViewModel {
         }
     }
     
-    func matchEmailRegex(text: String) -> Bool {
+    nonisolated func matchEmailRegex(text: String) -> Bool {
         let emailRegex = try! Regex("^[^@]+@[^@]+\\.[^@]+$")
         return try! emailRegex.wholeMatch(in: text) != nil
     }

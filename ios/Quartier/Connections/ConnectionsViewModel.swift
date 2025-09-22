@@ -8,18 +8,17 @@
 import Foundation
 
 //A view model for the connections screen, sorts the connected users and handles connection requests
-
+@MainActor
 protocol ConnectionsViewModel : ObservableObject {
-    var connections: [User] { get set }
-    var requests: [User] { get set }
-    var socials: [String: Socials] { get set }
+    var connections: [User] { get }
+    var requests: [User] { get }
+    var socials: [String: Socials] { get }
     
     func refreshConnections()
     func acceptConnection(uid: String)
     func declineConnection(uid: String)
 }
 
-@MainActor
 class ConnectionsViewModelImpl : ConnectionsViewModel {
     private var userRepository: any UserRepository
     private var connectionsRepository: any ConnectionsRepository

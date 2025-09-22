@@ -19,8 +19,10 @@ struct ProfileImagePicker: View {
     var onChange: (UIImage) -> Void
     
     var body: some View {
+        let currentImage = selectedImage
+        
         PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()){
-            if let image = selectedImage { //New pfp
+            if let image = currentImage { //New pfp
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -39,9 +41,10 @@ struct ProfileImagePicker: View {
                     .scaledToFit()
                     .frame(width: 150, height: 150)
             }
-        }.onChange(of: selectedItem) {
+        }.onChange(of: selectedItem) { _, newValue in
+            guard let newValue else { return }
             Task { //Load the pfp
-                if let data = try? await selectedItem?.loadTransferable(type: Data.self),
+                if let data = try await newValue.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data)
                 {
                     self.selectedImage = uiImage

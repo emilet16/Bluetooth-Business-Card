@@ -18,7 +18,7 @@ enum ConnectionResult {
     case requested
 }
 
-protocol ConnectionsRepository {
+protocol ConnectionsRepository : Sendable {
     func getConnections() async throws -> [Connection]
     func getConnectionWithUser(requestedID: String) async throws -> Connection?
     func requestConnection(requestedID: String) async throws -> ConnectionResult?
@@ -26,7 +26,7 @@ protocol ConnectionsRepository {
     func deleteConnection(requestedID: String) async throws
 }
 
-class ConnectionsDatabase : ConnectionsRepository {
+final class ConnectionsDatabase : ConnectionsRepository {
     static let shared = ConnectionsDatabase()
     
     func getConnections() async throws -> [Connection] { //Get all connections for the user

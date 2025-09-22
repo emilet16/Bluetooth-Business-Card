@@ -11,7 +11,7 @@ import Testing
 
 //Encode and decode the image path to bypass this in the tests
 
-class MockImageRepo : ImageRepository {
+final class MockImageRepo : ImageRepository {
     func resizeTo400(image: UIImage) -> UIImage {
         return image
     }

@@ -9,18 +9,17 @@ import Foundation
 import PhotosUI
 
 //The viewmodel for the Edit Profile screen, handle fetching and saving user's profile
-
+@MainActor
 protocol EditProfileViewModel : ObservableObject {
-    var userProfile: User? { get set }
-    var userSocials: Socials? { get set }
-    var saveStatus: SaveStatus? { get set }
+    var userProfile: User? { get }
+    var userSocials: Socials? { get }
+    var saveStatus: SaveStatus? { get }
     
     func refreshUser()
     func saveUser(name: String, jobTitle: String, linkedInURL: String, pfp: UIImage?)
     func matchesLinkedinRegex(input: String) -> Bool
 }
 
-@MainActor
 class EditProfileViewModelImpl : EditProfileViewModel {
     private var userRepository: any UserRepository
     private var socialsRepository: any SocialsRepository
@@ -95,7 +94,7 @@ class EditProfileViewModelImpl : EditProfileViewModel {
         }
     }
     
-    func matchesLinkedinRegex(input: String) -> Bool { //Check if the link is a valid linkedin link
+    nonisolated func matchesLinkedinRegex(input: String) -> Bool { //Check if the link is a valid linkedin link
         let regex = try! Regex("^https://www\\.linkedin\\.com/in/[^/]+/?$")
         return try! regex.wholeMatch(in: input) != nil
     }

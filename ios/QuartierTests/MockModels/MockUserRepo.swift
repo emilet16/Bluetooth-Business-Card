@@ -12,7 +12,7 @@ import Testing
 
 //Mock the behavior of the profiles table in the supabase db
 
-class MockUserRepo: UserRepository {
+final class MockUserRepo: UserRepository, @unchecked Sendable {
     var profileError = false
     var pfpError = false
     

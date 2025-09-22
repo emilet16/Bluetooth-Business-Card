@@ -9,11 +9,11 @@ import Foundation
 import Combine
 
 //Viewmodel class for the connect screen, fetch nearby users and send requests
-
+@MainActor
 protocol ConnectViewModel : ObservableObject {
-    var users: [User] { get set }
-    var message: String? { get set }
-    var connectionMessage: String? { get set }
+    var users: [User] { get }
+    var message: String? { get }
+    var connectionMessage: String? { get }
     
     func connectWithUser(requestedID: String)
     func startAdvertising()
@@ -24,7 +24,6 @@ protocol ConnectViewModel : ObservableObject {
     func updateUsers()
 }
 
-@MainActor
 class ConnectViewModelImpl : ConnectViewModel {
     private var blePeripheralManager: any BluetoothPeripheralManager
     private var bleCentralManager: any BluetoothCentralManager
@@ -38,7 +37,7 @@ class ConnectViewModelImpl : ConnectViewModel {
     private var cancellables = Set<AnyCancellable>()
     private var scanTask: Task<Void, Never>? = nil
     
-    init(blePeripheralManager: any BluetoothPeripheralManager = BluetoothPeripheralManagerImpl.shared, bleCentralManager: any BluetoothCentralManager = BluetoothCentralManagerImpl.shared,
+    init(blePeripheralManager: any BluetoothPeripheralManager = BluetoothPeripheralManagerImpl(), bleCentralManager: any BluetoothCentralManager = BluetoothCentralManagerImpl(),
          userRepository: any UserRepository = UserDatabase.shared, connectionsRepository: any ConnectionsRepository = ConnectionsDatabase.shared) {
         self.blePeripheralManager = blePeripheralManager
         self.bleCentralManager = bleCentralManager

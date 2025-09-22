@@ -11,7 +11,7 @@ import Foundation
 
 //Mock the behavior of the auth manager for viewmodel tests, checked against the accounts dictionary
 
-class MockAuthManager: AuthManager {
+final class MockAuthManager: AuthManager {
     let accounts = ["email@gmail.com": "Password"]
     
     func login(email:String, pwd: String) async throws {

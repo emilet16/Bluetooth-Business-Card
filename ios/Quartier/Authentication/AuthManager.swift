@@ -8,13 +8,13 @@ import Foundation
 
 //Class handling authentication with supabase
 
-protocol AuthManager {
+protocol AuthManager : Sendable {
     func login(email:String, pwd: String) async throws
     func signup(email:String, pwd: String, name: String) async throws
     func signout() async throws
 }
 
-class AuthManagerImpl : AuthManager {
+final class AuthManagerImpl : AuthManager {
     static let shared = AuthManagerImpl()
     
     func login(email:String, pwd: String) async throws {

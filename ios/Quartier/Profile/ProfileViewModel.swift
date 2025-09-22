@@ -8,7 +8,7 @@
 import Foundation
 
 //Viewmodel for the profile screen, fecthes the user's profile
-
+@MainActor
 protocol ProfileViewModel : ObservableObject {
     var userProfile: User? { get }
     var userSocials: Socials? { get }
@@ -16,7 +16,6 @@ protocol ProfileViewModel : ObservableObject {
     func fetchProfile()
 }
 
-@MainActor
 class ProfileViewModelImpl: ProfileViewModel {
     private var userRepository: any UserRepository
     private var socialsRepository: any SocialsRepository

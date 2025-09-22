@@ -18,14 +18,14 @@ struct User : Decodable, Hashable {
     var connectionStatus: String? = nil
 }
 
-protocol UserRepository {
+protocol UserRepository : Sendable {
     func getUser() async throws -> User
     func getUsers(ids: [String]) async throws -> [User]
     func updateUser(name: String, jobTitle: String) async throws
     func uploadPfp(fileName: String, imageData: Data) async throws
 }
 
-class UserDatabase : UserRepository {
+final class UserDatabase : UserRepository {
     static let shared = UserDatabase()
     
     func getUser() async throws -> User { //Get current user's profile
