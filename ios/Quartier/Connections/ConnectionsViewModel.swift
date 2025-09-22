@@ -53,7 +53,12 @@ class ConnectionsViewModelImpl : ConnectionsViewModel {
     
     //Get connected users profiles
     private func connectionsToUsers(connections: [Connection]) async throws -> [User] {
-        let userID = supabase.auth.currentUser!.id.uuidString
+        let userID = supabase.auth.currentUser?.id.uuidString
+        
+        guard let userID else {
+            throw SupabaseError.authError("Error: No user logged in")
+        }
+        
         var connectedUserStatus: [String: String] = [:]
         for connection in connections {
             let connectedID = connection.requested_by == userID.lowercased() ? connection.requested_for : connection.requested_by

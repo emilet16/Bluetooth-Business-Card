@@ -147,9 +147,9 @@ class BluetoothCentralManagerImpl: NSObject, BluetoothCentralManager {
         var services = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
         services.removeAll(where: { $0 == targetServiceUUID}) //Both the userId and the service uuid are being sent in the packet, so remove the service key to get the user ID (the order can vary so indexing doesn't work)
         let uid = services.first?.uuidString
-        if(uid != nil) {
+        if let uid {
             if(!uids.contains(where: {$0 == uid})) {
-                uids.append(uid!)
+                uids.append(uid)
             }
         }
     }

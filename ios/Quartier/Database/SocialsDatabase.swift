@@ -13,7 +13,7 @@ struct Socials: Decodable, Hashable {
 }
 
 protocol SocialsRepository : Sendable {
-    func getUserSocials() async throws -> Socials
+    func getUserSocials() async throws -> Socials?
     func getConnectedSocials() async throws -> [Socials]
     func upsertSocials(linkedInUrl: String) async throws
 }
@@ -21,9 +21,13 @@ protocol SocialsRepository : Sendable {
 final class SocialsDatabase : SocialsRepository {
     static let shared = SocialsDatabase()
     
-    func getUserSocials() async throws -> Socials { //Get the current user's socials
-        let userID = supabase.auth.currentUser!.id.uuidString
-        return try await (supabase.from("socials").select("*").eq("id", value: userID).execute().value as [Socials]).first!
+    func getUserSocials() async throws -> Socials? { //Get the current user's socials
+        let userID = supabase.auth.currentUser?.id.uuidString
+        guard let userID else {
+            throw SupabaseError.authError("Error: No user logged in")
+        }
+        
+        return try await (supabase.from("socials").select("*").eq("id", value: userID).execute().value as [Socials]).first
     }
     
     func getConnectedSocials() async throws -> [Socials] { //Get socials of all connected users, RLS only allows reading connected users, so no filtering needed
@@ -31,7 +35,11 @@ final class SocialsDatabase : SocialsRepository {
     }
     
     func upsertSocials(linkedInUrl: String) async throws {
-        let userID = supabase.auth.currentUser!.id.uuidString
+        let userID = supabase.auth.currentUser?.id.uuidString
+        guard let userID else {
+            throw SupabaseError.authError("Error: No user logged in")
+        }
+        
         try await supabase.from("socials").upsert(["id": userID, "linkedin_url": linkedInUrl], onConflict: "id").execute()
     }
 }

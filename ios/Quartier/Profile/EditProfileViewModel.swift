@@ -53,11 +53,13 @@ class EditProfileViewModelImpl : EditProfileViewModel {
     }
     
     func saveUser(name: String, jobTitle: String, linkedInURL: String, pfp: UIImage?) {
+        guard let userProfile else { return }
+        
         saveStatus = SaveStatus.saving
         
         //If the user didn't change it, keep it the way it was
-        let savedName = name.isEmpty ? userProfile!.name : name
-        let savedJobTitle = jobTitle.isEmpty ? userProfile!.job: jobTitle
+        let savedName = name.isEmpty ? userProfile.name : name
+        let savedJobTitle = jobTitle.isEmpty ? userProfile.job: jobTitle
         let savedLinkedIn = linkedInURL.isEmpty ? userSocials?.linkedin_url : linkedInURL
         
         Task {
@@ -75,7 +77,7 @@ class EditProfileViewModelImpl : EditProfileViewModel {
                     if let pfpImage = pfp {
                         group.addTask {
                             let scaledImage = await self.imageRepository.resizeTo400(image: pfpImage) //Crop image
-                            let imageData = await self.imageRepository.encodeToWebP(image: scaledImage) //Convert to WebP
+                            let imageData = try await self.imageRepository.encodeToWebP(image: scaledImage) //Convert to WebP
                             try await self.userRepository.uploadPfp(fileName: UUID().uuidString+".webp", imageData: imageData) //Save image
                         }
                     }
@@ -95,8 +97,12 @@ class EditProfileViewModelImpl : EditProfileViewModel {
     }
     
     nonisolated func matchesLinkedinRegex(input: String) -> Bool { //Check if the link is a valid linkedin link
-        let regex = try! Regex("^https://www\\.linkedin\\.com/in/[^/]+/?$")
-        return try! regex.wholeMatch(in: input) != nil
+        do {
+            let regex = try Regex("^https://www\\.linkedin\\.com/in/[^/]+/?$")
+            return try regex.wholeMatch(in: input) != nil
+        } catch {
+            return false
+        }
     }
 }
 

@@ -13,7 +13,7 @@ import SDWebImageWebPCoder
 
 protocol ImageRepository : Sendable {
     func resizeTo400(image: UIImage) -> UIImage
-    func encodeToWebP(image: UIImage) -> Data
+    func encodeToWebP(image: UIImage) throws -> Data
 }
 
 final class ImageManager : ImageRepository {
@@ -37,12 +37,20 @@ final class ImageManager : ImageRepository {
     }
     
     //Convert the image to WebP for a tradeoff between size and quality
-    func encodeToWebP(image: UIImage) -> Data {
+    func encodeToWebP(image: UIImage) throws -> Data {
         let webpCoder = SDImageWebPCoder.shared
         let options: [SDImageCoderOption: Any] = [
             .encodeWebPLossless: false,
             .encodeCompressionQuality: 0.8
         ]
-        return webpCoder.encodedData(with: image, format: .webP, options: options)!
+        let data = webpCoder.encodedData(with: image, format: .webP, options: options)
+        guard let data else {
+            throw EncodingError.failed
+        }
+        return data
     }
+}
+
+enum EncodingError: Error {
+    case failed
 }

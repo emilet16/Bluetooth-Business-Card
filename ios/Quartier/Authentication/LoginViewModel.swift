@@ -37,7 +37,11 @@ class LoginViewModelImpl : LoginViewModel {
     }
     
     nonisolated func matchEmailRegex(text: String) -> Bool {
-        let emailRegex = try! Regex("^[^@]+@[^@]+\\.[^@]+$")
-        return try! emailRegex.wholeMatch(in: text) != nil
+        do {
+            let emailRegex = try Regex("^[^@]+@[^@]+\\.[^@]+$")
+            return try emailRegex.wholeMatch(in: text) != nil
+        } catch {
+            return false
+        }
     }
 }

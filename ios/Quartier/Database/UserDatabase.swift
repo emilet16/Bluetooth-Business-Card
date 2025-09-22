@@ -19,7 +19,7 @@ struct User : Decodable, Hashable {
 }
 
 protocol UserRepository : Sendable {
-    func getUser() async throws -> User
+    func getUser() async throws -> User?
     func getUsers(ids: [String]) async throws -> [User]
     func updateUser(name: String, jobTitle: String) async throws
     func uploadPfp(fileName: String, imageData: Data) async throws
@@ -28,9 +28,13 @@ protocol UserRepository : Sendable {
 final class UserDatabase : UserRepository {
     static let shared = UserDatabase()
     
-    func getUser() async throws -> User { //Get current user's profile
-        let id = supabase.auth.currentUser!.id.uuidString
-        return try await (supabase.from("profiles").select("*").eq("id", value: id).execute().value as [User]).first!
+    func getUser() async throws -> User? { //Get current user's profile
+        let id = supabase.auth.currentUser?.id.uuidString
+        guard let id else {
+            throw SupabaseError.authError("Error: No user logged in")
+        }
+        
+        return try await (supabase.from("profiles").select("*").eq("id", value: id).execute().value as [User]).first
     }
     
     func getUsers(ids: [String]) async throws -> [User] { //Get a list of profiles from a list of ids
@@ -38,12 +42,20 @@ final class UserDatabase : UserRepository {
     }
     
     func updateUser(name: String, jobTitle: String) async throws {
-        let userID = supabase.auth.currentUser!.id.uuidString
+        let userID = supabase.auth.currentUser?.id.uuidString
+        guard let userID else {
+            throw SupabaseError.authError("Error: No user logged in")
+        }
+        
         try await supabase.from("profiles").update(["name": name, "job": jobTitle]).eq("id", value: userID).execute()
     }
     
     func uploadPfp(fileName: String, imageData: Data) async throws {
-        let userID = supabase.auth.currentUser!.id.uuidString
+        let userID = supabase.auth.currentUser?.id.uuidString
+        guard let userID else {
+            throw SupabaseError.authError("Error: No user logged in")
+        }
+        
         try await supabase.storage.from("pfp").upload(fileName, data: imageData) //Upload the pfp to the bucket
         
         let url = try supabase.storage.from("pfp").getPublicURL(path: fileName) //Get the public url for the image

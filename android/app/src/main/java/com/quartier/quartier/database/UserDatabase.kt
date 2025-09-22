@@ -26,7 +26,7 @@ data class User(
 
 interface UserRepository {
     suspend fun getUsers(uids: List<String>): List<User>
-    suspend fun getUser(): User
+    suspend fun getUser(): User?
     suspend fun updateUser(name: String, job: String)
     suspend fun uploadPfp(fileName: String, image: ByteArray)
 }
@@ -40,7 +40,7 @@ class UserDatabase @Inject constructor() : UserRepository {
         }.decodeList<User>()
     }
 
-    override suspend fun getUser(): User {
+    override suspend fun getUser(): User? {
         val uid = supabase.auth.currentUserOrNull()?.id
 
         if(uid == null) throw SupabaseException("No internet connection!")
@@ -49,7 +49,7 @@ class UserDatabase @Inject constructor() : UserRepository {
             filter {
                 User::id eq uid
             }
-        }.decodeSingle()
+        }.decodeSingleOrNull()
     }
 
     override suspend fun updateUser(name: String, job: String) {

@@ -21,14 +21,14 @@ data class Socials(
 )
 
 interface SocialsRepository {
-    suspend fun getUserSocials(): Socials
+    suspend fun getUserSocials(): Socials?
     suspend fun getUserSocialsList(): List<Socials>
     suspend fun upsertSocials(linkedinURL: String)
 }
 
 @Singleton
 class SocialsDatabase @Inject constructor() : SocialsRepository {
-    override suspend fun getUserSocials(): Socials {
+    override suspend fun getUserSocials(): Socials? {
         val id = supabase.auth.currentUserOrNull()?.id
 
         if(id == null) throw SupabaseException("No internet connection!")
@@ -37,7 +37,7 @@ class SocialsDatabase @Inject constructor() : SocialsRepository {
             filter {
                 Socials::id eq id
             }
-        }.decodeSingle()
+        }.decodeSingleOrNull()
     }
 
     override suspend fun getUserSocialsList() : List<Socials> {

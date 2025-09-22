@@ -36,10 +36,9 @@ struct ConnectionsView<T: ConnectionsViewModel> : View {
                 } else {
                     ForEach(viewModel.connections, id: \.self) { connection in
                         UserCard(user: connection, socials: viewModel.socials[connection.id], onViewProfile: { url in
-                            if(url != nil) {
-                                if let url = URL(string: url!) {
-                                    openURL(url)
-                                }
+                            guard let url else { return }
+                            if let linkedin = URL(string: url) {
+                                openURL(linkedin)
                             }
                         })
                     }
