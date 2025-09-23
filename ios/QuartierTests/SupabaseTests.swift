@@ -50,7 +50,7 @@ func createUser() async throws -> String { //Create a user for tests and return 
         
         let _ = try await createUser() //Create a random user and get their profile
         let user = try await db.getUser()
-        #expect(user.name == "Test User") //By default, the name should be "Test User" (see AuthTests for the createUser() function)
+        #expect(user!.name == "Test User") //By default, the name should be "Test User" (see AuthTests for the createUser() function)
     }
     
     @Test func getUsers() async throws { //Create 2 users, and get their profiles by user id
@@ -62,8 +62,8 @@ func createUser() async throws -> String { //Create a user for tests and return 
         let _ = try await createUser() //Create user 2
         let user2 = try await db.getUser()
         
-        let users = try await db.getUsers(ids: [user1.id, user2.id])
-        #expect(users.contains([user1, user2]))
+        let users = try await db.getUsers(ids: [user1!.id, user2!.id])
+        #expect(users.contains([user1!, user2!]))
     }
     
     @Test func updateUserProfile() async throws { //Edit a user's profile
@@ -74,8 +74,8 @@ func createUser() async throws -> String { //Create a user for tests and return 
         try await db.updateUser(name: "New Name", jobTitle: "Amazing Job Title") //Change their profile
         let newUser = try await db.getUser() //Get the profile to ensure the changes have been applied
         
-        #expect(newUser.name == "New Name")
-        #expect(newUser.job == "Amazing Job Title")
+        #expect(newUser!.name == "New Name")
+        #expect(newUser!.job == "Amazing Job Title")
     }
     
     @Test func uploadUserImage() async throws {
@@ -89,7 +89,7 @@ func createUser() async throws -> String { //Create a user for tests and return 
         try await db.uploadPfp(fileName: UUID().uuidString+".jpg", imageData: imageData) //Upload image
         let profile = try await db.getUser()
         
-        #expect(profile.pfp_url != nil) //Make sure there is a link pointing to the image
+        #expect(profile!.pfp_url != nil) //Make sure there is a link pointing to the image
     }
     
     /*--------------------------------
@@ -100,10 +100,10 @@ func createUser() async throws -> String { //Create a user for tests and return 
         let db = ConnectionsDatabase.shared
         
         let _ = try await createUser() //Create a random user and get their id
-        let user1ID = try await userDB.getUser().id
+        let user1ID = try await userDB.getUser()!.id
         
         let _ = try await createUser() //Create another user and get their id
-        let user2ID = try await userDB.getUser().id
+        let user2ID = try await userDB.getUser()!.id
         let _ = try await db.requestConnection(requestedID: user1ID) //Make the connection
         
         let connection = try await db.getConnectionWithUser(requestedID: user1ID) //Check if the connection was made properly
@@ -117,7 +117,7 @@ func createUser() async throws -> String { //Create a user for tests and return 
         let db = ConnectionsDatabase.shared
         
         let _ = try await createUser() //Create a random user and get their id
-        let user1ID = try await userDB.getUser().id
+        let user1ID = try await userDB.getUser()!.id
         
         let result = try await db.requestConnection(requestedID: user1ID) //Make the connection
         
@@ -130,10 +130,10 @@ func createUser() async throws -> String { //Create a user for tests and return 
         let db = ConnectionsDatabase.shared
         
         let email = try await createUser() //Create a random user and get their email
-        let user1ID = try await userDB.getUser().id
+        let user1ID = try await userDB.getUser()!.id
         
         let _ = try await createUser()
-        let user2ID = try await userDB.getUser().id //Create another user and get their id
+        let user2ID = try await userDB.getUser()!.id //Create another user and get their id
         let _ = try await db.requestConnection(requestedID: user1ID) //Make the connection
         
         try await auth.login(email: email, pwd: "Password123")
@@ -151,10 +151,10 @@ func createUser() async throws -> String { //Create a user for tests and return 
         let db = ConnectionsDatabase.shared
         
         let email = try await createUser() //Create a random user and get their email
-        let user1ID = try await userDB.getUser().id
+        let user1ID = try await userDB.getUser()!.id
         
         let _ = try await createUser()
-        let user2ID = try await userDB.getUser().id //Create another user and get their id
+        let user2ID = try await userDB.getUser()!.id //Create another user and get their id
         let _ = try await db.requestConnection(requestedID: user1ID) //Make the connection
         
         try await auth.login(email: email, pwd: "Password123")
@@ -170,14 +170,14 @@ func createUser() async throws -> String { //Create a user for tests and return 
         let db = ConnectionsDatabase.shared
         
         let email = try await createUser() //Create a random user and get their email
-        let user1ID = try await userDB.getUser().id
+        let user1ID = try await userDB.getUser()!.id
         
         let _ = try await createUser()
-        let user2ID = try await userDB.getUser().id //Create another user and get their id
+        let user2ID = try await userDB.getUser()!.id //Create another user and get their id
         let _ = try await db.requestConnection(requestedID: user1ID) //Make the connection
         
         let _ = try await createUser()
-        let user3ID = try await userDB.getUser().id //Create another user and get their id
+        let user3ID = try await userDB.getUser()!.id //Create another user and get their id
         let _ = try await db.requestConnection(requestedID: user1ID) //Make the connection
         
         try await auth.login(email: email, pwd: "Password123")
@@ -196,7 +196,7 @@ func createUser() async throws -> String { //Create a user for tests and return 
         try await db.upsertSocials(linkedInUrl: "https://www.linkedin.com/in/user")
         
         let socials = try await db.getUserSocials()
-        #expect(socials.linkedin_url == "https://www.linkedin.com/in/user")
+        #expect(socials!.linkedin_url == "https://www.linkedin.com/in/user")
     }
     
     @Test func getConnectedSocials() async throws {
@@ -206,15 +206,15 @@ func createUser() async throws -> String { //Create a user for tests and return 
         let socialsDB = SocialsDatabase.shared
         
         let email = try await createUser() //Create a random user and get their email
-        let user1ID = try await userDB.getUser().id
+        let user1ID = try await userDB.getUser()!.id
         
         let _ = try await createUser()
-        let user2ID = try await userDB.getUser().id //Create another user and get their id
+        let user2ID = try await userDB.getUser()!.id //Create another user and get their id
         try await socialsDB.upsertSocials(linkedInUrl: "https://www.linkedin.com/in/user2")
         let _ = try await connDB.requestConnection(requestedID: user1ID) //Make the connection
         
         let _ = try await createUser()
-        let user3ID = try await userDB.getUser().id //Create another user and get their id
+        let user3ID = try await userDB.getUser()!.id //Create another user and get their id
         try await socialsDB.upsertSocials(linkedInUrl: "https://www.linkedin.com/in/user3")
         let _ = try await connDB.requestConnection(requestedID: user1ID) //Make the connection
         

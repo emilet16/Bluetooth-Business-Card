@@ -21,7 +21,7 @@ class MockSocialsRepo : SocialsRepository, @unchecked Sendable {
         Socials(id: "3", linkedin_url: nil)
     ]
     
-    func getUserSocials() async throws -> Socials { //Get user's socials
+    func getUserSocials() async throws -> Socials? { //Get user's socials
         return socials[0]
     }
     

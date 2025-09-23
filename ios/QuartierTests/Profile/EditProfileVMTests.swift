@@ -44,13 +44,13 @@ struct EditProfileVMTests {
             #expect(status == .success)
             Task {
                 let user = try await userRepo.getUser()
-                #expect(user.name == "newname")
-                #expect(user.job.rawValue == "newjob")
-                #expect(user.pfp_url == "https://google.com")
+                #expect(user!.name == "newname")
+                #expect(user!.job.rawValue == "newjob")
+                #expect(user!.pfp_url == "https://google.com")
             }
             Task {
                 let socials = try await socialsRepo.getUserSocials()
-                #expect(socials.linkedin_url == "linkedin")
+                #expect(socials!.linkedin_url == "linkedin")
             }
         }
         
@@ -136,13 +136,13 @@ struct EditProfileVMTests {
             #expect(status == .success)
             Task {
                 let user = try await userRepo.getUser()
-                #expect(user.name == "newname")
-                #expect(user.job.rawValue == "newjob")
-                #expect(user.pfp_url == "https://google.com")
+                #expect(user!.name == "newname")
+                #expect(user!.job.rawValue == "newjob")
+                #expect(user!.pfp_url == "https://google.com")
             }
             Task {
                 let socials = try await socialsRepo.getUserSocials()
-                #expect(socials.linkedin_url == "link")
+                #expect(socials!.linkedin_url == "link")
             }
         }
         
@@ -165,13 +165,13 @@ struct EditProfileVMTests {
             #expect(status == .success)
             Task {
                 let user = try await userRepo.getUser()
-                #expect(user.name == "newname")
-                #expect(user.job.rawValue == "newjob")
-                #expect(user.pfp_url == nil)
+                #expect(user!.name == "newname")
+                #expect(user!.job.rawValue == "newjob")
+                #expect(user!.pfp_url == nil)
             }
             Task {
                 let socials = try await socialsRepo.getUserSocials()
-                #expect(socials.linkedin_url == "linkedin")
+                #expect(socials!.linkedin_url == "linkedin")
             }
         }
         
@@ -196,13 +196,13 @@ struct EditProfileVMTests {
             #expect(status == .success)
             Task {
                 let user = try await userRepo.getUser()
-                #expect(user.name == "name")
-                #expect(user.job.rawValue == "job")
-                #expect(user.pfp_url == "https://google.com")
+                #expect(user!.name == "name")
+                #expect(user!.job.rawValue == "job")
+                #expect(user!.pfp_url == "https://google.com")
             }
             Task {
                 let socials = try await socialsRepo.getUserSocials()
-                #expect(socials.linkedin_url == "linkedin")
+                #expect(socials!.linkedin_url == "linkedin")
             }
         }
         

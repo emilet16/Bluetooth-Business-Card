@@ -25,7 +25,7 @@ final class MockUserRepo: UserRepository, @unchecked Sendable {
         User(id: "5", name: "name", job: "job"),
     ]
     
-    func getUser() async throws -> Quartier.User { //Return user's profile
+    func getUser() async throws -> Quartier.User? { //Return user's profile
         return users[0]
     }
     
