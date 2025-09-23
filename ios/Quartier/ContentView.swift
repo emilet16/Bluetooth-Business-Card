@@ -35,8 +35,6 @@ struct ContentView: View {
                 NavigationStack {
                     LoginView(viewModel: LoginViewModelImpl())
                 }
-            case .loading:
-                ProgressView()
             }
         }
     }

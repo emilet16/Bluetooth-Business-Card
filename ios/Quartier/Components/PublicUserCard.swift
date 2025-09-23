@@ -19,8 +19,9 @@ struct PublicUserCard : View {
         }) {
             VStack {
                 ProfileImage(url: user.pfp_url)
-                Text(user.name).font(.roboto(17))
-                Text(user.job).font(.roboto(17))
+                Spacer().frame(height: 10)
+                Text(user.name).font(.bodyBold(17))
+                Text(user.job).font(.body(17))
             }
             .frame(maxWidth: .infinity)
             .padding()
@@ -28,8 +29,8 @@ struct PublicUserCard : View {
             .cornerRadius(12)
         }
         .buttonStyle(.borderless)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
+        .frame(width: 150, height: 150)
+        .padding(10)
     }
 }
 	

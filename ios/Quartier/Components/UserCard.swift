@@ -18,22 +18,21 @@ struct UserCard : View {
         Button(action: {
             onViewProfile(socials?.linkedin_url)
         }) {
-            HStack {
-                ProfileImage(url: user.pfp_url, size: 150)
+            HStack(alignment: .top) {
+                ProfileImage(url: user.pfp_url, size: 100)
                 Spacer()
-                VStack {
-                    Text(user.name).font(.roboto(17))
-                    Text(user.job).font(.roboto(17))
+                VStack(alignment: .trailing) {
+                    Text(user.name).font(.titleBold(24))
+                    Text(user.job).font(.body(17))
                 }
-                Spacer()
             }
             .padding()
             .background(Color(.systemGray6))
             .cornerRadius(12)
         }
         .buttonStyle(.borderless)
-        .frame(maxWidth: .infinity)
-        .padding()
+        .frame(maxWidth: .infinity, idealHeight: 150)
+        .padding(20)
     }
 }
 

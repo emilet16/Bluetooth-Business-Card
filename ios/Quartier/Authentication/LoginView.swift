@@ -21,47 +21,59 @@ struct LoginView<T: LoginViewModel> : View {
         ZStack(alignment: .bottom) {
             //Show a message to the user if something goes wrong (ex. wrong password)
             if let message = viewModel.message {
-                Text(message).font(.roboto(17)).padding().frame(width: 400)
+                Text(message).font(.body(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             
-            VStack {
-                Text("Welcome!").font(.roboto(24))
-                Text("Please login").font(.roboto(20))
+            VStack(alignment: .leading) {
+                Text("Welcome back!").font(.title(24))
+                Text("Please sign in").font(.titleBold(24))
                 
-                TextField(text: $email, prompt: Text("Enter your email here")) {
+                Spacer().frame(height: 15)
+                
+                TextField(text: $email, prompt: Text("Email")) {
                     Text("Email")
                 }.keyboardType(.emailAddress).onChange(of: email) {
                     emailValid = !email.isEmpty && viewModel.matchEmailRegex(text: email)
-                }.font(.roboto(17))
+                }.font(.body(17))
                 
                 if(!emailValid && !email.isEmpty) {
                     Text("Invalid Input").foregroundStyle(.red).font(.caption)
                 }
                 
-                SecureField(text: $password, prompt: Text("Enter your password here")) {
+                SecureField(text: $password, prompt: Text("Password")) {
                     Text("Password")
                 }.onChange(of: password) {
-                    pwdValid = !password.isEmpty && password.count >= 6
-                }.font(.roboto(17))
+                    pwdValid = !password.isEmpty && password.count >= 8
+                }.font(.body(17))
+                
+                Spacer().frame(height: 15)
                 
                 if(!pwdValid && !password.isEmpty) {
-                    Text("Invalid Input").foregroundStyle(.red).font(.caption)
+                    Text("Password must be 8 characters long").foregroundStyle(.red).font(.caption)
                 }
                 
                 Button(action: {
                     viewModel.login(email: email, pwd: password)
                 }) {
-                    Text("Login").foregroundStyle(Color("OnAccentColor")).font(.roboto(17))
+                    HStack {
+                        Spacer()
+                        Text("Login").foregroundStyle(Color("OnAccentColor")).font(.body(17))
+                        Spacer()
+                    }
                 }.disabled(!emailValid || !pwdValid).buttonStyle(.borderedProminent)
                 
                 NavigationLink(destination: RegisterView(viewModel: RegisterViewModelImpl())) {
-                    Text("Don't have an account? Register here.").font(.roboto(17))
+                    HStack {
+                        Spacer()
+                        Text("Don't have an account? Register here.").font(.body(17))
+                        Spacer()
+                    }
                 }
             }
             .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding()
+            .padding(20)
             .frame(maxHeight: .infinity)
         }
     }

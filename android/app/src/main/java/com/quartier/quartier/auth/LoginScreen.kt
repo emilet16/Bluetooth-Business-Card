@@ -84,7 +84,7 @@ private fun LoginScreen(onEmailSignIn: (String, String) -> Unit, onNavToRegister
 
         PasswordTextField(pwd, showError = (pwd.isNotEmpty() && !pwdValid), onValueChange = {
             pwd = it
-            pwdValid = it.isNotBlank() && it.length >= 6
+            pwdValid = it.isNotBlank() && it.length >= 8
         })
 
         Spacer(Modifier.height(15.dp))

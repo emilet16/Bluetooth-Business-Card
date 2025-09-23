@@ -28,7 +28,7 @@ struct EditProfileView<T: EditProfileViewModel> : View {
     var body : some View {
         ZStack(alignment: .bottom) {
             if let message = userMessage {
-                Text(message).font(.roboto(17)).padding().frame(width: 400)
+                Text(message).font(.title(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
@@ -37,10 +37,10 @@ struct EditProfileView<T: EditProfileViewModel> : View {
                 ProfileImagePicker(url: viewModel.userProfile?.pfp_url, onChange: { pfp in
                     newPfp = pfp
                 })
-                TextField("Name", text: $name, prompt: Text("Enter your name")).font(.roboto(17))
-                TextField("Job Title", text: $jobTitle, prompt: Text("Enter your job title")).font(.roboto(17))
+                TextField("Name", text: $name, prompt: Text("Enter your name")).font(.body(17))
+                TextField("Job Title", text: $jobTitle, prompt: Text("Enter your job title")).font(.body(17))
                 
-                TextField("LinkedIn URL", text: $linkedInURL, prompt: Text("Paste your linkedin URL here")).font(.roboto(17))
+                TextField("LinkedIn URL", text: $linkedInURL, prompt: Text("Paste your linkedin URL here")).font(.body(17))
                     .onChange(of: linkedInURL) {
                         linkedinValid = linkedInURL.isEmpty || viewModel.matchesLinkedinRegex(input: linkedInURL)
                     }
@@ -52,7 +52,7 @@ struct EditProfileView<T: EditProfileViewModel> : View {
                 Button(action: {
                     viewModel.saveUser(name: name, jobTitle: jobTitle, linkedInURL: linkedInURL, pfp: newPfp)
                 }) {
-                    Text("Submit").foregroundStyle(Color("OnAccentColor")).font(.roboto(17))
+                    Text("Submit").foregroundStyle(Color("OnAccentColor")).font(.body(17))
                 }.disabled(!linkedinValid).buttonStyle(.borderedProminent)
             }
             .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -61,7 +61,7 @@ struct EditProfileView<T: EditProfileViewModel> : View {
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Edit Profile").font(.poppins(24))
+                Text("Edit Profile").font(.title(24))
             }
         }
         .onChange(of: viewModel.saveStatus) {

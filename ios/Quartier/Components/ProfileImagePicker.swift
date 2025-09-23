@@ -28,8 +28,7 @@ struct ProfileImagePicker: View {
                     .scaledToFill()
                     .frame(width: 150, height: 150)
                     .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.black, lineWidth: 2))
-                    .shadow(radius: 5)
+                    .foregroundStyle(.shadow(.inner(radius: 1)))
                     .padding()
             } else if let imageUrl = url { //Old pfp
                 ProfileImage(url: imageUrl, size: 150)

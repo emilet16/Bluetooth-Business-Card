@@ -26,8 +26,7 @@ struct ProfileImage: View {
                         .scaledToFill()
                         .frame(width: size, height: size)
                         .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.black, lineWidth: 2))
-                        .shadow(radius: 5)
+                        .foregroundStyle(.shadow(.inner(radius: 1)))
                 case .failure: //Could not open image
                     Image(systemName: "person.circle.fill")
                         .resizable()
@@ -49,5 +48,5 @@ struct ProfileImage: View {
 }
 
 #Preview {
-    ProfileImage(url: "https://picsum.photos/60", size: 60)
+    ProfileImage(url: "https://picsum.photos/100", size: 100)
 }

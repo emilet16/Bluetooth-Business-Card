@@ -27,57 +27,67 @@ struct RegisterView<T: RegisterViewModel>: View {
         ZStack(alignment: .bottom) {
             //Show a message if something goes wrong, ex. user already exists
             if let message = viewModel.message {
-                Text(message).font(.roboto(17)).padding().frame(width: 400)
+                Text(message).font(.body(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             
-            VStack {
-                Text("We're glad to meet you").font(.roboto(24))
-                Text("Please sign up").font(.roboto(20))
+            VStack(alignment: .leading) {
+                Text("First time here?").font(.title(24))
+                Text("Register now").font(.titleBold(24))
                 
-                TextField(text: $name, prompt: Text("Enter your name here")) {
+                Spacer().frame(height: 15)
+                
+                TextField(text: $name, prompt: Text("Name")) {
                     Text("Name")
                 }.onChange(of: name) {
                     nameValid = !name.isEmpty
-                }.font(.roboto(17))
+                }.font(.body(17))
                 
                 if(!nameValid && !name.isEmpty) {
                     Text("Invalid Input").foregroundStyle(.red).font(.caption)
                 }
                 
-                TextField(text: $email, prompt: Text("Enter your email here")) {
+                TextField(text: $email, prompt: Text("Email")) {
                     Text("Email")
                 }.keyboardType(.emailAddress).onChange(of: email) {
                     emailValid = !email.isEmpty && viewModel.matchEmailRegex(text: email)
-                }.font(.roboto(17))
+                }.font(.body(17))
                 
                 if(!emailValid && !email.isEmpty) {
                     Text("Invalid Input").foregroundStyle(.red).font(.caption)
                 }
                 
-                SecureField(text: $password, prompt: Text("Enter your password here")) {
+                SecureField(text: $password, prompt: Text("Password")) {
                     Text("Password")
                 }.onChange(of: password) {
-                    pwdValid = !password.isEmpty && password.count >= 6
-                }.font(.roboto(17))
+                    pwdValid = !password.isEmpty && password.count >= 8
+                }.font(.body(17))
                 
                 if(!pwdValid && !password.isEmpty) {
                     Text("Invalid Input").foregroundStyle(.red).font(.caption)
                 }
                 
+                Spacer().frame(height: 15)
+                
                 Button(action: {
                     viewModel.signup(email: email, pwd: password, name: name)
                 }) {
-                    Text("Register").foregroundStyle(Color("OnAccentColor")).font(.roboto(17))
+                    HStack {
+                        Spacer()
+                        Text("Register").foregroundStyle(Color("OnAccentColor")).font(.body(17))
+                        Spacer()
+                    }
                 }.disabled(!emailValid || !pwdValid || !nameValid).buttonStyle(.borderedProminent)
                 
                 Button(action: {dismiss()}) {
-                    Text("Already have an account? Log in").font(.roboto(17))
+                    Spacer()
+                    Text("Already have an account? Log in").font(.body(17))
+                    Spacer()
                 }
             }
             .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding()
+            .padding(20)
             .frame(maxHeight: .infinity)
         }
     }

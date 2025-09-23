@@ -28,7 +28,7 @@ struct ProfileView<T: ProfileViewModel> : View {
             }
         }.toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Profile").font(.poppins(24))
+                Text("Profile").font(.title(24))
             }
             ToolbarItem(placement: .primaryAction) {
                 NavigationLink (destination: EditProfileView(viewModel: EditProfileViewModelImpl())) {

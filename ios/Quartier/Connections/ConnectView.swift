@@ -15,7 +15,7 @@ struct ConnectView<T: ConnectViewModel> : View {
         ZStack(alignment: .bottom) {
             //Show a message to the user about the connection status (ex. connection request sent)
             if let connectionMessage = viewModel.connectionMessage {
-                Text(connectionMessage).font(.roboto(17)).padding().frame(width: 400)
+                Text(connectionMessage).font(.body(17)).padding().frame(width: 400)
                     .background(Color.cyan.opacity(0.6))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
@@ -24,7 +24,7 @@ struct ConnectView<T: ConnectViewModel> : View {
                 if let message = viewModel.message { //Show a message if an error happens (ex. Bluetooth not available)
                     Text(message)
                 } else if(viewModel.users.isEmpty) {
-                    Text("No nearby people").font(.roboto(17))
+                    Text("No nearby people").font(.body(17))
                 } else {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
                         ForEach(viewModel.users, id: \.self) { user in
@@ -38,7 +38,7 @@ struct ConnectView<T: ConnectViewModel> : View {
         }
         .toolbar() {
             ToolbarItem(placement: .principal) {
-                Text("Nearby People").font(.poppins(24))
+                Text("Nearby People").font(.title(24))
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(action: {

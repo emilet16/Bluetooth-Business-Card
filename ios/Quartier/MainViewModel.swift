@@ -11,7 +11,7 @@ import Foundation
 
 @MainActor
 class MainViewModel : ObservableObject {
-    @Published var page: ContentPage = .loading
+    @Published var page: ContentPage = .login
     private var authStateTask: Task<Void, Never>? = nil
     
     init() {
@@ -47,5 +47,5 @@ class MainViewModel : ObservableObject {
 }
 
 enum ContentPage {
-    case login, loading, main
+    case login, main
 }
