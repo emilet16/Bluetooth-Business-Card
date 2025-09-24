@@ -1,1 +1,3 @@
 android/.idea/studiobot.xml
+*.xcuserstate
+*.salive
