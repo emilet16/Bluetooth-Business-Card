@@ -56,17 +56,27 @@ class ConnectionsViewModelImpl : ConnectionsViewModel {
     
     func refreshConnections() { //Load connections and sort them to display
         Task {
-            let connectionsArray = try await connectionsRepository.getConnections()
-            
-            let connectedUsers = try await connectionsRepository.connectionsToUsers(userRepository: userRepository, connections: connectionsArray)
-            
-            requests = connectedUsers.filter { $0.connectionStatus == "pending" }
-            connections = connectedUsers.filter { $0.connectionStatus == "accepted" }
+            do {
+                let connectionsArray = try await connectionsRepository.getConnections()
+                
+                let connectedUsers = try await connectionsRepository.connectionsToUsers(userRepository: userRepository, connections: connectionsArray)
+                
+                requests = connectedUsers.filter { $0.connectionStatus == "pending" }
+                connections = connectedUsers.filter { $0.connectionStatus == "accepted" }
+            } catch {
+                self.message = "Internet error! Check your connection!"
+                hideMessageAfterDelay()
+            }
         }
         Task {
-            let connectedSocials = try await socialsRepository.getConnectedSocials()
-            socials = connectedSocials.reduce(into: [String: Socials]()) { result, userSocials in
-                result[userSocials.id] = userSocials
+            do {
+                let connectedSocials = try await socialsRepository.getConnectedSocials()
+                socials = connectedSocials.reduce(into: [String: Socials]()) { result, userSocials in
+                    result[userSocials.id] = userSocials
+                }
+            } catch {
+                self.message = "Internet error! Check your connection!"
+                hideMessageAfterDelay()
             }
         }
     }
@@ -75,43 +85,58 @@ class ConnectionsViewModelImpl : ConnectionsViewModel {
     
     func acceptConnection(uid: String) {
         Task {
-            try await connectionsRepository.acceptConnection(requestedID: uid)
-            refreshConnections()
+            do {
+                try await connectionsRepository.acceptConnection(requestedID: uid)
+                refreshConnections()
+            } catch {
+                self.message = "Internet error! Check your connection!"
+                hideMessageAfterDelay()
+            }
         }
     }
     
     func declineConnection(uid: String) {
         Task {
-            try await connectionsRepository.deleteConnection(requestedID: uid)
-            refreshConnections()
+            do {
+                try await connectionsRepository.deleteConnection(requestedID: uid)
+                refreshConnections()
+            } catch {
+                self.message = "Internet error! Check your connection!"
+                hideMessageAfterDelay()
+            }
         }
     }
     
     func connectWithUser(requestedID: String) {
         Task {
-            let connection = try await connectionsRepository.getConnectionWithUser(requestedID: requestedID)
-            
-            if(connection == nil) {
-                //No connection exist with this user, make sure the user isn't trying to connect with themselves, then send request
-                let result = try await connectionsRepository.requestConnection(requestedID: requestedID)
-                if(result == .cannotConnectWithSelf) { message = "You cannot connect with yourself!" }
-                else { message = "Connection request sent!" }
-            } else if(connection?.status == "pending" && connection?.requested_by == requestedID) {
-                //Connection request was sent by the other user, accept it
-                try await connectionsRepository.acceptConnection(requestedID: requestedID)
-                message = "Connection request accepted!"
-            } else if(connection?.status == "accepted") {
-                //A connection already exists between the users
-                message = "You are already connected to this user."
-            } else if(connection?.status == "pending" && connection?.requested_for == requestedID) {
-                //Connection request was already sent, wait for confirmation on the other side
-                message = "Connection request pending..."
-            } else {
-                //Show the user if something unexpected happens
-                message = "An error happened, please try again!"
+            do {
+                let connection = try await connectionsRepository.getConnectionWithUser(requestedID: requestedID)
+                
+                if(connection == nil) {
+                    //No connection exist with this user, make sure the user isn't trying to connect with themselves, then send request
+                    let result = try await connectionsRepository.requestConnection(requestedID: requestedID)
+                    if(result == .cannotConnectWithSelf) { message = "You cannot connect with yourself!" }
+                    else { message = "Connection request sent!" }
+                } else if(connection?.status == "pending" && connection?.requested_by == requestedID) {
+                    //Connection request was sent by the other user, accept it
+                    try await connectionsRepository.acceptConnection(requestedID: requestedID)
+                    message = "Connection request accepted!"
+                } else if(connection?.status == "accepted") {
+                    //A connection already exists between the users
+                    message = "You are already connected to this user."
+                } else if(connection?.status == "pending" && connection?.requested_for == requestedID) {
+                    //Connection request was already sent, wait for confirmation on the other side
+                    message = "Connection request pending..."
+                } else {
+                    //Show the user if something unexpected happens
+                    message = "An error happened, please try again!"
+                }
+                
+                hideMessageAfterDelay()
+            } catch {
+                self.message = "Internet error! Check your connection!"
+                hideMessageAfterDelay()
             }
-            
-            hideMessageAfterDelay()
         }
     }
     
@@ -178,7 +203,12 @@ class ConnectionsViewModelImpl : ConnectionsViewModel {
         bleCentralManager.discoveredUIDS
             .sink { [weak self] uids in
                 Task {
-                    self?.nearbyUsers = try await self?.userRepository.getUsers(ids: uids) ?? []
+                    do {
+                        self?.nearbyUsers = try await self?.userRepository.getUsers(ids: uids) ?? []
+                    } catch {
+                        self?.message = "Internet error! Check your connection!"
+                        self?.hideMessageAfterDelay()
+                    }
                 }
         }.store(in: &cancellables)
     }

@@ -1,6 +1,8 @@
 package com.quartier.quartier.connections
 
 import android.Manifest
+import android.bluetooth.BluetoothManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -87,6 +89,9 @@ fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavTo
         }
     }
 
+    val bluetoothManager = LocalContext.current.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    val bleAdapter = bluetoothManager.adapter
+
     Scaffold(modifier = Modifier.fillMaxSize(),
         snackbarHost = {
             SnackbarHost(snackbarHostState)
@@ -98,13 +103,17 @@ fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavTo
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     val advAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
                     val scanAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
-                    if(advAllowed && scanAllowed) {
+                    if(advAllowed && scanAllowed && bleAdapter.isEnabled) {
                         viewModel.openNearbyUsers()
                     } else {
                         if(!advAllowed) {
                             requestAdvPerm.launch(Manifest.permission.BLUETOOTH_ADVERTISE)
-                        } else {
+                        }
+                        if(!scanAllowed) {
                             requestScanPerm.launch(Manifest.permission.BLUETOOTH_SCAN)
+                        }
+                        if(!bleAdapter.isEnabled) {
+                            viewModel.bluetoothDisabled()
                         }
                     }
                 } else {
@@ -123,7 +132,7 @@ fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavTo
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         val advAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
                         val scanAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
-                        if(advAllowed && scanAllowed) {
+                        if(advAllowed && scanAllowed && bleAdapter.isEnabled) {
                             viewModel.openNearbyUsers()
                         } else {
                             if(!advAllowed) {
@@ -131,6 +140,9 @@ fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavTo
                             }
                             if(!scanAllowed) {
                                 requestScanPerm.launch(Manifest.permission.BLUETOOTH_SCAN)
+                            }
+                            if(!bleAdapter.isEnabled) {
+                                viewModel.bluetoothDisabled()
                             }
                         }
                     } else {
@@ -147,7 +159,7 @@ fun ConnectionsScreen(viewModel: ConnectionsViewModel = hiltViewModel(), onNavTo
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val advAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
                 val scanAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
-                if(advAllowed && scanAllowed) {
+                if(advAllowed && scanAllowed && bleAdapter.isEnabled) {
                     viewModel.closeNearbyUsers()
                 }
             } else {

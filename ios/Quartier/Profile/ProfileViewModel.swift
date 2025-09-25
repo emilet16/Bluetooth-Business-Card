@@ -39,10 +39,20 @@ class ProfileViewModelImpl: ProfileViewModel {
     
     func fetchProfile() {
         Task {
-            userProfile = try await userRepository.getUser()
+            do {
+                userProfile = try await userRepository.getUser()
+            }  catch {
+                self.userMessage = "Internet error! Check your connection!"
+                hideMessageAfterDelay()
+            }
         }
         Task {
-            userSocials = try await socialsRepository.getUserSocials()
+            do {
+                userSocials = try await socialsRepository.getUserSocials()
+            } catch {
+                self.userMessage = "Internet error! Check your connection!"
+                hideMessageAfterDelay()
+            }
         }
     }
     
@@ -93,6 +103,13 @@ class ProfileViewModelImpl: ProfileViewModel {
                 userMessage = nil
                 dismissEdit = false
             }
+        }
+    }
+    
+    private func hideMessageAfterDelay() {
+        Task {
+            try await Task.sleep(for: .seconds(5))
+            userMessage = nil
         }
     }
     

@@ -231,6 +231,10 @@ class ConnectionsViewModel @Inject constructor(
         _userMessage.value = R.string.bluetooth_permission_denied
     }
 
+    fun bluetoothDisabled() {
+        _userMessage.value = R.string.enable_bluetooth
+    }
+
     fun snackbarMessageShown() {
         _userMessage.value = null
     }

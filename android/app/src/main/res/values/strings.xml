@@ -54,5 +54,6 @@
     <string name="alone">You are alone</string>
     <string name="dont_save_profile">Don\'t save profile</string>
     <string name="no_internet">No internet connection</string>
+    <string name="enable_bluetooth">Please enable bluetooth</string>
 
 </resources>
