@@ -1,3 +1,4 @@
 android/.idea/studiobot.xml
 *.xcuserstate
 *.salive
+*.DS_Store
