@@ -27,8 +27,8 @@ android {
             versionNameSuffix = "-dev"
             resValue("string", "app_name", "Quartier (dev)")
 
-            buildConfigField("String", "SUPABASE_URL", project.property("SUPABASE_URL_DEBUG").toString()) //Defined in local.properties or command line build
-            buildConfigField("String", "SUPABASE_KEY", project.property("SUPABASE_KEY_DEBUG").toString()) //Defined in local.properties or command line build
+            buildConfigField("String", "SUPABASE_URL", project.property("SUPABASE_URL_DEBUG").toString()) //Defined in gradle.properties or command line build
+            buildConfigField("String", "SUPABASE_KEY", project.property("SUPABASE_KEY_DEBUG").toString()) //Defined in gradle.properties or command line build
         }
         release {
             isMinifyEnabled = true
