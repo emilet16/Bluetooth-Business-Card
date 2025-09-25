@@ -17,10 +17,8 @@
 		8DF1B4882E43DF1E00C23B02 /* RegisterVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4772E43DF1E00C23B02 /* RegisterVMTests.swift */; };
 		8DF1B4892E43DF1E00C23B02 /* MockAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47C2E43DF1E00C23B02 /* MockAuthManager.swift */; };
 		8DF1B48A2E43DF1E00C23B02 /* MockConnectionsRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47E2E43DF1E00C23B02 /* MockConnectionsRepo.swift */; };
-		8DF1B48B2E43DF1E00C23B02 /* ConnectVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47A2E43DF1E00C23B02 /* ConnectVMTests.swift */; };
 		8DF1B48C2E43DF1E00C23B02 /* ConnectionsVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4792E43DF1E00C23B02 /* ConnectionsVMTests.swift */; };
 		8DF1B48D2E43DF1E00C23B02 /* MockBleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B47D2E43DF1E00C23B02 /* MockBleManager.swift */; };
-		8DF1B48E2E43DF1E00C23B02 /* EditProfileVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4832E43DF1E00C23B02 /* EditProfileVMTests.swift */; };
 		8DF1B48F2E43DF1E00C23B02 /* MockUserRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4812E43DF1E00C23B02 /* MockUserRepo.swift */; };
 		8DF1B4902E43DF1E00C23B02 /* LoginVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4762E43DF1E00C23B02 /* LoginVMTests.swift */; };
 		8DF1B4912E43DF1E00C23B02 /* ProfileVMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF1B4842E43DF1E00C23B02 /* ProfileVMTests.swift */; };
@@ -53,14 +51,12 @@
 		8DF1B4762E43DF1E00C23B02 /* LoginVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVMTests.swift; sourceTree = "<group>"; };
 		8DF1B4772E43DF1E00C23B02 /* RegisterVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVMTests.swift; sourceTree = "<group>"; };
 		8DF1B4792E43DF1E00C23B02 /* ConnectionsVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionsVMTests.swift; sourceTree = "<group>"; };
-		8DF1B47A2E43DF1E00C23B02 /* ConnectVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectVMTests.swift; sourceTree = "<group>"; };
 		8DF1B47C2E43DF1E00C23B02 /* MockAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAuthManager.swift; sourceTree = "<group>"; };
 		8DF1B47D2E43DF1E00C23B02 /* MockBleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBleManager.swift; sourceTree = "<group>"; };
 		8DF1B47E2E43DF1E00C23B02 /* MockConnectionsRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConnectionsRepo.swift; sourceTree = "<group>"; };
 		8DF1B47F2E43DF1E00C23B02 /* MockImageRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockImageRepo.swift; sourceTree = "<group>"; };
 		8DF1B4802E43DF1E00C23B02 /* MockSocialsRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocialsRepo.swift; sourceTree = "<group>"; };
 		8DF1B4812E43DF1E00C23B02 /* MockUserRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUserRepo.swift; sourceTree = "<group>"; };
-		8DF1B4832E43DF1E00C23B02 /* EditProfileVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVMTests.swift; sourceTree = "<group>"; };
 		8DF1B4842E43DF1E00C23B02 /* ProfileVMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVMTests.swift; sourceTree = "<group>"; };
 		8DF1B68D2E46D34700C23B02 /* SupabaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -158,7 +154,6 @@
 			isa = PBXGroup;
 			children = (
 				8DF1B4792E43DF1E00C23B02 /* ConnectionsVMTests.swift */,
-				8DF1B47A2E43DF1E00C23B02 /* ConnectVMTests.swift */,
 			);
 			path = Connections;
 			sourceTree = "<group>";
@@ -179,7 +174,6 @@
 		8DF1B4852E43DF1E00C23B02 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
-				8DF1B4832E43DF1E00C23B02 /* EditProfileVMTests.swift */,
 				8DF1B4842E43DF1E00C23B02 /* ProfileVMTests.swift */,
 			);
 			path = Profile;
@@ -356,11 +350,9 @@
 				8DF1B4882E43DF1E00C23B02 /* RegisterVMTests.swift in Sources */,
 				8DF1B4892E43DF1E00C23B02 /* MockAuthManager.swift in Sources */,
 				8DF1B48A2E43DF1E00C23B02 /* MockConnectionsRepo.swift in Sources */,
-				8DF1B48B2E43DF1E00C23B02 /* ConnectVMTests.swift in Sources */,
 				8DF1B68E2E46D34B00C23B02 /* SupabaseTests.swift in Sources */,
 				8DF1B48C2E43DF1E00C23B02 /* ConnectionsVMTests.swift in Sources */,
 				8DF1B48D2E43DF1E00C23B02 /* MockBleManager.swift in Sources */,
-				8DF1B48E2E43DF1E00C23B02 /* EditProfileVMTests.swift in Sources */,
 				8DF1B48F2E43DF1E00C23B02 /* MockUserRepo.swift in Sources */,
 				8DF1B4902E43DF1E00C23B02 /* LoginVMTests.swift in Sources */,
 				8DF1B4912E43DF1E00C23B02 /* ProfileVMTests.swift in Sources */,

@@ -30,6 +30,10 @@ class MockConnectionsRepo : ConnectionsRepository, @unchecked Sendable {
         })
     }
     
+    func connectionsToUsers(userRepository: any UserRepository, connections: [Connection]) async throws -> [User] {
+        return try await userRepository.getUsers(ids: ["1", "2", "3", "4", "5"])
+    }
+    
     func requestConnection(requestedID: String) async throws -> ConnectionResult? { //Create connection request
         if(requestedID == "0") { return .cannotConnectWithSelf }
         connections.append(Connection(requested_by: "0", requested_for: requestedID, status: "pending"))

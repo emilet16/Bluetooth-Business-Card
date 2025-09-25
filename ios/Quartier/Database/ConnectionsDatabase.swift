@@ -21,6 +21,7 @@ enum ConnectionResult {
 protocol ConnectionsRepository : Sendable {
     func getConnections() async throws -> [Connection]
     func getConnectionWithUser(requestedID: String) async throws -> Connection?
+    func connectionsToUsers(userRepository: any UserRepository, connections: [Connection]) async throws -> [User]
     func requestConnection(requestedID: String) async throws -> ConnectionResult?
     func acceptConnection(requestedID: String) async throws
     func deleteConnection(requestedID: String) async throws
@@ -47,6 +48,25 @@ final class ConnectionsDatabase : ConnectionsRepository {
         return try await (supabase.from("connections").select("*")
             .or("and(requested_for.eq.\(userID), requested_by.eq.\(requestedID)), and(requested_by.eq.\(userID), requested_for.eq.\(requestedID))")
             .execute().value as [Connection]).first
+    }
+    
+    func connectionsToUsers(userRepository: any UserRepository, connections: [Connection]) async throws -> [User] {
+        let userID = supabase.auth.currentUser?.id.uuidString
+        
+        guard let userID else {
+            throw SupabaseError.authError("Error: No user logged in")
+        }
+        
+        var connectedUserStatus: [String: String] = [:]
+        for connection in connections {
+            let connectedID = connection.requested_by == userID.lowercased() ? connection.requested_for : connection.requested_by
+            connectedUserStatus[connectedID] = connection.status
+        }
+        
+        let users = try await userRepository.getUsers(ids: Array(connectedUserStatus.keys))
+        return users.map({ user in
+            User(id: user.id, name: user.name, job: user.job, pfp_url: user.pfp_url, connectionStatus: connectedUserStatus[user.id])
+        })
     }
     
     func requestConnection(requestedID: String) async throws -> ConnectionResult? { //Create a connection request

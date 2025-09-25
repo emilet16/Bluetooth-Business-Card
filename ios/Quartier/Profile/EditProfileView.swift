@@ -10,10 +10,15 @@ import PhotosUI
 
 //A screen allowing the user to change their profile
 
-struct EditProfileView<T: EditProfileViewModel> : View {
+struct EditProfileView : View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
-    @StateObject var viewModel: T
+    
+    @State var userProfile: User?
+    @State var userMessage: String?
+    var matchesLinkedinRegex: (String)->Bool
+    var saveUser: (String, String, String, UIImage?) -> Void
+    
     
     @State var name : String = ""
     @State var jobTitle : String = ""
@@ -22,8 +27,6 @@ struct EditProfileView<T: EditProfileViewModel> : View {
     @State var linkedinValid = true
     
     @State var newPfp: UIImage?
-    
-    @State var userMessage: String?
     
     var body : some View {
         ZStack(alignment: .bottom) {
@@ -34,64 +37,49 @@ struct EditProfileView<T: EditProfileViewModel> : View {
             }
             
             VStack() {
-                ProfileImagePicker(url: viewModel.userProfile?.pfp_url, onChange: { pfp in
+                ProfileImagePicker(url: userProfile?.pfp_url, onChange: { pfp in
                     newPfp = pfp
                 })
-                TextField("Name", text: $name, prompt: Text("Enter your name")).font(.body(17))
-                TextField("Job Title", text: $jobTitle, prompt: Text("Enter your job title")).font(.body(17))
+                TextField("Name", text: $name, prompt: Text("Name")).font(.body(17))
+                TextField("Job Title", text: $jobTitle, prompt: Text("Job Title")).font(.body(17))
                 
-                TextField("LinkedIn URL", text: $linkedInURL, prompt: Text("Paste your linkedin URL here")).font(.body(17))
+                TextField("LinkedIn URL", text: $linkedInURL, prompt: Text("Linkedin URL")).font(.body(17))
+                    .lineLimit(3...5)
                     .onChange(of: linkedInURL) {
-                        linkedinValid = linkedInURL.isEmpty || viewModel.matchesLinkedinRegex(input: linkedInURL)
+                        linkedinValid = linkedInURL.isEmpty || matchesLinkedinRegex(linkedInURL)
                     }
                 
                 if(!linkedinValid) {
                     Text("Invalid Input").foregroundStyle(.red).font(.caption)
                 }
                 
-                Button(action: {
-                    viewModel.saveUser(name: name, jobTitle: jobTitle, linkedInURL: linkedInURL, pfp: newPfp)
-                }) {
-                    Text("Submit").foregroundStyle(Color("OnAccentColor")).font(.body(17))
-                }.disabled(!linkedinValid).buttonStyle(.borderedProminent)
+                HStack {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Spacer()
+                        Text("Don't save").font(.body(17))
+                        Spacer()
+                    }.buttonStyle(.bordered)
+                    
+                    Button(action: {
+                        saveUser(name, jobTitle, linkedInURL, newPfp)
+                    }) {
+                        Spacer()
+                        Text("Save").foregroundStyle(Color("OnAccentColor")).font(.body(17))
+                        Spacer()
+                    }.disabled(!linkedinValid).buttonStyle(.borderedProminent)
+                }
             }
             .textFieldStyle(RoundedBorderTextFieldStyle())
             .padding()
             .frame(maxHeight: .infinity)
         }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("Edit Profile").font(.title(24))
-            }
-        }
-        .onChange(of: viewModel.saveStatus) {
-            switch(viewModel.saveStatus) {
-            case .success:
-                dismiss()
-            case .saving:
-                userMessage = "Saving..."
-            case .error:
-                userMessage = "Error saving, please try again"
-            default:
-                userMessage = nil
-            }
-        }
-        .onAppear() {
-            viewModel.refreshUser()
-        }
     }
 }
 
 #Preview {
-    EditProfileView(viewModel: MockEditProfileVM())
-}
-
-class MockEditProfileVM : EditProfileViewModel {
-    var userProfile: User?  = User(id: "0", name: "Steve Jobs", job: "CEO")
-    var userSocials: Socials? = nil
-    var saveStatus: SaveStatus? = nil
-    
-    func refreshUser() {}
-    func saveUser(name: String, jobTitle: String, linkedInURL: String, pfp: UIImage?) {}
-    func matchesLinkedinRegex(input: String) -> Bool {true}
+    EditProfileView(userProfile: nil, matchesLinkedinRegex: {_ in true}) { _, _, _, _ in
+        
+    }
 }
