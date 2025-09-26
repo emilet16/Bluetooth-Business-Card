@@ -1,33 +1,58 @@
-# Bluetooth Business Card (Quartier)
+# Quartier: Bluetooth Business Card
 
-Quartier is a mobile application to connect at networking events.
+Quartier is a cross-platform mobile app that lets users instantly share business cards at networking events via Bluetooth.
 
-You can:
-- Create a business card with your name, title, and LinkedIn
-- Share it with other people
+## Features
+- Create personalized business cards (name, title, LinkedIn, etc.)
+- Share cards with others nearby using Bluetooth
+- Cross-platform: Android & iOS
 
-## Usage
+## Demo
+![Demo GIF](assets/QuartierDemo.gif)
 
-You can start your own server with the Supabase CLI:
+## Prerequisites
+- [Node.js](https://nodejs.org/)
+- [Supabase CLI](https://supabase.com/docs/guides/cli)
+- [Android Studio](https://developer.android.com/studio) / [Xcode](https://developer.apple.com/xcode/)
 
+## Installation
+
+```bash
+git clone https://github.com/emilet16/Bluetooth-Business-Card.git
+cd Bluetooth-Business-Card
+```
+
+### Configure Supabase Keys
+
+**Android:**  
+Edit `android/gradle.properties`:
+```kotlin
+SUPABASE_URL_RELEASE = "[Your Supabase URL]"
+SUPABASE_KEY_RELEASE = "[Your Supabase Key]"
+```
+
+**iOS:**  
+Edit `ios/Quartier/QuartierApp.swift`:
+```swift
+supabaseURL: URL(string: "[Your Supabase URL]")!,
+supabaseKey: "[Your Supabase Key]"
+```
+
+## Running the App
+- Open in Android Studio or Xcode and build/run as usual.
+- Start the server:
 ```bash
 npx supabase start
 ```
 
-You might have to change the server URL/Key in the code:
+## Usage
+1. Open Quartier
+2. Fill in your details to create your business card
+3. Tap '+' to broadcast via Bluetooth
+4. Nearby users can receive and save your card
 
-For Android, in android/gradle.properties:
+## License
+This project is licensed under the MIT License.
 
-```kotlin
-SUPABASE_URL_RELEASE = "[Link to your URL]"
-SUPABASE_KEY_RELEASE = "[Supabase Key]"
-```
-
-For iOS, in ios/Quartier/QuartierApp.swift
-
-```swift
-supabaseURL: URL(string: "[Link to your URL]")!,
-supabaseKey: "[Supabase Key]"
-```
-
-Then, you can build and run the app in Android IDE or XCode
+## Contact
+Questions or feedback? Open an issue or email [turcotte.emile1610@gmail.com](mailto:turcotte.emile1610@gmail.com)
